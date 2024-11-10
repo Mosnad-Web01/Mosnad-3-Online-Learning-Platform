@@ -19,3 +19,20 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+/* إزالة لون حدود التقويم */
+.custom-calendar {
+  border: none;
+}
+
+/* جعل علامة اليوم الحالي دائرة */
+.custom-calendar .react-calendar__tile--now {
+  background-color: transparent !important;
+  border-radius: 50%;
+  border: 2px solid var(--foreground);
+}
+
+/* تخصيص لون أيام الجمعة والسبت */
+.custom-calendar .react-calendar__month-view__days__day:nth-child(6),
+.custom-calendar .react-calendar__month-view__days__day:nth-child(7) {
+  color: gray;
+}
