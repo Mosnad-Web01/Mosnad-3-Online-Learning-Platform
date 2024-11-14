@@ -1,7 +1,7 @@
 
 # System Overview
 
-This project is designed to support user authentication and data management with integration to a database named **`your_database_name`**. The system currently includes the following features:
+This project is designed to support user authentication and data management with integration to a database named **`paltform`**. The system currently includes the following features:
 
 - User authentication with separate login and signup pages.
 - A customizable dashboard for authenticated users.
