@@ -36,3 +36,4 @@ Route::get('/login', [LoginController::class, 'create'])->name('login');
 Route::get('/signup', [SignupController::class, 'create'])->name('signup');
 
 
+
