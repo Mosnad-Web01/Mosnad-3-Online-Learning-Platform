@@ -1,21 +1,22 @@
+// src/app/page.js
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React from 'react';
+import Main from '../components/Main'; 
+import CourseSection from '../components/CourseSection'; 
+import About from '../components/About';
+import ContactSection from '../components/ContactSection';
 
 export default function HomePage() {
-  const [isMounted, setIsMounted] = useState(false);
-  const router = useRouter();
+  return (
+    <div>
+      <div id="home"><Main /></div>
+      <div id="about"><About /></div>
+     
+      <div id="services"><CourseSection /></div>
+      
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (isMounted) {
-      router.push('/Dashboard');
-    }
-  }, [isMounted, router]);
-
-  return null;
+      <div id="contacts"><ContactSection /></div>
+    </div>
+  );
 }

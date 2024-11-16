@@ -15,15 +15,15 @@ export default function Login() {
     e.preventDefault();
     const user = loginUser(username, password);
     if (user) {
-      window.location.href = '/Dashboard';
+      window.location.href = '/profile';
     } else {
       setError('Invalid credentials. Please try again.');
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-white">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg w-full">
+    <div className="flex justify-center items-center h-screen bg-white dark:bg-gray-800">
+      <form onSubmit={handleSubmit} className="bg-gray-100 dark:bg-gray-900 text-black dark:text-gray-200 p-6 rounded shadow-md max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg w-full">
         <h2 className="text-2xl font-bold mb-4">Login</h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="mb-4">
@@ -48,7 +48,7 @@ export default function Login() {
             required
           />
         </div>
-        <button type="submit" className="bg-blue-500 text-white w-full p-2 rounded">Login</button>
+        <button type="submit" className="bg-gray-600 dark:bg-gray-800 text-white w-full p-2 rounded">Login</button>
       </form>
     </div>
   );

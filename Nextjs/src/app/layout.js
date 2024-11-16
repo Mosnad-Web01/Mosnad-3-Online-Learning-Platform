@@ -1,6 +1,8 @@
+// src/app/layout.js
 import localFont from "next/font/local";
 import "./globals.css";
-import Sidebar from "../components/Sidebar"; 
+import Navbar from "../components/Navbar";  // استيراد الناف بار
+import Footer from "../components/Footer";  // استيراد الفوتر
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -20,14 +22,17 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <div className="flex">
-          <Sidebar /> 
-          <main className="flex-grow p-5">
-            {children}
-          </main>
-        </div>
+        {/* إضافة ناف بار هنا */}
+        <Navbar />
+        
+        <main className="flex-grow p-0">
+          {children}
+        </main>
+
+        {/* إضافة الفوتر هنا */}
+        <Footer />
       </body>
     </html>
   );
