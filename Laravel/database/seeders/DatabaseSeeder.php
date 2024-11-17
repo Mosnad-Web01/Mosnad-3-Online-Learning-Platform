@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Role;
  
@@ -16,7 +15,10 @@ class DatabaseSeeder extends Seeder
     }
     /**
      * Seed the application's database.
+     *
+     * @return void
      */
+<<<<<<< HEAD
     // public function run(): void
     // {
         
@@ -27,4 +29,15 @@ class DatabaseSeeder extends Seeder
     //     //     'email' => 'test@example.com',
     //     // ]);
     // }
+=======
+    public function run()
+    {
+        $this->call([
+            UserSeeder::class,
+            CourseCategorySeeder::class,
+            CourseSeeder::class,
+            LessonSeeder::class,
+        ]);
+    }
+>>>>>>> develop
 }
