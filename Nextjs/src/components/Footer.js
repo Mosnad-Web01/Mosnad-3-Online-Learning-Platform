@@ -3,12 +3,12 @@
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
 import dynamic from 'next/dynamic';
 
-// استخدم dynamic لتأخير تحميل `react-scroll` لتجنب التعارض
+//  dynamic لتأخير تحميل `react-scroll` لتجنب التعارض
 const ScrollLink = dynamic(() => import('react-scroll').then((mod) => mod.Link), { ssr: false });
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-200 dark:bg-gray-800 text-black dark:text-white py-8">
+    <footer className="bg-gray-200 dark:bg-gray-900 text-black dark:text-white py-8">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {/* قسم الروابط الأساسية */}

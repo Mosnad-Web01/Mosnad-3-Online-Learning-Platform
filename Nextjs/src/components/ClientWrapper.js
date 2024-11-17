@@ -1,4 +1,3 @@
-// src/components/ClientWrapper.js
 "use client";
 import { useEffect, useState } from "react";
 import i18n from "../lib/i18n";
@@ -11,7 +10,7 @@ export default function ClientWrapper({ children }) {
       setLanguage("ar");
       i18n.changeLanguage("ar");
       document.documentElement.lang = "ar";
-      document.body.dir = "rtl"; // تعيين اتجاه الكتابة إلى اليمين لليسار (RTL)
+      document.body.dir = "rtl"; 
     }
   }, []);
 

@@ -17,7 +17,7 @@ const NavbarDropdown = ({ title, links }) => {
   const handleMouseLeave = () => {
     const id = setTimeout(() => {
       setIsOpen(false);
-    }, 300); // Delay before hiding
+    }, 300); 
     setTimeoutId(id);
   };
 

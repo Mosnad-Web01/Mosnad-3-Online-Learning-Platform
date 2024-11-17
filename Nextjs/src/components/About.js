@@ -2,7 +2,7 @@ import React from 'react';
 
 const About = () => {
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900 text-black dark:text-white">
+    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800 text-black dark:text-white">
       <div className="text-center">
         <h2 className="text-4xl font-extrabold font-serif mb-4">
           About TutorNet
