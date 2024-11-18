@@ -1,12 +1,29 @@
-import axios from 'axios';
+// src/services/api.js
 
-// ضبط العنوان الأساسي للـ API
-const apiClient = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api',
+import axios from 'axios';
+import {getToken } from '@/utils/auth'; // استيراد دالة needsAuth للتحقق من الحاجة إلى التوكن
+
+const api = axios.create({
+  baseURL: 'http://127.0.0.1:8000/api', // قاعدة الرابط الخاصة بـ API
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+// إضافة التوكن إلى الرؤوس في كل طلب
+api.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export default api;
+
+
+
+
 
 // الفئات (Categories)
 export const fetchCategories = () => apiClient.get('/categories');
