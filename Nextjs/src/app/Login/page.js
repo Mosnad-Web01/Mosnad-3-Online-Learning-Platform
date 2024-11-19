@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { loginUser } from '../../utils/auth';
+import { loginUser } from '@/utils/auth';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -8,16 +8,29 @@ export default function Login() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-  
+    // يمكنك إضافة عمليات تهيئة هنا إذا لزم الأمر
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const user = loginUser(username, password);
-    if (user) {
-      window.location.href = '/profile';
-    } else {
-      setError('Invalid credentials. Please try again.');
+    console.log('Submitting login form...');
+    console.log('Username:', username);
+    console.log('Password:', password);
+    
+    try {
+      const user = await loginUser(username, password);
+      console.log('User authenticated:', user);
+      
+      if (user) {
+        console.log('Redirecting to home page...');
+        window.location.href = '/';  // هنا يتم التوجيه إلى صفحة الهوم بعد المصادقة الناجحة
+      } else {
+        console.log('Invalid credentials');
+        setError('Invalid credentials. Please try again.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('An unexpected error occurred. Please try again.');
     }
   };
 

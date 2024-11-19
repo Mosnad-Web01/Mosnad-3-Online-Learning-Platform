@@ -2,6 +2,11 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\InstructorController;
+use App\Http\Controllers\StudentController;
 use App\Http\Controllers\CourseCategoryController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
@@ -17,7 +22,42 @@ use App\Http\Controllers\LessonController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+// مسارات عامة لا تتطلب مصادقة
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+
+
+// مسارات تتطلب مصادقة باستخدام Sanctum
+Route::middleware('auth:sanctum')->group(function () {
+    // معلومات المستخدم العام
+    Route::get('/user', [UserController::class, 'show']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    // مسارات خاصة بالمشرفين فقط
+    Route::middleware(['role:admin'])->group(function () {
+        Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+        Route::get('/admin/users', [AdminController::class, 'listUsers']);
+        // يمكنك إضافة المزيد من المسارات هنا خاصة بالمشرف
+    });
+
+    // مسارات خاصة بالمعلمين فقط
+    Route::middleware(['role:instructor'])->group(function () {
+        Route::get('/instructor/courses', [InstructorController::class, 'myCourses']);
+        Route::post('/instructor/course', [InstructorController::class, 'createCourse']);
+        // يمكنك إضافة المزيد من المسارات هنا خاصة بالمعلم
+    });
+
+    // // مسارات خاصة بالطلاب فقط
+    // Route::middleware(['role:student'])->group(function () {
+    //     Route::get('/student/courses', [StudentController::class, 'enrolledCourses']);
+    //     Route::post('/student/enroll', [StudentController::class, 'enrollCourse']);
+    //     // يمكنك إضافة المزيد من المسارات هنا خاصة بالطالب
+    // });
+});
+
+// مسار للحصول على معلومات المستخدم المصادق
+Route::middleware('auth:sanctum')->get('/authenticated-user', function (Request $request) {
     return $request->user();
 });
 

@@ -33,7 +33,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/login', [LoginController::class, 'create'])->name('login');
 
 // روت صفحة إنشاء حساب
-Route::get('/signup', [SignupController::class, 'create'])->name('signup');
+Route::post('/register', [SignupController::class, 'create'])->name('register');
 
 
 
