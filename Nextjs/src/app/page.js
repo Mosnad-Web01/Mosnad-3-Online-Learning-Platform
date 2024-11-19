@@ -1,5 +1,5 @@
 // src/app/page.js
-'use client';
+
 
 import React from 'react';
 import Main from '../components/Main'; 

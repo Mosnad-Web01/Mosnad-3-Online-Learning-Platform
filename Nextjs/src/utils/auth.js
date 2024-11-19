@@ -38,8 +38,8 @@ import { fetchData } from '@/services/fetchData';
 export const loginUser = async (username, password, router) => {
   console.log(router);
   return await fetchData('/login', 'POST', { email: username, password }, router);
-};
 
+};
 // دالة جلب بيانات المستخدم باستخدام fetchData
 export const fetchUserData = async (router) => {
   const userData = await fetchData('/user-profile', 'GET', null, router);
