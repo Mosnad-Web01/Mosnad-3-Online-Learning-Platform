@@ -36,6 +36,7 @@ import { fetchData } from '@/services/fetchData';
 
 // دالة تسجيل الدخول باستخدام fetchData
 export const loginUser = async (username, password, router) => {
+  console.log(router);
   return await fetchData('/login', 'POST', { email: username, password }, router);
 };
 

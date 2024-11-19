@@ -3,6 +3,7 @@ import { needsAuth,getToken } from '@/utils/auth'; // استيراد دالة ne
 
 export const fetchData = async (url, method = 'GET', data = null, router = null) => {
   // التحقق مما إذا كان الرابط يتطلب توكن
+  console.log('techdata',data);
   const token = getToken();
   const requiresAuth = needsAuth(url);
 
@@ -28,8 +29,12 @@ export const fetchData = async (url, method = 'GET', data = null, router = null)
     };
 
     const response = await api(options);
-console.log('res: ',response);
-    if (response.data && response.data.success) {
+    console.log('data responses: ',response.data);
+    console.log('data responses access_token: ',response.data.access_token);
+
+    if (response.data && response.data.access_token) {
+        console.log('fetach data responses: ',response);
+
       return response.data; // إرجاع بيانات الاستجابة
     } else {
       throw new Error(response.data.message || 'Unknown error');
