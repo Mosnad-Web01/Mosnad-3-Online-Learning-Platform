@@ -10,6 +10,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\CourseCategoryController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
+use App\Http\Controllers\UserProfileController;
 
 /*
 |----------------------------------------------------------------------
@@ -33,6 +34,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // معلومات المستخدم العام
     Route::get('/user', [UserController::class, 'show']);
     Route::post('/logout', [AuthController::class, 'logout']);
+  // ملف تعريف المستخدم
+  Route::get('/user-profile', [UserProfileController::class, 'show']);
 
     // مسارات خاصة بالمشرفين فقط
     Route::middleware(['role:admin'])->group(function () {

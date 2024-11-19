@@ -47,5 +47,10 @@ class User extends Authenticatable
 {
     return $this->belongsToMany(Role::class, 'role_user');
 }
+  // إضافة العلاقة مع جدول user_profiles
+  public function profile()
+  {
+      return $this->hasOne(UserProfile::class);
+  }
 
 }
