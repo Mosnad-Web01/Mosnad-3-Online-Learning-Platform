@@ -10,6 +10,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\CourseCategoryController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
+use App\Http\Controllers\UserProfileController;
 
 /*
 |----------------------------------------------------------------------
@@ -33,7 +34,18 @@ Route::middleware('auth:sanctum')->group(function () {
     // معلومات المستخدم العام
     Route::get('/user', [UserController::class, 'show']);
     Route::post('/logout', [AuthController::class, 'logout']);
+  // ملف تعريف المستخدم
 
+  Route::middleware('auth:sanctum')->group(function () {
+      Route::get('/user-profiles', [UserProfileController::class, 'index']); // عرض جميع الـ Profiles
+      Route::post('/user-profiles', [UserProfileController::class, 'store']); // إضافة Profile جديد
+      Route::get('/user-profiles/{id}', [UserProfileController::class, 'show']); // عرض Profile محدد
+      Route::put('/user-profiles/{id}', [UserProfileController::class, 'update']); // تحديث Profile محدد
+      Route::delete('/user-profiles/{id}', [UserProfileController::class, 'destroy']); // حذف Profile محدد
+      Route::post('/user-profile/{userId}/upload-image', [UserProfileController::class, 'uploadImage']);
+
+  });
+  
     // مسارات خاصة بالمشرفين فقط
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);

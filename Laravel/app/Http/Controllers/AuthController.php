@@ -28,7 +28,6 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
         $token = $user->createToken('auth_token')->plainTextToken;
-
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
@@ -48,29 +47,39 @@ class AuthController extends Controller
 
     // تسجيل الدخول
     public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
+{
+    // التحقق من صحة البيانات المدخلة
+    $request->validate([
+        'email' => 'required|string|email',
+        'password' => 'required|string',
+    ]);
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
-
-        $user = User::where('email', $request->email)->firstOrFail();
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ]);
+    // التحقق من بيانات المستخدم
+    if (!Auth::attempt($request->only('email', 'password'))) {
+        return response()->json(['message' => 'Unauthorized'], 401);
     }
+
+    $user = User::where('email', $request->email)->firstOrFail();
+
+    // إنشاء التوكن
+    $token = $user->createToken('auth_token')->plainTextToken;
+
+    // تخزين التوكن في HttpOnly Cookie
+    return response()->json([
+        'message' => 'Login successful',
+    ])->cookie('token', $token, 60*24, '/', '', true, true); // التوكن في cookie
+}
 
     // تسجيل الخروج
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
-        return response()->json(['message' => 'Logged out successfully']);
+        // حذف التوكن من الـ cookies
+        $request->user()->tokens->each(function ($token) {
+            $token->delete();
+        });
+    
+        // حذف التوكن من cookie
+        return response()->json(['message' => 'Logged out successfully'])->cookie('token', '', -1); // حذف التوكن
     }
+    
 }
