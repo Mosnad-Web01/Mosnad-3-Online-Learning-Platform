@@ -1,36 +1,36 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { loginUser } from '@/utils/auth';
 
 export default function Login() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // في حالة احتجت إلى عمليات تهيئة هنا
+    // يمكنك إضافة عمليات تهيئة هنا إذا لزم الأمر
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    console.log('Submitting login form...');
+    console.log('Username:', username);
+    console.log('Password:', password);
+    
     try {
       const user = await loginUser(username, password);
-
+      console.log('User authenticated:', user);
+      
       if (user) {
-        // احصل على قيمة `redirect` من بارامترات البحث
-        const redirectTo = searchParams.get('redirect') || '/';
-        console.log('redirect to ' + redirectTo);
-        router.push(redirectTo);  // توجيه المستخدم إلى الصفحة المحددة بعد تسجيل الدخول
+        console.log('Redirecting to home page...');
+        window.location.href = '/';  // هنا يتم التوجيه إلى صفحة الهوم بعد المصادقة الناجحة
       } else {
+        console.log('Invalid credentials');
         setError('Invalid credentials. Please try again.');
       }
     } catch (error) {
-      setError('An unexpected error occurred. Please try again.');
       console.error('Login error:', error);
+      setError('An unexpected error occurred. Please try again.');
     }
   };
 

@@ -15,32 +15,28 @@ export default function Profile() {
   // Check authentication and fetch user data
   useEffect(() => {
     const fetchUserData = async () => {
-      // التحقق مما إذا كان المستخدم مصادق عليه
       if (!isAuthenticated()) {
-        // إذا لم يكن المستخدم مصادقًا، يمكنك ترك الصفحة فارغة أو عرض محتوى افتراضي
-        console.log('User is not authenticated');
-        return; // عدم التوجيه
+        router.push('/login');
+        return;
       }
-  
+
       try {
         const userData = await fetchData('/user-profile', 'GET', null, router);
-  
+
         if (userData && userData.user) {
           setUser(userData.user);
           setEditableUser({ ...userData.user }); // Clone the user data for editing
         } else {
-          // إذا لم يتم العثور على بيانات المستخدم، لا تفعل شيئًا
-          console.log('User profile not found');
+          throw new Error('User profile not found');
         }
       } catch (error) {
-        // في حالة حدوث خطأ، لا تقم بتوجيه المستخدم واترك الصفحة كما هي
         console.error('Error fetching user data:', error.message);
+        router.push('/login'); // Redirect to login if there's an error
       }
     };
-  
+
     fetchUserData();
   }, [router]);
-  
 
   // Handle input changes for editable fields
   const handleInputChange = (e) => {

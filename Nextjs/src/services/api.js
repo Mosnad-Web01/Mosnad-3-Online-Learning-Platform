@@ -19,7 +19,7 @@ api.interceptors.request.use((config) => {
 });
 
 export default api;
-//لا تحتاج الى توكن
+
 // الفئات (Categories)
 export const fetchCategories = () => api.get('/categories');
 export const createCategory = (data) => api.post('/categories', data);

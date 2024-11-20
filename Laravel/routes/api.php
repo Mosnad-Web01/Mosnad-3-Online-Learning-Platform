@@ -42,6 +42,8 @@ Route::middleware('auth:sanctum')->group(function () {
       Route::get('/user-profiles/{id}', [UserProfileController::class, 'show']); // عرض Profile محدد
       Route::put('/user-profiles/{id}', [UserProfileController::class, 'update']); // تحديث Profile محدد
       Route::delete('/user-profiles/{id}', [UserProfileController::class, 'destroy']); // حذف Profile محدد
+      Route::post('/user-profile/{userId}/upload-image', [UserProfileController::class, 'uploadImage']);
+
   });
   
     // مسارات خاصة بالمشرفين فقط

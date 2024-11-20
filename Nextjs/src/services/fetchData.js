@@ -1,4 +1,3 @@
-
 import api from './api';
 import { needsAuth,getToken } from '@/utils/auth'; // استيراد دالة needsAuth للتحقق من الحاجة إلى التوكن
 
@@ -41,9 +40,7 @@ export const fetchData = async (url, method = 'GET', data = null, router = null)
       throw new Error(response.data.message || 'Unknown error');
     }
   } catch (error) {
-    //console.error('Error occurred during the request:', error);
-    //setError('Incorrect username or password. Please check your credentials and try again.');
-     
+    console.error('Error occurred during the request:', error);
     if (router) {
       router.push('/login'); // إعادة التوجيه إلى صفحة تسجيل الدخول إذا كانت هناك مشكلة في المصادقة
     }
