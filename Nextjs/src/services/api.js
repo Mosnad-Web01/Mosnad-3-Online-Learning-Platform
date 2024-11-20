@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { getToken } from '@/utils/auth'; // استيراد دالة needsAuth للتحقق من الحاجة إلى التوكن
 
 // إنشاء كائن API باستخدام axios
 const api = axios.create({
@@ -7,18 +6,25 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // هام للسماح بإرسال الكوكيز عبر النطاقات
 });
 
-// إضافة التوكن إلى الرؤوس في كل طلب
-api.interceptors.request.use((config) => {
-  const token = getToken();
-  if (token) {
-    config.headers['Authorization'] = `Bearer ${token}`;
+// إضافة interceptor للتحقق من الطلبات
+api.interceptors.request.use(
+  (config) => {
+    console.log('Interceptor triggered for URL:', config.url); 
+    return config;
+  },
+  (error) => {
+    console.error('Error in request interceptor:', error);
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
-export default api;
+//  userدوال التعامل مع API
+export const loginUser = ( { email, password }) => api.post('/login', { email, password });
+export const fetchUserprofile = (id) => api.get('/user-profile',id);
+export const fetchCurrentUser = () => api.get('/user');
 
 // الفئات (Categories)
 export const fetchCategories = () => api.get('/categories');
@@ -43,3 +49,17 @@ export const updateLesson = (courseId, lessonId, data) =>
   api.put(`/courses/${courseId}/lessons/${lessonId}`, data);
 export const deleteLesson = (courseId, lessonId) =>
   api.delete(`/courses/${courseId}/lessons/${lessonId}`);
+
+// تسجيل الخروج
+export const logout = async () => {
+  try {
+    const response = await api.post('/logout');
+    console.log('Logout response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Logout error:', error);
+    throw error;
+  }
+};
+
+export default api;
