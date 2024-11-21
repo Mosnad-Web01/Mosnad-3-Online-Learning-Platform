@@ -11,6 +11,8 @@ use App\Http\Controllers\CourseCategoryController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\ReviewController; // الاتصال بكنترول المراجعات
+
 
 /*
 |----------------------------------------------------------------------
@@ -45,7 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
       Route::post('/user-profile/{userId}/upload-image', [UserProfileController::class, 'uploadImage']);
 
   });
-  
+
     // مسارات خاصة بالمشرفين فقط
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
@@ -99,4 +101,28 @@ Route::prefix('courses/{courseId}/lessons')->name('courses.lessons.')->group(fun
     Route::delete('{lessonId}', [LessonController::class, 'destroy'])->name('destroy');
 });
 
+
+
+// تعريف الاتصال بكنترول المراجعات
+
+// عرض جميع التقييمات
+Route::get('/reviews', [ReviewController::class, 'index']);
+
+// عرض تقييم معين بناءً على الـ ID
+Route::get('/reviews/{id}', [ReviewController::class, 'show']);
+
+// إنشاء تقييم جديد
+Route::post('/reviews', [ReviewController::class, 'store']);
+
+// تحديث تقييم موجود
+Route::put('/reviews/{id}', [ReviewController::class, 'update']);
+
+// حذف تقييم
+Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
+
+// عرض جميع التقييمات المرتبطة بكورس معين
+Route::get('/reviews/course/{courseId}', [ReviewController::class, 'getReviewsByCourse']);
+
+// عرض جميع التقييمات المرتبطة بأستاذ معين
+Route::get('/reviews/instructor/{instructorId}', [ReviewController::class, 'getReviewsByInstructor']);
 
