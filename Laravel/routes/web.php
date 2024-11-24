@@ -27,26 +27,29 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/login', [LoginController::class, 'create'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
 
-// Signup page route
-
-
+// Signup routes
 Route::get('/signup', [SignupController::class, 'create'])->name('signup');
 Route::post('/signup', [SignupController::class, 'store'])->name('signup.submit');
-// Route for Admin Dashboard, protected by 'auth' and 'role:admin' middleware
-Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-Route::get('/instructor/dashboard', [InstructorDashboardController::class, 'index'])->name('instructor.dashboard');
 
+// Admin Dashboard route, protected by 'auth' and 'role:admin' middleware
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+});
+
+// Instructor Dashboard and Course management routes
 Route::middleware('auth')->prefix('instructor')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [InstructorDashboardController::class, 'index'])->name('instructor.dashboard');
+
+    // Course routes
     Route::get('/courses', [InstructorCourseController::class, 'index'])->name('instructor.courses.index');
     Route::get('/courses/create', [InstructorCourseController::class, 'create'])->name('instructor.courses.create');
     Route::post('/courses', [InstructorCourseController::class, 'store'])->name('instructor.courses.store');
     Route::get('/courses/{id}/edit', [InstructorCourseController::class, 'edit'])->name('instructor.courses.edit');
     Route::put('/courses/{id}', [InstructorCourseController::class, 'update'])->name('instructor.courses.update');
     Route::delete('/courses/{id}', [InstructorCourseController::class, 'destroy'])->name('instructor.courses.destroy');
-});
 
-
-Route::middleware('auth')->prefix('instructor')->group(function () {
+    // Lesson routes
     Route::get('/courses/{courseId}/lessons', [InstructorLessonController::class, 'index'])->name('instructor.lessons.index');
     Route::get('/courses/{courseId}/lessons/create', [InstructorLessonController::class, 'create'])->name('instructor.lessons.create');
     Route::post('/courses/{courseId}/lessons', [InstructorLessonController::class, 'store'])->name('instructor.lessons.store');
@@ -54,5 +57,3 @@ Route::middleware('auth')->prefix('instructor')->group(function () {
     Route::put('/courses/{courseId}/lessons/{lessonId}', [InstructorLessonController::class, 'update'])->name('instructor.lessons.update');
     Route::delete('/courses/{courseId}/lessons/{lessonId}', [InstructorLessonController::class, 'destroy'])->name('instructor.lessons.destroy');
 });
-
-
