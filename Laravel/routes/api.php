@@ -11,8 +11,11 @@ use App\Http\Controllers\CourseCategoryController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\UserProfileController;
-use App\Http\Controllers\ReviewController; // الاتصال بكنترول المراجعات
-
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\LessonCompletionController;
+use App\Http\Controllers\CourseUserController;
+use App\Http\Controllers\PaymentController;
 
 /*
 |----------------------------------------------------------------------
@@ -29,45 +32,39 @@ use App\Http\Controllers\ReviewController; // الاتصال بكنترول ال
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-
-
 // مسارات تتطلب مصادقة باستخدام Sanctum
 Route::middleware('auth:sanctum')->group(function () {
     // معلومات المستخدم العام
     Route::get('/user', [UserController::class, 'show']);
     Route::post('/logout', [AuthController::class, 'logout']);
-  // ملف تعريف المستخدم
 
-  Route::middleware('auth:sanctum')->group(function () {
-      Route::get('/user-profiles', [UserProfileController::class, 'index']); // عرض جميع الـ Profiles
-      Route::post('/user-profiles', [UserProfileController::class, 'store']); // إضافة Profile جديد
-      Route::get('/user-profiles/{id}', [UserProfileController::class, 'show']); // عرض Profile محدد
-      Route::put('/user-profiles/{id}', [UserProfileController::class, 'update']); // تحديث Profile محدد
-      Route::delete('/user-profiles/{id}', [UserProfileController::class, 'destroy']); // حذف Profile محدد
-      Route::post('/user-profile/{userId}/upload-image', [UserProfileController::class, 'uploadImage']);
-
-  });
+    // ملف تعريف المستخدم
+    Route::prefix('user-profiles')->group(function () {
+        Route::get('/', [UserProfileController::class, 'index']);
+        Route::post('/', [UserProfileController::class, 'store']);
+        Route::get('/{id}', [UserProfileController::class, 'show']);
+        Route::put('/{id}', [UserProfileController::class, 'update']);
+        Route::delete('/{id}', [UserProfileController::class, 'destroy']);
+        Route::post('/{userId}/upload-image', [UserProfileController::class, 'uploadImage']);
+    });
 
     // مسارات خاصة بالمشرفين فقط
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
         Route::get('/admin/users', [AdminController::class, 'listUsers']);
-        // يمكنك إضافة المزيد من المسارات هنا خاصة بالمشرف
     });
 
     // مسارات خاصة بالمعلمين فقط
     Route::middleware(['role:instructor'])->group(function () {
         Route::get('/instructor/courses', [InstructorController::class, 'myCourses']);
         Route::post('/instructor/course', [InstructorController::class, 'createCourse']);
-        // يمكنك إضافة المزيد من المسارات هنا خاصة بالمعلم
     });
 
-    // // مسارات خاصة بالطلاب فقط
-    // Route::middleware(['role:student'])->group(function () {
-    //     Route::get('/student/courses', [StudentController::class, 'enrolledCourses']);
-    //     Route::post('/student/enroll', [StudentController::class, 'enrollCourse']);
-    //     // يمكنك إضافة المزيد من المسارات هنا خاصة بالطالب
-    // });
+    // مسارات خاصة بالطلاب فقط
+    Route::middleware(['role:student'])->group(function () {
+        Route::get('/student/courses', [StudentController::class, 'enrolledCourses']);
+        Route::post('/student/enroll', [StudentController::class, 'enrollCourse']);
+    });
 });
 
 // مسار للحصول على معلومات المستخدم المصادق
@@ -78,7 +75,7 @@ Route::middleware('auth:sanctum')->get('/authenticated-user', function (Request 
 // Routes for Categories
 Route::prefix('categories')->group(function () {
     Route::post('/', [CourseCategoryController::class, 'store']);
-    Route::get('/', [CourseCategoryController::class, 'index']);  // تعديل هنا
+    Route::get('/', [CourseCategoryController::class, 'index']);
     Route::get('{id}', [CourseCategoryController::class, 'show']);
     Route::put('{id}', [CourseCategoryController::class, 'update']);
     Route::delete('{id}', [CourseCategoryController::class, 'destroy']);
@@ -93,6 +90,7 @@ Route::prefix('courses')->group(function () {
     Route::delete('{id}', [CourseController::class, 'destroy']);
 });
 
+// Routes for Lessons
 Route::prefix('courses/{courseId}/lessons')->name('courses.lessons.')->group(function () {
     Route::post('/', [LessonController::class, 'store'])->name('store');
     Route::get('/', [LessonController::class, 'index'])->name('index');
@@ -101,28 +99,46 @@ Route::prefix('courses/{courseId}/lessons')->name('courses.lessons.')->group(fun
     Route::delete('{lessonId}', [LessonController::class, 'destroy'])->name('destroy');
 });
 
+// Routes for Enrollments
+Route::prefix('enrollments')->group(function () {
+    Route::get('/', [EnrollmentController::class, 'index']);
+    Route::post('/', [EnrollmentController::class, 'store']);
+    Route::put('{enrollment}', [EnrollmentController::class, 'update']);
+    Route::delete('{enrollment}', [EnrollmentController::class, 'destroy']);
+});
 
+// Routes for Lesson Completions
+Route::prefix('lesson-completions')->group(function () {
+    Route::get('/', [LessonCompletionController::class, 'index']);
+    Route::post('/', [LessonCompletionController::class, 'store']);
+    Route::delete('{lessonCompletion}', [LessonCompletionController::class, 'destroy']);
+});
 
-// تعريف الاتصال بكنترول المراجعات
+// Routes for Course User
+Route::prefix('course-user')->group(function () {
+    Route::post('/', [CourseUserController::class, 'store']);
+    Route::get('/', [CourseUserController::class, 'index']);
+    Route::get('{id}', [CourseUserController::class, 'show']);
+    Route::put('{id}', [CourseUserController::class, 'update']);
+    Route::delete('{id}', [CourseUserController::class, 'destroy']);
+});
 
-// عرض جميع التقييمات
-Route::get('/reviews', [ReviewController::class, 'index']);
+// Routes for Payments
+Route::prefix('payments')->group(function () {
+    Route::post('/', [PaymentController::class, 'store']);
+    Route::get('/', [PaymentController::class, 'index']);
+    Route::get('{id}', [PaymentController::class, 'show']);
+    Route::put('{id}', [PaymentController::class, 'update']);
+    Route::delete('{id}', [PaymentController::class, 'destroy']);
+});
 
-// عرض تقييم معين بناءً على الـ ID
-Route::get('/reviews/{id}', [ReviewController::class, 'show']);
-
-// إنشاء تقييم جديد
-Route::post('/reviews', [ReviewController::class, 'store']);
-
-// تحديث تقييم موجود
-Route::put('/reviews/{id}', [ReviewController::class, 'update']);
-
-// حذف تقييم
-Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
-
-// عرض جميع التقييمات المرتبطة بكورس معين
-Route::get('/reviews/course/{courseId}', [ReviewController::class, 'getReviewsByCourse']);
-
-// عرض جميع التقييمات المرتبطة بأستاذ معين
-Route::get('/reviews/instructor/{instructorId}', [ReviewController::class, 'getReviewsByInstructor']);
-
+// Routes for Reviews
+Route::prefix('reviews')->group(function () {
+    Route::get('/', [ReviewController::class, 'index']);
+    Route::get('{id}', [ReviewController::class, 'show']);
+    Route::post('/', [ReviewController::class, 'store']);
+    Route::put('{id}', [ReviewController::class, 'update']);
+    Route::delete('{id}', [ReviewController::class, 'destroy']);
+    Route::get('/course/{courseId}', [ReviewController::class, 'getReviewsByCourse']);
+    Route::get('/instructor/{instructorId}', [ReviewController::class, 'getReviewsByInstructor']);
+});

@@ -39,4 +39,16 @@ class Course extends Model
     {
         return $this->hasMany(Lesson::class);
     }
+
+    // علاقة مع المدفوعات
+    public function payments()
+    {
+        return $this->hasManyThrough(Payment::class, CourseUser::class);
+    }
+
+    // علاقة مع التسجيلات
+    public function courseUsers()
+    {
+        return $this->hasMany(CourseUser::class);
+    }
 }

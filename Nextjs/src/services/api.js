@@ -12,7 +12,7 @@ const api = axios.create({
 // إضافة interceptor للتحقق من الطلبات
 api.interceptors.request.use(
   (config) => {
-    console.log('Interceptor triggered for URL:', config.url); 
+    console.log('Interceptor triggered for URL:', config.url);
     return config;
   },
   (error) => {
@@ -21,10 +21,22 @@ api.interceptors.request.use(
   }
 );
 
-//  userدوال التعامل مع API
-export const loginUser = ( { email, password }) => api.post('/login', { email, password });
-export const fetchUserprofile = (id) => api.get('/user-profile',id);
+// دوال التعامل مع API
+export const loginUser = ({ email, password }) => api.post('/login', { email, password });
+export const fetchUserprofile = (id) => api.get(`/user-profile/${id}`);
 export const fetchCurrentUser = () => api.get('/user');
+
+// تسجيل الخروج
+export const logout = async () => {
+  try {
+    const response = await api.post('/logout');
+    console.log('Logout response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Logout error:', error);
+    throw error;
+  }
+};
 
 // الفئات (Categories)
 export const fetchCategories = () => api.get('/categories');
@@ -50,16 +62,19 @@ export const updateLesson = (courseId, lessonId, data) =>
 export const deleteLesson = (courseId, lessonId) =>
   api.delete(`/courses/${courseId}/lessons/${lessonId}`);
 
-// تسجيل الخروج
-export const logout = async () => {
-  try {
-    const response = await api.post('/logout');
-    console.log('Logout response:', response.data);
-    return response.data;
-  } catch (error) {
-    console.error('Logout error:', error);
-    throw error;
-  }
-};
+// التسجيلات (Enrollments)
+export const fetchEnrollments = () => api.get('/enrollments');
+export const fetchEnrollmentById = (id) => api.get(`/enrollments/${id}`);
+export const createEnrollment = (data) => api.post('/enrollments', data);
+export const updateEnrollment = (id, data) => api.put(`/enrollments/${id}`, data);
+export const deleteEnrollment = (id) => api.delete(`/enrollments/${id}`);
+
+// إكمالات الدروس (Lesson Completions)
+export const fetchLessonCompletions = () => api.get('/lesson-completions');
+export const createLessonCompletion = (data) => api.post('/lesson-completions', data);
+export const deleteLessonCompletion = (id) => api.delete(`/lesson-completions/${id}`);
+
+// المدفوعات (Payments)
+export const createPayment = (paymentData) => api.post('/payments', paymentData);
 
 export default api;
