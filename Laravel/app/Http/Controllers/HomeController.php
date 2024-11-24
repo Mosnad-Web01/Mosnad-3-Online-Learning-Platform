@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    public function index(): Factory|View {
-        return view('home'); 
+    public function index(): Factory|View
+    {
+        return view('home');
     }
 }

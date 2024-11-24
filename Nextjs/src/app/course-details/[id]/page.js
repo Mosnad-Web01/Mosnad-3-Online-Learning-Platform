@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { FaStar, FaArrowRight } from 'react-icons/fa';
-import { fetchCourseById, fetchCourses } from '@/services/api';
+import { fetchCourseById, fetchCourses, createEnrollment } from '@/services/api';
 import ScrollableCourseList from '@/components/ScrollableCourseList';
 import Link from 'next/link';
 import Image from 'next/image'; 
@@ -10,38 +10,82 @@ import { motion } from 'framer-motion';
 
 const CourseDetails = () => {
   const { id } = useParams();
+  const router = useRouter();
   const [course, setCourse] = useState(null);
   const [instructor, setInstructor] = useState(null);
   const [relatedCourses, setRelatedCourses] = useState([]);
   const [averageCourseRating, setAverageCourseRating] = useState(0);
+  const [isEnrolled, setIsEnrolled] = useState(false);  // حالة التسجيل
+  const [isProcessing, setIsProcessing] = useState(false); // للتأكد من عدم تكرار النقرات
 
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
         const response = await fetchCourseById(id);
-        const courseData = response.data;
-
-        setCourse(courseData);
-        setInstructor(courseData.instructor);
-
-        const courseRatings = courseData.ratings || [];
-        const avgRating =
-          courseRatings.length === 0
-            ? 0
-            : courseRatings.reduce((total, rating) => total + rating.courseRating, 0) / courseRatings.length;
-        setAverageCourseRating(avgRating);
-
-        const relatedResponse = await fetchCourses();
-        const allCourses = relatedResponse.data;
-        const related = allCourses.filter(c => c.category_id === courseData.category_id && c.id !== courseData.id);
-        setRelatedCourses(related);
+    
+        if (response && response.data) {
+          const courseData = response.data;
+    
+          setCourse(courseData);
+          setInstructor(courseData.instructor);
+    
+          const courseRatings = courseData.ratings || [];
+          const avgRating =
+            courseRatings.length === 0
+              ? 0
+              : courseRatings.reduce((total, rating) => total + rating.courseRating, 0) / courseRatings.length;
+          setAverageCourseRating(avgRating);
+    
+          const relatedResponse = await fetchCourses();
+          if (relatedResponse && relatedResponse.data) {
+            const allCourses = relatedResponse.data;
+            const related = allCourses.filter(c => c.category_id === courseData.category_id && c.id !== courseData.id);
+            setRelatedCourses(related);
+          }
+    
+          // تحقق من حالة التسجيل
+          const enrollmentResponse = await checkEnrollment(courseData.id);
+          if (enrollmentResponse && enrollmentResponse.data) {
+            setIsEnrolled(enrollmentResponse.data.isEnrolled);
+          }
+        } else {
+          console.error('Error: No data in the response');
+        }
       } catch (error) {
         console.error("Error fetching course details:", error);
       }
     };
+    
 
     fetchCourseDetails();
   }, [id]);
+
+  const checkEnrollment = async (courseId) => {
+    // استدعاء API للتحقق من التسجيل
+    // return response
+  };
+
+  const handleEnrollment = async () => {
+    if (isProcessing) return; // منع التكرار
+    setIsProcessing(true);
+
+    try {
+      if (course.price === 0) {
+        // إذا كانت الدورة مجانية، يتم تسجيل الطالب تلقائيًا
+        await createEnrollment({ courseId: course.id });
+        setIsEnrolled(true);
+      } else {
+        if (!isEnrolled) {
+          // إذا كانت الدورة مدفوعة وغير مسجل، نقله إلى صفحة الدفع
+          router.push(`/payment/${course.id}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error during enrollment:", error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   if (!course || !instructor) return <p>Course or instructor not found</p>;
 
@@ -84,11 +128,21 @@ const CourseDetails = () => {
               <p className="text-md md:text-lg mb-4">Price: ${course.price}</p>
               <div className="flex items-center mt-4">
                 {ratingStars}
-                <span className="ml-2 text-sm">({averageCourseRating.toFixed(1)})</span>
+                <span className="ml-2 text-sm">
+                  ({averageCourseRating ? averageCourseRating.toFixed(1) : '0.0'})
+                </span>
               </div>
+              {/* زر الالتحاق بالدورة */}
+              <button
+                onClick={handleEnrollment}
+                className="mt-4 py-2 px-6 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              >
+                {course.price === 0 || isEnrolled ? 'Go to Lessons' : 'Enroll Now'}
+              </button>
             </div>
           </div>
         </motion.section>
+
 
         <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />
 

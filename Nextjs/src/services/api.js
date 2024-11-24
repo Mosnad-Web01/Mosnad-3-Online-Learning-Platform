@@ -31,3 +31,18 @@ export const updateLesson = (courseId, lessonId, data) =>
   apiClient.put(`/courses/${courseId}/lessons/${lessonId}`, data);
 export const deleteLesson = (courseId, lessonId) =>
   apiClient.delete(`/courses/${courseId}/lessons/${lessonId}`);
+
+// التسجيلات (Enrollments)
+export const fetchEnrollments = () => apiClient.get('/enrollments');
+export const fetchEnrollmentById = (id) => apiClient.get(`/enrollments/${id}`);
+export const createEnrollment = (data) => apiClient.post('/enrollments', data);
+export const updateEnrollment = (id, data) => apiClient.put(`/enrollments/${id}`, data);
+export const deleteEnrollment = (id) => apiClient.delete(`/enrollments/${id}`);
+
+// إكمالات الدروس (Lesson Completions)
+export const fetchLessonCompletions = () => apiClient.get('/lesson-completions');
+export const createLessonCompletion = (data) => apiClient.post('/lesson-completions', data);
+export const deleteLessonCompletion = (id) => apiClient.delete(`/lesson-completions/${id}`);
+export const createPayment = (paymentData) => {
+  return apiClient.post('/payments', paymentData);
+};
