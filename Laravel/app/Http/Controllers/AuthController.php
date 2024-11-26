@@ -21,37 +21,35 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
         ]);
-
+    
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+    
+        // تعيين دور للمستخدم بعد إنشائه
+        $role = Role::where('name', 'student')->first(); // تعيين دور "student"
+        $user->roles()->attach($role); // إضافة الدور للمستخدم
+    
+        // إنشاء التوكن
         $token = $user->createToken('auth_token')->plainTextToken;
+    
+        // إرجاع الاستجابة مع التوكن
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
         ], 201);
-
-         // تعيين دور للمستخدم بعد إنشائه
-    $role = Role::where('name', 'student')->first(); // تعيين دور "student"
-    $user->roles()->attach($role); // إضافة الدور للمستخدم
-
-    $token = $user->createToken('auth_token')->plainTextToken;
-
-    return response()->json([
-        'access_token' => $token,
-        'token_type' => 'Bearer',
-    ], 201);
     }
-
+    
     // تسجيل الدخول
     public function login(Request $request)
 {
     // التحقق من صحة البيانات المدخلة
+
     $request->validate([
-        'email' => 'required|string|email',
-        'password' => 'required|string',
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:6|confirmed',
     ]);
 
     // التحقق من بيانات المستخدم
@@ -67,7 +65,7 @@ class AuthController extends Controller
     // تخزين التوكن في HttpOnly Cookie
     return response()->json([
         'message' => 'Login successful',
-    ])->cookie('token', $token, 60*24, '/', '', true, true); // التوكن في cookie
+    ])->cookie('token', $token, 60*24, '/', '', false, true); // التوكن في cookie
 }
 
     // تسجيل الخروج

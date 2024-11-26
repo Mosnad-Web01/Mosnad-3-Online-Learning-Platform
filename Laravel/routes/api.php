@@ -17,16 +17,12 @@ use App\Http\Controllers\LessonCompletionController;
 use App\Http\Controllers\CourseUserController;
 use App\Http\Controllers\PaymentController;
 
-/*
-|----------------------------------------------------------------------
-| API Routes
-|----------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
+// مسار لـ CSRF Cookie (لـ Sanctum)
+
+
+Route::middleware('auth:sanctum')->get('/sanctum/csrf-cookie', function (Request $request) {
+    return $request->user();
+});
 
 // مسارات عامة لا تتطلب مصادقة
 Route::post('/register', [AuthController::class, 'register']);
@@ -34,7 +30,6 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // مسارات تتطلب مصادقة باستخدام Sanctum
 Route::middleware('auth:sanctum')->group(function () {
-    // معلومات المستخدم العام
     Route::get('/user', [UserController::class, 'show']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
@@ -48,31 +43,26 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{userId}/upload-image', [UserProfileController::class, 'uploadImage']);
     });
 
-    // مسارات خاصة بالمشرفين فقط
-    Route::middleware(['role:admin'])->group(function () {
-        Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
-        Route::get('/admin/users', [AdminController::class, 'listUsers']);
+    // مسارات المشرفين
+    Route::prefix('admin')->middleware('role:admin')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'dashboard']);
+        Route::get('/users', [AdminController::class, 'listUsers']);
     });
 
-    // مسارات خاصة بالمعلمين فقط
-    Route::middleware(['role:instructor'])->group(function () {
-        Route::get('/instructor/courses', [InstructorController::class, 'myCourses']);
-        Route::post('/instructor/course', [InstructorController::class, 'createCourse']);
+    // مسارات المعلمين
+    Route::prefix('instructor')->middleware('role:instructor')->group(function () {
+        Route::get('/courses', [InstructorController::class, 'myCourses']);
+        Route::post('/course', [InstructorController::class, 'createCourse']);
     });
 
-    // مسارات خاصة بالطلاب فقط
-    Route::middleware(['role:student'])->group(function () {
-        Route::get('/student/courses', [StudentController::class, 'enrolledCourses']);
-        Route::post('/student/enroll', [StudentController::class, 'enrollCourse']);
-    });
+    // // مسارات الطلاب
+    // Route::prefix('student')->middleware('role:student')->group(function () {
+    //     Route::get('/courses', [StudentController::class, 'enrolledCourses']);
+    //     Route::post('/enroll', [StudentController::class, 'enrollCourse']);
+    // });
 });
 
-// مسار للحصول على معلومات المستخدم المصادق
-Route::middleware('auth:sanctum')->get('/authenticated-user', function (Request $request) {
-    return $request->user();
-});
-
-// Routes for Categories
+// مسارات الفئات
 Route::prefix('categories')->group(function () {
     Route::post('/', [CourseCategoryController::class, 'store']);
     Route::get('/', [CourseCategoryController::class, 'index']);
@@ -81,7 +71,7 @@ Route::prefix('categories')->group(function () {
     Route::delete('{id}', [CourseCategoryController::class, 'destroy']);
 });
 
-// Routes for Courses
+// مسارات الدورات
 Route::prefix('courses')->group(function () {
     Route::post('/', [CourseController::class, 'store']);
     Route::get('/', [CourseController::class, 'index']);
@@ -90,7 +80,7 @@ Route::prefix('courses')->group(function () {
     Route::delete('{id}', [CourseController::class, 'destroy']);
 });
 
-// Routes for Lessons
+// مسارات الدروس
 Route::prefix('courses/{courseId}/lessons')->name('courses.lessons.')->group(function () {
     Route::post('/', [LessonController::class, 'store'])->name('store');
     Route::get('/', [LessonController::class, 'index'])->name('index');
@@ -99,7 +89,7 @@ Route::prefix('courses/{courseId}/lessons')->name('courses.lessons.')->group(fun
     Route::delete('{lessonId}', [LessonController::class, 'destroy'])->name('destroy');
 });
 
-// Routes for Enrollments
+// مسارات الالتحاق بالدورات
 Route::prefix('enrollments')->group(function () {
     Route::get('/', [EnrollmentController::class, 'index']);
     Route::post('/', [EnrollmentController::class, 'store']);
@@ -107,14 +97,14 @@ Route::prefix('enrollments')->group(function () {
     Route::delete('{enrollment}', [EnrollmentController::class, 'destroy']);
 });
 
-// Routes for Lesson Completions
+// مسارات إكمال الدروس
 Route::prefix('lesson-completions')->group(function () {
     Route::get('/', [LessonCompletionController::class, 'index']);
     Route::post('/', [LessonCompletionController::class, 'store']);
     Route::delete('{lessonCompletion}', [LessonCompletionController::class, 'destroy']);
 });
 
-// Routes for Course User
+// مسارات المستخدم والدورات
 Route::prefix('course-user')->group(function () {
     Route::post('/', [CourseUserController::class, 'store']);
     Route::get('/', [CourseUserController::class, 'index']);
@@ -123,7 +113,7 @@ Route::prefix('course-user')->group(function () {
     Route::delete('{id}', [CourseUserController::class, 'destroy']);
 });
 
-// Routes for Payments
+// مسارات الدفع
 Route::prefix('payments')->group(function () {
     Route::post('/', [PaymentController::class, 'store']);
     Route::get('/', [PaymentController::class, 'index']);
@@ -132,7 +122,7 @@ Route::prefix('payments')->group(function () {
     Route::delete('{id}', [PaymentController::class, 'destroy']);
 });
 
-// Routes for Reviews
+// مسارات المراجعات
 Route::prefix('reviews')->group(function () {
     Route::get('/', [ReviewController::class, 'index']);
     Route::get('{id}', [ReviewController::class, 'show']);
