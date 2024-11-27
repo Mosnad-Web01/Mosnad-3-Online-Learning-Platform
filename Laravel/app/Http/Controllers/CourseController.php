@@ -117,7 +117,7 @@ class CourseController extends Controller
     /**
      * Get all courses with category, instructor, and lessons.
      */
-    public function index()
+    public function index(Request $request)
     {
         $courses = Course::with(['category', 'instructor', 'lessons'])->get();
 
@@ -127,6 +127,20 @@ class CourseController extends Controller
                 $course->image_url = asset('storage/' . $course->image);
             }
         }
+         // التحقق من دور المستخدم
+    $user = $request->user();  // الحصول على المستخدم المسجل دخوله
+
+    // إذا كان المستخدم طالبًا، يمكنه فقط رؤية الكورسات التي التحق بها
+    if ($user->role == 'student') {
+        $courses = $user->courses;  // أو بناءً على العلاقة مع الكورسات
+    } elseif ($user->role == 'instructor') {
+        // إذا كان المستخدم معلمًا، يمكنه رؤية الكورسات التي أنشأها
+        $courses = $user->createdCourses;  // أو أي علاقة مع الكورسات التي أنشأها المعلم
+    } else {
+        // للمسؤولين أو المستخدمين الآخرين، يمكنهم رؤية جميع الكورسات
+        $courses = Course::all();
+    }
+
 
         return response()->json($courses, Response::HTTP_OK);
     }

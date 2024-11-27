@@ -20,16 +20,17 @@ use App\Http\Controllers\PaymentController;
 // مسار لـ CSRF Cookie (لـ Sanctum)
 
 
-Route::middleware('auth:sanctum')->get('/sanctum/csrf-cookie', function (Request $request) {
-    return $request->user();
+Route::middleware('web')->get('/sanctum/csrf-cookie', function (Request $request) {
+    return response()->json(['message' => 'CSRF token set']);
 });
+
 
 // مسارات عامة لا تتطلب مصادقة
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 // مسارات تتطلب مصادقة باستخدام Sanctum
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['web'])->group(function () {
     Route::get('/user', [UserController::class, 'show']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
@@ -60,7 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
     //     Route::get('/courses', [StudentController::class, 'enrolledCourses']);
     //     Route::post('/enroll', [StudentController::class, 'enrollCourse']);
     // });
-});
+
 
 // مسارات الفئات
 Route::prefix('categories')->group(function () {
@@ -131,4 +132,5 @@ Route::prefix('reviews')->group(function () {
     Route::delete('{id}', [ReviewController::class, 'destroy']);
     Route::get('/course/{courseId}', [ReviewController::class, 'getReviewsByCourse']);
     Route::get('/instructor/{instructorId}', [ReviewController::class, 'getReviewsByInstructor']);
+});
 });
