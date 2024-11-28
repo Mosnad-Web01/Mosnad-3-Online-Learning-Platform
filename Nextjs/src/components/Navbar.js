@@ -3,8 +3,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaSearch, FaMoon, FaSun, FaUser, FaBars, FaTimes } from "react-icons/fa";
 import dynamic from "next/dynamic";
-import NavbarDropdown from "../components/NavbarDropdown"; 
+import NavbarDropdown from "../components/NavbarDropdown";
 import Image from 'next/image';
+import { logoutStudent, getCurrentStudent } from "../services/api";
+import { toast } from "react-toastify";
 
 // Delay loading of `react-scroll` to avoid conflicts with SSR
 const ScrollLink = dynamic(() => import("react-scroll").then((mod) => mod.Link), { ssr: false });
@@ -12,10 +14,11 @@ const ScrollLink = dynamic(() => import("react-scroll").then((mod) => mod.Link),
 const Navbar = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      // استرجاع الثيم المحفوظ من localStorage
       const savedTheme = localStorage.getItem("theme");
       if (savedTheme) {
         setIsDarkMode(savedTheme === "dark");
@@ -23,12 +26,21 @@ const Navbar = () => {
         setIsDarkMode(window.matchMedia("(prefers-color-scheme: dark)").matches);
       }
     }
+  }, []);
 
-    // Fetch user login state from localStorage
-    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
-    if (loggedInUser && loggedInUser.isLoggedIn) {
-      setUser(loggedInUser); 
-    }
+  useEffect(() => {
+    // جلب بيانات الطالب الحالي عند التحميل
+    const fetchStudentData = async () => {
+      try {
+        const studentData = await getCurrentStudent();
+        setUser(studentData);
+      } catch (error) {
+        console.error("Error fetching student data:", error);
+        // يمكن إضافة معالجة إضافية إذا لزم الأمر
+      }
+    };
+
+    fetchStudentData();
   }, []);
 
   useEffect(() => {
@@ -51,23 +63,26 @@ const Navbar = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const handleLogout = () => {
-   
-    localStorage.removeItem("loggedInUser");
-    setUser(null);
-    console.log("Logged out successfully");
+  const handleLogout = async () => {
+    try {
+      await logoutStudent();
+      localStorage.removeItem("loggedInUser");
+      setUser(null);
+      toast.success("Logged out successfully");
+    } catch (error) {
+      toast.error("Failed to log out. Please try again.");
+    }
   };
 
   return (
     <nav className="bg-gray-200 dark:bg-gray-900 text-gray-900 dark:text-white p-4 flex justify-between items-center flex-wrap z-50 relative">
       <div className="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-start">
-        
         <Link href="/" className="text-2xl font-bold">
           <Image
             src={isDarkMode ? "/images/dark_mood.svg" : "/images/light_mood.svg"}
             alt="Logo"
-            width={50}  
-            height={50} 
+            width={50}
+            height={50}
             className="h-8"
           />
         </Link>
@@ -143,11 +158,11 @@ const Navbar = () => {
             title={<FaUser className="text-gray-700 dark:text-white" />}
             links={[
               { href: "/Profile", label: "Profile" },
-              { href: "#", label: "Log out", onClick: handleLogout },
+              { href: "#", label: "Log out", onClick: handleLogout }, // تسجيل الخروج عند النقر
             ]}
           />
         ) : (
-          <Link href="/login">
+          <Link href="/Login">
             <FaUser className="text-gray-700 dark:text-white" />
           </Link>
         )}

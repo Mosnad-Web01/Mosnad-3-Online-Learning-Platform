@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class LoginController extends Controller
 {
@@ -50,6 +51,11 @@ class LoginController extends Controller
            'email' => 'The provided credentials do not match our records.',
        ]);
    }
+
+
+
+
+
 
 
 }

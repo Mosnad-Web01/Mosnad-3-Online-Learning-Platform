@@ -1,59 +1,64 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation'; // لاسترجاع المعرف من الرابط
-import { fetchCourseById } from '@/services/api'; // API function to fetch course by ID
+import React, { useState, useEffect } from "react";
+import { useParams } from "next/navigation"; // لاسترجاع معرّف الدورة
+import { fetchCourseById, createPayment, fetchCourseUser } from "@/services/api";
 
 const PaymentPage = () => {
   const { id } = useParams(); // Get the course ID from the URL
   const [course, setCourse] = useState(null);
+  const [courseUser, setCourseUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const [amount, setAmount] = useState('');
-  const [userId, setUserId] = useState(''); // سيتم تحديده تلقائيًا
-  const [status] = useState('pending'); // سيتم تحديده تلقائيًا
-  const [paymentDate] = useState(new Date().toISOString()); // سيتم تحديده تلقائيًا
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
-    const fetchCourseDetails = async () => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const studentId = queryParams.get("studentId");
+
+    const fetchDetails = async () => {
       try {
-        const response = await fetchCourseById(id); // Fetch the course data
-        setCourse(response.data);
-        setAmount(response.data.price); // Set the price from the course details
+        // Fetch course details
+        const courseResponse = await fetchCourseById(id);
+        setCourse(courseResponse.data);
+
+        // Fetch CourseUser
+        const courseUserResponse = await fetchCourseUser(studentId, id);
+        setCourseUser(courseUserResponse.data);
+
+        // Set default amount
+        setAmount(courseResponse.data.price);
       } catch (err) {
-        setError('Error fetching course details.');
+        setError("Error fetching details.");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchCourseDetails();
-  }, [id]); // Reload when the course ID changes
+    fetchDetails();
+  }, [id]);
 
   const handlePayment = async (e) => {
     e.preventDefault();
-
     setLoading(true);
     setErrorMessage(null);
 
     try {
-      // Sending payment data using API call
       const response = await createPayment({
-        user_id: userId, // سيتم تحديده تلقائيًا
-        course_user_id: id, // سيتم تحديده تلقائيًا من URL
+        user_id: courseUser.user_id, // من بيانات التسجيل
+        course_user_id: courseUser.id, // من بيانات التسجيل
         amount: amount,
-        status: status, // سيتم تحديده تلقائيًا
-        payment_date: paymentDate, // سيتم تحديده تلقائيًا
+        status: "pending", // الحالة الافتراضية
+        payment_date: new Date().toISOString(), // تاريخ الدفع الحالي
       });
 
       if (response.status === 201) {
-        // Success, update UI
-        alert('Payment Successful!');
+        alert("Payment Successful!");
       }
     } catch (err) {
-      setErrorMessage('An error occurred while processing the payment. Please try again.');
+      setErrorMessage("An error occurred while processing the payment.");
     } finally {
       setLoading(false);
     }
@@ -65,7 +70,7 @@ const PaymentPage = () => {
   return (
     <div className="payment-page bg-white p-8">
       <h1 className="text-3xl font-bold mb-4">Course Payment</h1>
-      {course ? (
+      {course && courseUser ? (
         <>
           <h2 className="text-xl">{course.course_name}</h2>
           <p>Price: ${course.price}</p>
@@ -87,39 +92,19 @@ const PaymentPage = () => {
                 />
               </div>
 
-              {/* Hidden fields */}
-              <input type="hidden" id="courseUserId" value={id} /> {/* Course ID */}
-              <input type="hidden" id="userId" value={userId} /> {/* User ID */}
-
-              {/* Payment form fields */}
               <div className="mb-4">
                 <label htmlFor="cardNumber" className="block mb-1">Card Number</label>
-                <input
-                  type="text"
-                  id="cardNumber"
-                  className="w-full p-2 border rounded"
-                  required
-                />
+                <input type="text" id="cardNumber" className="w-full p-2 border rounded" required />
               </div>
 
               <div className="mb-4">
                 <label htmlFor="expiry" className="block mb-1">Expiry Date</label>
-                <input
-                  type="text"
-                  id="expiry"
-                  className="w-full p-2 border rounded"
-                  required
-                />
+                <input type="text" id="expiry" className="w-full p-2 border rounded" required />
               </div>
 
               <div className="mb-4">
                 <label htmlFor="cvv" className="block mb-1">CVV</label>
-                <input
-                  type="text"
-                  id="cvv"
-                  className="w-full p-2 border rounded"
-                  required
-                />
+                <input type="text" id="cvv" className="w-full p-2 border rounded" required />
               </div>
 
               <button
@@ -127,7 +112,7 @@ const PaymentPage = () => {
                 className="w-full p-2 bg-blue-500 text-white rounded"
                 disabled={loading}
               >
-                {loading ? 'Processing...' : 'Complete Payment'}
+                {loading ? "Processing..." : "Complete Payment"}
               </button>
             </form>
           </div>

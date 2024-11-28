@@ -1,30 +1,28 @@
-// src/utils/auth.js
-import mockData from '../data/mockData.js';
+import { loginStudent } from '../services/api'; // استيراد وظيفة تسجيل الدخول من API
 
-export function loginUser(username, password) {
-  const user = mockData.users.find(
-    (user) => user.name === username && user.password === password
-  );
+let loggedInUser = null; // تتبع حالة تسجيل الدخول في الذاكرة
 
-  if (user) {
-    user.isLoggedIn = true; 
-    localStorage.setItem('loggedInUser', JSON.stringify(user)); 
-    console.log(`تم تسجيل الدخول بنجاح. مرحبًا، ${user.name}!`);
-    return user;
-  } else {
-    console.log('فشل تسجيل الدخول: تحقق من اسم المستخدم أو كلمة المرور.');
+export async function loginUser(username, password) {
+  try {
+    const response = await loginStudent({ username, password }); // إرسال بيانات تسجيل الدخول
+    loggedInUser = response.data.user; // حفظ بيانات المستخدم في الذاكرة
+    console.log(`تم تسجيل الدخول بنجاح. مرحبًا، ${loggedInUser.name}!`);
+    return loggedInUser;
+  } catch (error) {
+    console.error('فشل تسجيل الدخول: تحقق من اسم المستخدم أو كلمة المرور.', error.response?.data || error.message);
     return null;
   }
 }
 
-export function logoutUser(userId) {
-  const user = mockData.users.find((user) => user.id === userId);
-
-  if (user && user.isLoggedIn) {
-    user.isLoggedIn = false; // تحديث حالة تسجيل الخروج
-    localStorage.removeItem('loggedInUser'); // إزالة معلومات المستخدم من localStorage
-    console.log(`${user.name} تم تسجيل الخروج بنجاح.`);
+export function logoutUser() {
+  if (loggedInUser) {
+    console.log(`${loggedInUser.name} تم تسجيل الخروج بنجاح.`);
+    loggedInUser = null; // إزالة بيانات المستخدم من الذاكرة
   } else {
     console.log('المستخدم غير مسجل الدخول.');
   }
+}
+
+export function getLoggedInUser() {
+  return loggedInUser; // إرجاع حالة تسجيل الدخول
 }

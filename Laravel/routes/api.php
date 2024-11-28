@@ -9,17 +9,7 @@ use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\LessonCompletionController;
 use App\Http\Controllers\CourseUserController;
 use App\Http\Controllers\PaymentController;
-
-/*
-|----------------------------------------------------------------------
-| API Routes
-|----------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
+use App\Http\Controllers\StudentController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -53,11 +43,12 @@ Route::prefix('courses/{courseId}/lessons')->name('courses.lessons.')->group(fun
 
 
 // Routes for Enrollments (Course Tracking)
-Route::prefix('enrollments')->group(function () {
-    Route::get('/', [EnrollmentController::class, 'index']); // عرض جميع التسجيلات مع تقدمها
-    Route::post('/', [EnrollmentController::class, 'store']); // تسجيل طالب في دورة
-    Route::put('{enrollment}', [EnrollmentController::class, 'update']); // تحديث تقدم دورة أو تاريخ الإتمام
-    Route::delete('{enrollment}', [EnrollmentController::class, 'destroy']); // حذف تسجيل
+Route::prefix('enrollments')->middleware('auth:sanctum')->group(function () {
+    Route::get('/', [EnrollmentController::class, 'index']);
+    Route::post('/', [EnrollmentController::class, 'store']);
+    Route::put('/{enrollment}', [EnrollmentController::class, 'update']);
+    Route::delete('/{enrollment}', [EnrollmentController::class, 'destroy']);
+    Route::post('/check/{courseId}', [EnrollmentController::class, 'checkEnrollment']);
 });
 
 // Routes for Lesson Completions (Lesson Tracking)
@@ -73,6 +64,7 @@ Route::prefix('course-user')->group(function () {
     Route::get('{id}', [CourseUserController::class, 'show']);  // عرض تسجيل معين
     Route::put('{id}', [CourseUserController::class, 'update']); // تحديث تسجيل معين
     Route::delete('{id}', [CourseUserController::class, 'destroy']); // حذف تسجيل
+    Route::get('/course-users', [CourseUserController::class, 'getByUserAndCourse']);
 });
 
 // Routes for Payments
@@ -83,3 +75,18 @@ Route::prefix('payments')->group(function () {
     Route::put('{id}', [PaymentController::class, 'update']); // تحديث دفعة
     Route::delete('{id}', [PaymentController::class, 'destroy']); // حذف دفعة
 });
+
+
+Route::prefix('students')->group(function () {
+    Route::post('register', [StudentController::class, 'register']);
+    Route::post('login', [StudentController::class, 'login']);
+    Route::get('{id}', [StudentController::class, 'show']);
+    Route::put('{id}', [StudentController::class, 'update']);
+    Route::delete('{id}', [StudentController::class, 'destroy']);
+    Route::post('logout', [StudentController::class, 'logout'])->middleware('auth:sanctum');
+    Route::get('me', [StudentController::class, 'getCurrentStudent'])->middleware('auth:sanctum');
+});
+
+
+
+

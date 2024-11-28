@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import mockData from '../../data/mockData';
 import { useRouter } from 'next/navigation';
 import { FaPen } from 'react-icons/fa';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { fetchStudentById } from '../../services/api';
 
 export default function Profile() {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const router = useRouter();
   const [darkMode, setDarkMode] = useState(false);
   const [isPurple, setIsPurple] = useState(true);
@@ -46,17 +48,39 @@ export default function Profile() {
     localStorage.setItem('isPurple', JSON.stringify(isPurple));
   }, [darkMode, isPurple]);
 
+  // Fetch user data from the API
   useEffect(() => {
-    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-    if (loggedInUser) {
-      const currentUser = mockData.users.find((user) => user.id === loggedInUser.id);
-      setUser(currentUser);
-    } else {
-      router.push('/login');
-    }
+    const fetchUser = async () => {
+      try {
+        const studentId = localStorage.getItem('studentId');
+        if (!studentId) {
+          router.push('/Login');
+          return;
+        }
+        const response = await fetchStudentById(studentId); // استدعاء API لجلب بيانات المستخدم
+        setUser(response.data); // ضبط بيانات المستخدم
+        setError(null);
+      } catch (err) {
+        setError('Failed to load user data.');
+      } finally {
+        setLoading(false); // إيقاف عرض التحميل
+      }
+    };
+
+    fetchUser();
   }, [router]);
 
-  if (!user) return null;
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
 
   const toggleSection = (section) => {
     setOpenSection(openSection === section ? null : section);
@@ -101,7 +125,10 @@ export default function Profile() {
           </div>
           <button
             className="flex items-center gap-2 text-black dark:text-white"
-            onClick={(e) => { e.stopPropagation(); handleEdit(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleEdit();
+            }}
           >
             <FaPen className="h-5 w-5" />
             <span className="text-sm">Edit</span>
@@ -112,7 +139,7 @@ export default function Profile() {
           <div className="flex flex-col gap-3 text-gray-600 dark:text-gray-300">
             <p><strong>Name:</strong> {user.name}</p>
             <p><strong>Email:</strong> {user.email}</p>
-            <p><strong>Phone:</strong> {user.phone}</p>
+            <p><strong>Phone:</strong> {user.phone || 'N/A'}</p>
           </div>
         )}
 
