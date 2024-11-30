@@ -9,7 +9,12 @@
         use App\Http\Controllers\InstructorLessonController;
         use App\Http\Controllers\WebAuthController;
         use Illuminate\Support\Facades\Auth;
-
+        use App\Http\Controllers\CourseUserController;
+        use App\Http\Controllers\ReviewController;
+        use App\Http\Controllers\EnrollmentController;
+        use App\Http\Controllers\LessonCompletionController;
+        use App\Http\Controllers\CourseCategoryController;
+        
         /*
 |---------------------------------------------------------------------------
 | Web Routes
@@ -51,7 +56,7 @@
         // Route::get('/redirect', function () {
         //     // لن يتم تنفيذ الكود هنا، يتم التوجيه بناءً على الدور
         // })->middleware('role.redirect:admin,/admin/dashboard,instructor,/instructor/dashboard');
-        // Route::middleware(['auth:sanctum'])->group(function () {
+ Route::middleware(['auth:sanctum'])->group(function () {
         // مسارات لوحة التحكم الأخرى
         Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
         Route::get('/instructor/dashboard', [InstructorDashboardController::class, 'index'])->name('instructor.dashboard');
@@ -91,10 +96,10 @@
                 Route::delete('/courses/{courseId}/lessons/{lessonId}', [InstructorLessonController::class, 'destroy'])->name('instructor.lessons.destroy');
 
                 // Students
-                Route::get('/courses/{courseId}/students', [InstructorStudentController::class, 'index'])->name('instructor.students.index');
-                Route::get('/courses/{courseId}/students/{studentId}/edit', [InstructorStudentController::class, 'edit'])->name('instructor.students.edit');
-                Route::put('/courses/{courseId}/students/{studentId}', [InstructorStudentController::class, 'update'])->name('instructor.students.update');
-                Route::delete('/courses/{courseId}/students/{studentId}', [InstructorStudentController::class, 'destroy'])->name('instructor.students.destroy');
+                Route::get('/courses/{courseId}/students', [CourseUserController::class, 'index'])->name('instructor.students.index');
+                Route::get('/courses/{courseId}/students/{studentId}/edit', [CourseUserController::class, 'edit'])->name('instructor.students.edit');
+                Route::put('/courses/{courseId}/students/{studentId}', [CourseUserController::class, 'update'])->name('instructor.students.update');
+                Route::delete('/courses/{courseId}/students/{studentId}', [CourseUserController::class, 'destroy'])->name('instructor.students.destroy');
             });
         // });
-    // });
+    });

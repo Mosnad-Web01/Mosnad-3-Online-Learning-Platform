@@ -26,13 +26,19 @@
             @endif
 
             <li>
+            <a href="{{ route('instructor.students.index', ['courseId' => $course->id]) }}" class="hover:text-gray-300">
             Students
+                </a>
             </li>
             <li>
+                <a href="{{ route('instructor.queries.index') }}" class="hover:text-gray-300">
                     Answer Queries
+                </a>
             </li>
             <li>
+                <a href="{{ route('instructor.reviews.index') }}" class="hover:text-gray-300">
                     Reviews & Feedback
+                </a>
             </li>
         </ul>
 
@@ -44,7 +50,6 @@
             </button>
             <ul class="absolute right-0 mt-2 bg-white text-gray-800 shadow-md rounded-lg py-2 w-48">
                 <li>
-                    PRO
                 </li>
                 <li>
                     <form method="POST" action="{{ route('logout') }}">
