@@ -16,6 +16,7 @@ class RoleMiddleware
      * @param  mixed  ...$roles  قائمة الأدوار المسموح بها
      * @return mixed
      */
+    
     public function handle(Request $request, Closure $next, ...$roles)
     {
         // التحقق من أن المستخدم مصادق عليه
@@ -36,4 +37,5 @@ class RoleMiddleware
 
         return $next($request);
     }
+
 }

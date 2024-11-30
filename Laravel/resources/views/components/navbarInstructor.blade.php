@@ -8,29 +8,31 @@
         <!-- Navigation Links -->
         <ul class="flex space-x-6">
             <li>
-                <a href="{{ route('instructor.courses') }}" class="hover:text-gray-300">
+                <a href="{{ route('instructor.courses.index') }}" class="hover:text-gray-300">
                     Manage Courses
                 </a>
             </li>
             <li>
-                <a href="{{ route('instructor.lessons') }}" class="hover:text-gray-300">
-                    Manage Lessons
+                <a href="{{ route('instructor.courses.create') }}" class="hover:text-gray-300">
+                    Create Course
                 </a>
             </li>
+            <!-- إضافة روابط الدروس والطلاب والاستفسارات والمراجعات -->
+            @if(isset($course))
+            <a href="{{ route('instructor.lessons.index', ['courseId' => $course->id]) }}" class="hover:text-gray-300">
+                Manage Lessons
+            </a>
+
+            @endif
+
             <li>
-                <a href="{{ route('instructor.students') }}" class="hover:text-gray-300">
-                    Students
-                </a>
+            Students
             </li>
             <li>
-                <a href="{{ route('instructor.queries') }}" class="hover:text-gray-300">
                     Answer Queries
-                </a>
             </li>
             <li>
-                <a href="{{ route('instructor.reviews') }}" class="hover:text-gray-300">
                     Reviews & Feedback
-                </a>
             </li>
         </ul>
 
@@ -42,7 +44,7 @@
             </button>
             <ul class="absolute right-0 mt-2 bg-white text-gray-800 shadow-md rounded-lg py-2 w-48">
                 <li>
-                    <a href="{{ route('profile.show') }}" class="block px-4 py-2 hover:bg-gray-200">Profile</a>
+                    PRO
                 </li>
                 <li>
                     <form method="POST" action="{{ route('logout') }}">

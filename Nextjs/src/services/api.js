@@ -17,15 +17,17 @@ const getCsrfToken = () => {
       ?.split('=')[1];
   });
 };
-
+// تحليل الكوكي للحصول على قيمة معينة
+function getCookie(name) {
+  const cookies = document.cookie.split('; ');
+  const tokenCookie = cookies.find(cookie => cookie.startsWith(`${name}=`));
+  return tokenCookie ? tokenCookie.split('=')[1] : null;
+}
 // تعيين التوكن XSRF بشكل افتراضي في رؤوس الطلبات
 api.interceptors.request.use(async (config) => {
-  // التحقق من وجود XSRF-TOKEN في الكوكيز
-  let csrfToken = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('XSRF-TOKEN='))
-    ?.split('=')[1];
-
+  
+    let csrfToken = getCookie('XSRF-TOKEN'); // قراءة الكوكي "XSRF-TOKEN"
+    //let token = getCookie('token'); // قراءة الكوكي "token"
 
   // إذا لم يكن التوكن موجودًا، قم بطلبه وانتظره
   if (!csrfToken) {
@@ -34,10 +36,14 @@ api.interceptors.request.use(async (config) => {
 
   // إذا كان التوكن موجودًا، تعيينه في الرؤوس
   if (csrfToken) {
+    console.log('csrfToken ',csrfToken);
+
     config.headers['X-XSRF-TOKEN'] = decodeURIComponent(csrfToken);
   }
-
-  // تعيين Content-Type إلى 'application/json' إذا لم يكن محددًا
+  // if (token) {
+  //   config.headers['Authorization'] = `Bearer ${decodeURIComponent(token)}`; // إضافة التوكن للهيدر
+  // }
+  // // تعيين Content-Type إلى 'application/json' إذا لم يكن محددًا
   if (!config.headers['Content-Type']) {
     config.headers['Content-Type'] = 'application/json';
   }
@@ -61,7 +67,7 @@ console.log("Password:", password);
 };
 
 // دوال أخرى (أمثلة)...
-export const fetchUserprofile = (id) => api.get(`/user-profile/${id}`);
+export const fetchUserprofile = () => api.get(`/user-profiles`);
 export const fetchCurrentUser = () => api.get('/user');
 
 // تسجيل الخروج
