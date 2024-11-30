@@ -20,7 +20,7 @@
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::middleware('web')->group(function () {
+// Route::middleware('web')->group(function () {
     Route::get('/sanctum/csrf-cookie', function () {
         return response()->json(['message' => 'CSRF cookie set']);
     });
@@ -47,11 +47,11 @@ Route::middleware('web')->group(function () {
         });
         
         
-        // استخدام الميدلوير لتوجيه المستخدم بناءً على الدور
-        Route::get('/redirect', function () {
-            // لن يتم تنفيذ الكود هنا، يتم التوجيه بناءً على الدور
-        })->middleware('role.redirect:admin,/admin/dashboard,instructor,/instructor/dashboard');
-        
+        // // استخدام الميدلوير لتوجيه المستخدم بناءً على الدور
+        // Route::get('/redirect', function () {
+        //     // لن يتم تنفيذ الكود هنا، يتم التوجيه بناءً على الدور
+        // })->middleware('role.redirect:admin,/admin/dashboard,instructor,/instructor/dashboard');
+        // Route::middleware(['auth:sanctum'])->group(function () {
         // مسارات لوحة التحكم الأخرى
         Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
         Route::get('/instructor/dashboard', [InstructorDashboardController::class, 'index'])->name('instructor.dashboard');
@@ -63,7 +63,7 @@ Route::middleware('web')->group(function () {
 
 
         // مسارات لوحة التحكم باستخدام 'auth:sanctum' للتحقق من المصادقة
-        Route::middleware(['auth:sanctum'])->group(function () {
+        
 
             // مسارات المسؤول مع تحقق الدور "admin"
             // Route::middleware(['role:admin'])->group(function () {
@@ -71,10 +71,9 @@ Route::middleware('web')->group(function () {
             // });
 
             // مسارات المدرب مع تحقق الدور "instructor"
-            // Route::prefix('instructor')->middleware(['role:instructor'])->group(function () {
-            //     // Dashboard
-            //     Route::get('/dashboard', [InstructorDashboardController::class, 'index'])->name('instructor.dashboard');
-
+            Route::prefix('instructor')->group(function () {
+                // Dashboard
+                Route::get('/dashboard', [InstructorDashboardController::class, 'index'])->name('instructor.dashboard');
                 // Course routes
                 Route::get('/courses', [InstructorCourseController::class, 'index'])->name('instructor.courses.index');
                 Route::get('/courses/create', [InstructorCourseController::class, 'create'])->name('instructor.courses.create');
@@ -90,6 +89,12 @@ Route::middleware('web')->group(function () {
                 Route::get('/courses/{courseId}/lessons/{lessonId}/edit', [InstructorLessonController::class, 'edit'])->name('instructor.lessons.edit');
                 Route::put('/courses/{courseId}/lessons/{lessonId}', [InstructorLessonController::class, 'update'])->name('instructor.lessons.update');
                 Route::delete('/courses/{courseId}/lessons/{lessonId}', [InstructorLessonController::class, 'destroy'])->name('instructor.lessons.destroy');
+
+                // Students
+                Route::get('/courses/{courseId}/students', [InstructorStudentController::class, 'index'])->name('instructor.students.index');
+                Route::get('/courses/{courseId}/students/{studentId}/edit', [InstructorStudentController::class, 'edit'])->name('instructor.students.edit');
+                Route::put('/courses/{courseId}/students/{studentId}', [InstructorStudentController::class, 'update'])->name('instructor.students.update');
+                Route::delete('/courses/{courseId}/students/{studentId}', [InstructorStudentController::class, 'destroy'])->name('instructor.students.destroy');
             });
-        });
+        // });
     // });
