@@ -1,12 +1,11 @@
 // pages/profile.js
 'use client';
 
-import { isAuthenticated } from '@/utils/auth';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { FaPen } from 'react-icons/fa';
-import {fetchData} from '@/services/fetchData';
+import {fetchUserprofile} from '@/services/api';
 export default function Profile() {
   const [user, setUser] = useState(null);
   const [editableUser, setEditableUser] = useState(null);
@@ -15,13 +14,13 @@ export default function Profile() {
   // Check authentication and fetch user data
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!isAuthenticated()) {
-        router.push('/login');
-        return;
-      }
+      // if (!isAuthenticated()) {
+      //   router.push('/login');
+      //   return;
+      // }
 
       try {
-        const userData = await fetchData('/user-profile', 'GET', null, router);
+        const userData = await fetchUserprofile();
 
         if (userData && userData.user) {
           setUser(userData.user);

@@ -1,29 +1,73 @@
 import axios from 'axios';
 
-// إنشاء كائن API باستخدام axios
+// إنشاء مثال لـ axios مع إعدادات افتراضية
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api', // قاعدة الرابط الخاصة بـ API
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  withCredentials: true, // هام للسماح بإرسال الكوكيز عبر النطاقات
+  baseURL: 'http://localhost:8000/api',
+  withCredentials: true, // تأكد من إرسال الكوكيز مع الطلبات
 });
 
-// إضافة interceptor للتحقق من الطلبات
-api.interceptors.request.use(
-  (config) => {
-    console.log('Interceptor triggered for URL:', config.url);
-    return config;
-  },
-  (error) => {
-    console.error('Error in request interceptor:', error);
-    return Promise.reject(error);
+// دالة مساعدة للحصول على التوكن إذا لم يكن موجودًا
+const getCsrfToken = () => {
+  return axios.get('http://localhost:8000/api/sanctum/csrf-cookie', {
+    withCredentials: true, // إرسال الكوكيز مع الطلب
+  }).then(() => {
+    return document.cookie
+      .split('; ')
+      .find(row => row.startsWith('XSRF-TOKEN='))
+      ?.split('=')[1];
+  });
+};
+// تحليل الكوكي للحصول على قيمة معينة
+function getCookie(name) {
+  const cookies = document.cookie.split('; ');
+  const tokenCookie = cookies.find(cookie => cookie.startsWith(`${name}=`));
+  return tokenCookie ? tokenCookie.split('=')[1] : null;
+}
+// تعيين التوكن XSRF بشكل افتراضي في رؤوس الطلبات
+api.interceptors.request.use(async (config) => {
+  
+    let csrfToken = getCookie('XSRF-TOKEN'); // قراءة الكوكي "XSRF-TOKEN"
+    //let token = getCookie('token'); // قراءة الكوكي "token"
+
+  // إذا لم يكن التوكن موجودًا، قم بطلبه وانتظره
+  if (!csrfToken) {
+    csrfToken = await getCsrfToken();
   }
-);
+
+  // إذا كان التوكن موجودًا، تعيينه في الرؤوس
+  if (csrfToken) {
+    console.log('csrfToken ',csrfToken);
+
+    config.headers['X-XSRF-TOKEN'] = decodeURIComponent(csrfToken);
+  }
+  // if (token) {
+  //   config.headers['Authorization'] = `Bearer ${decodeURIComponent(token)}`; // إضافة التوكن للهيدر
+  // }
+  // // تعيين Content-Type إلى 'application/json' إذا لم يكن محددًا
+  if (!config.headers['Content-Type']) {
+    config.headers['Content-Type'] = 'application/json';
+  }
+  console.log("csrfToken:", csrfToken);
+  
+  return config;
+}, (error) => {
+  // معالجة الأخطاء في حال وجودها
+  return Promise.reject(error);
+});
 
 // دوال التعامل مع API
-export const loginUser = ({ email, password }) => api.post('/login', { email, password });
-export const fetchUserprofile = (id) => api.get(`/user-profile/${id}`);
+export const loginUser = ({ email, password }) => {
+  console.log("Email:", email);
+console.log("Password:", password);
+
+  return api.post('/login', { email, password }).then((response) => {
+    // لا حاجة لتخزين التوكن في الكوكيز يدويًا، حيث يتولى Sanctum هذا الأمر
+    return response;
+  });
+};
+
+// دوال أخرى (أمثلة)...
+export const fetchUserprofile = () => api.get(`/user-profiles`);
 export const fetchCurrentUser = () => api.get('/user');
 
 // تسجيل الخروج
@@ -38,6 +82,10 @@ export const logout = async () => {
   }
 };
 
+// دوال إضافية للتعامل مع الأقسام الأخرى...
+// (ابق الدوال الأخرى كما هي في الشيفرة الأصلية)
+
+
 // الفئات (Categories)
 export const fetchCategories = () => api.get('/categories');
 export const createCategory = (data) => api.post('/categories', data);
@@ -45,7 +93,7 @@ export const updateCategory = (id, data) => api.put(`/categories/${id}`, data);
 export const deleteCategory = (id) => api.delete(`/categories/${id}`);
 
 // الكورسات (Courses)
-export const fetchCourses = () => api.get('/courses');
+export const fetchCourses = () => api.get('/courses')
 export const fetchCourseById = (id) => api.get(`/courses/${id}`);
 export const createCourse = (data) => api.post('/courses', data);
 export const updateCourse = (id, data) => api.put(`/courses/${id}`, data);

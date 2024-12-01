@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class UserProfileController extends Controller
 {
@@ -43,11 +42,19 @@ class UserProfileController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
+
     public function index()
     {
-        $profiles = UserProfile::all();
-        return response()->json($profiles);
+        $user = Auth::user(); // Get the authenticated user
+    
+        if ($user) {
+            $profile = $user->profile; // Assuming there's a one-to-one or hasOne relationship
+            return response()->json($profile);
+        }
+    
+        return response()->json(['message' => 'Unauthorized'], 401);
     }
+    
 /**
  * Store a newly created UserProfile in storage.
  *

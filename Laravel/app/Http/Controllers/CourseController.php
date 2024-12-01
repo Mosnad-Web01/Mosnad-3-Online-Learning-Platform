@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
-
 class CourseController extends Controller
 {
     /**
@@ -117,19 +117,63 @@ class CourseController extends Controller
     /**
      * Get all courses with category, instructor, and lessons.
      */
-    public function index()
-    {
-        $courses = Course::with(['category', 'instructor', 'lessons'])->get();
+    // public function index(Request $request)
+    // {
+    //     $user = $request->user();
+    
+    //     if (!$user) {
+    //         return response()->json(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+    //     }
+    
+    //     if ($user->role === 'student') {
+    //         $courses = $user->courses()->with(['category', 'instructor', 'lessons'])->get();
+    //     } elseif ($user->role === 'instructor') {
+    //         $courses = $user->createdCourses()->with(['category', 'instructor', 'lessons'])->get();
+    //     } else {
+    //         $courses = Course::with(['category', 'instructor', 'lessons'])->get();
+    //     }
+    
+    //     // إضافة رابط الصورة
+    //     foreach ($courses as $course) {
+    //         if ($course->image) {
+    //             $course->image_url = asset('storage/' . $course->image);
+    //         }
+    //     }
+    
+    //     return response()->json($courses, Response::HTTP_OK);
+    // }
+    // ------Code for test Token-----
+    // $xsrfTokenFromHeader = $request->header('X-XSRF-TOKEN');
+    // $xsrfTokenFromCookie = $request->cookie('XSRF-TOKEN');
 
-        // إضافة رابط للصورة لكل دورة إذا كانت موجودة
-        foreach ($courses as $course) {
-            if ($course->image) {
-                $course->image_url = asset('storage/' . $course->image);
-            }
+    // if ($xsrfTokenFromHeader == $xsrfTokenFromCookie) {
+    //     // إذا لم يتطابق التوكن، يمكن إرجاع رد خطأ
+    //     return response()->json(['message' => 'Invalid CSRF token',
+    //     'xsrfTokenFromHeader'=>$xsrfTokenFromHeader,
+    //     'xsrfTokenFromCookie'=>$xsrfTokenFromCookie,
+    //     'Auth::check():'=>Auth::check(),
+    //     'Auth::user():'=>Auth::user(),
+
+    //      ], 403);
+    // }
+    public function index(Request $request)
+ {  
+
+    // جلب جميع الكورسات مع العلاقات المرتبطة
+    $courses = Course::with(['category', 'instructor', 'lessons'])->get();
+
+    // إضافة رابط للصورة لكل دورة إذا كانت موجودة
+    foreach ($courses as $course) {
+        if ($course->image) {
+            $course->image_url = asset('storage/' . $course->image);
         }
-
-        return response()->json($courses, Response::HTTP_OK);
     }
+
+    // إعادة الكورسات في استجابة JSON
+    return response()->json($courses, Response::HTTP_OK);
+}
+
+    
 
     /**
      * Display the specified course.
