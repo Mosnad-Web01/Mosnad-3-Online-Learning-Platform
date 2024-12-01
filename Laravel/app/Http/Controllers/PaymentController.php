@@ -12,7 +12,7 @@ class PaymentController extends Controller
     // إضافة دفعية جديدة
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = $request->validate([
             'user_id' => 'required|exists:users,id',
             'course_user_id' => 'required|exists:course_user,id',
             'amount' => 'required|numeric',
@@ -20,15 +20,12 @@ class PaymentController extends Controller
             'payment_date' => 'required|date',
         ]);
 
-        $payment = Payment::create([
-            'user_id' => $request->user_id,
-            'course_user_id' => $request->course_user_id,
-            'amount' => $request->amount,
-            'status' => $request->status,
-            'payment_date' => $request->payment_date,
-        ]);
-
-        return response()->json(['message' => 'Payment successfully created', 'data' => $payment], 201);
+        try {
+            $payment = Payment::create($request->all());
+            return response()->json(['message' => 'Payment successfully created', 'data' => $payment], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to create payment', 'details' => $e->getMessage()], 500);
+        }
     }
 
     // عرض جميع المدفوعات

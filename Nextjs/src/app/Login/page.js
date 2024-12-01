@@ -1,66 +1,25 @@
-'use client';
-import axios from 'axios';
-import React, { useState } from 'react';
-import { loginUser } from '@/services/api';
-import { useRouter } from 'next/navigation';
+"use client";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation"; // للتنقل بين الصفحات
+import { loginUser } from "../../services/api";
 
-const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
 
-  // دالة مساعدة للحصول على التوكن إذا لم يكن موجودًا
-  const getCsrfToken = async () => {
-    await axios.get('http://localhost:8000/api/sanctum/csrf-cookie', {
-      withCredentials: true,
-    });
-    return document.cookie
-      .split('; ')
-      .find(row => row.startsWith('XSRF-TOKEN='))
-      ?.split('=')[1];
-  };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
-
     try {
-          let csrfToken = null;
-
-      // التأكد من وجود التوكن أولاً
-      csrfToken = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('XSRF-TOKEN='))
-        ?.split('=')[1];
-  
-      // إذا لم يكن التوكن موجودًا، نقوم بطلبه
-      if (!csrfToken) {
-        csrfToken = await getCsrfToken(); // استدعاء دالة الحصول على التوكن
-      }
-
-      // تحقق مرة أخرى من التوكن بعد المحاولة
-      if (!csrfToken) {
-        throw new Error('Failed to retrieve CSRF token');
-      }
-  
-      // استدعاء API لتسجيل الدخول بعد التأكد من وجود التوكن
-      const response = await loginUser({ email, password });
-      console.log('Login successful:', response);
-  
-      // إذا تم تسجيل الدخول بنجاح، توجه المستخدم
-      if (response) {
-        router.push('/'); // توجيه إلى صفحة الهوم
-      }
-    } catch (err) {
-      console.error('Login error:', err);
-      const errorMessage =
-        err.response?.data?.message || 'Invalid email or password.';
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
+      const response = await loginUser({ email, password }); // استدعاء API لتسجيل الدخول
+      localStorage.setItem("studentId", response.data.student.id); // تخزين studentId
+      setError(""); // إزالة رسالة الخطأ
+      router.push("/Profile"); // التوجيه إلى صفحة الملف الشخصي عند النجاح
+    } catch (error) {
+      setError(
+        error.response?.data?.error || "Invalid credentials. Please try again."
+      );
     }
   };
 
@@ -101,13 +60,16 @@ const Login = () => {
         <button
           type="submit"
           className="bg-gray-600 dark:bg-gray-800 text-white w-full p-2 rounded"
-          disabled={loading}
         >
-          {loading ? 'Logging in...' : 'Login'}
+          Login
         </button>
+        <p className="mt-4 text-sm text-center">
+          Don’t have an account?{" "}
+          <a href="/Register" className="text-blue-500 hover:underline">
+            Create an account
+          </a>
+        </p>
       </form>
     </div>
   );
-};
-
-export default Login;
+}

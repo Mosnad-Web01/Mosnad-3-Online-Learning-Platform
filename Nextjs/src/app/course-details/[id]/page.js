@@ -7,6 +7,8 @@ import ScrollableCourseList from '@/components/ScrollableCourseList';
 import Link from 'next/link';
 import Image from 'next/image'; 
 import { motion } from 'framer-motion'; 
+import { apiClient } from '@/services/api';
+
 
 const CourseDetails = () => {
   const { id } = useParams();
@@ -60,32 +62,51 @@ const CourseDetails = () => {
     fetchCourseDetails();
   }, [id]);
 
-  const checkEnrollment = async (courseId) => {
-    // استدعاء API للتحقق من التسجيل
-    // return response
+  const checkEnrollment = async () => {
+    try {
+      const response = await axios.get('/api/check-enrollment');
+      if (response.data && response.data.get) {
+        // متابعة العمليات إذا كانت البيانات صحيحة
+      } else {
+        console.error('Data is missing or not in expected format');
+        return { isEnrolled: false };
+      }
+    } catch (error) {
+      console.error('Error checking enrollment:', error);
+      return { isEnrolled: false };
+    }
   };
+  
 
   const handleEnrollment = async () => {
-    if (isProcessing) return; // منع التكرار
+    if (isProcessing) return; // منع النقرات المتكررة
     setIsProcessing(true);
-
+  
     try {
+      const studentId = localStorage.getItem('studentId'); // استرجاع معرّف الطالب
+      if (!studentId) {
+        console.error('Student ID not found');
+        return;
+      }
+  
       if (course.price === 0) {
-        // إذا كانت الدورة مجانية، يتم تسجيل الطالب تلقائيًا
-        await createEnrollment({ courseId: course.id });
+        // إذا كانت الدورة مجانية، يتم التسجيل تلقائيًا
+        await createEnrollment({ courseId: course.id, studentId });
         setIsEnrolled(true);
       } else {
         if (!isEnrolled) {
-          // إذا كانت الدورة مدفوعة وغير مسجل، نقله إلى صفحة الدفع
-          router.push(`/payment/${course.id}`);
+          // إذا كانت الدورة مدفوعة، نقله إلى الدفع
+          router.push(`/payment/${course.id}?studentId=${studentId}`);
         }
       }
     } catch (error) {
-      console.error("Error during enrollment:", error);
+      console.error('Error during enrollment:', error);
     } finally {
       setIsProcessing(false);
     }
   };
+  
+  
 
   if (!course || !instructor) return <p>Course or instructor not found</p>;
 
@@ -139,6 +160,7 @@ const CourseDetails = () => {
               >
                 {course.price === 0 || isEnrolled ? 'Go to Lessons' : 'Enroll Now'}
               </button>
+
             </div>
           </div>
         </motion.section>
@@ -197,35 +219,41 @@ const CourseDetails = () => {
 
         <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />
 
-        {/* Lessons Section with Go to button and Animation */}
-        {course.lessons && course.lessons.length > 0 ? (
-          <motion.section
-            className="my-6 p-4 bg-white dark:bg-gray-800 text-black dark:text-white"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7 }}
-          >
-            <h2 className="text-2xl font-semibold">Lessons</h2>
-            <div className="mt-4">
-              <Link href={`/course-details/${course.id}/lessons`} passHref>
-                <button className="flex items-center text-blue-500 hover:text-blue-700">
-                  <span>Go to Lessons</span>
-                  <FaArrowRight className="ml-2" />
-                </button>
-              </Link>
-            </div>
-          </motion.section>
-        ) : (
-          <motion.section
-            className="my-6 p-4 bg-white dark:bg-gray-800 text-black dark:text-white"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7 }}
-          >
-            <h2 className="text-2xl font-semibold">Lessons</h2>
-            <p>No lessons available for this course.</p>
-          </motion.section>
-        )}
+       {/* Lessons Section with Go to button and Animation */}
+          {isEnrolled && course.lessons && course.lessons.length > 0 ? (
+            <motion.section
+              className="my-6 p-4 bg-white dark:bg-gray-800 text-black dark:text-white"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7 }}
+            >
+              <h2 className="text-2xl font-semibold">Lessons</h2>
+              <div className="mt-4">
+                <Link href={`/course-details/${course.id}/lessons`} passHref>
+                  <button className="flex items-center text-blue-500 hover:text-blue-700">
+                    <span>Go to Lessons</span>
+                    <FaArrowRight className="ml-2" />
+                  </button>
+                </Link>
+              </div>
+            </motion.section>
+          ) : (
+            <motion.section
+              className="my-6 p-4 bg-white dark:bg-gray-800 text-black dark:text-white"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7 }}
+            >
+              <h2 className="text-2xl font-semibold">Lessons</h2>
+              {isEnrolled ? (
+                <p>You are already enrolled in this course. Start learning now!</p>
+              ) : (
+                <p>You need to enroll in this course to access its content.</p>
+              )}
+
+            </motion.section>
+          )}
+
 
         <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />
 
