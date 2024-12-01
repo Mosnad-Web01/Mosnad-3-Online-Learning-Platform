@@ -1,4 +1,7 @@
-<div>
-    <p>Admin</p>
-    <!-- Breathing in, I calm body and mind. Breathing out, I smile. - Thich Nhat Hanh -->
-</div>
+<x-layout>
+
+    <h1>Welcome to Admin Dashboard</h1>
+    <!-- <p>Total Users: {{ $adminData['usersCount'] }}</p>
+    <p>Total Courses: {{ $adminData['coursesCount'] }}</p> -->
+
+</x-layout>

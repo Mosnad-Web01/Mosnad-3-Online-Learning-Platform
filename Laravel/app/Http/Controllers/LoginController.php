@@ -52,10 +52,4 @@ class LoginController extends Controller
        ]);
    }
 
-
-
-
-
-
-
 }
