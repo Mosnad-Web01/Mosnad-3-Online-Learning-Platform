@@ -25,7 +25,7 @@
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-// Route::middleware('web')->group(function () {
+ Route::middleware('web')->group(function () {
     Route::get('/sanctum/csrf-cookie', function () {
         return response()->json(['message' => 'CSRF cookie set']);
     });
@@ -101,5 +101,5 @@
                 Route::put('/courses/{courseId}/students/{studentId}', [CourseUserController::class, 'update'])->name('instructor.students.update');
                 Route::delete('/courses/{courseId}/students/{studentId}', [CourseUserController::class, 'destroy'])->name('instructor.students.destroy');
             });
-        // });
+         });
     });
