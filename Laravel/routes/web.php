@@ -10,11 +10,8 @@
         use App\Http\Controllers\WebAuthController;
         use Illuminate\Support\Facades\Auth;
         use App\Http\Controllers\CourseUserController;
-        use App\Http\Controllers\ReviewController;
-        use App\Http\Controllers\EnrollmentController;
-        use App\Http\Controllers\LessonCompletionController;
-        use App\Http\Controllers\CourseCategoryController;
-        
+        use App\Http\Controllers\AdminUserController;
+            
         /*
 |---------------------------------------------------------------------------
 | Web Routes
@@ -25,11 +22,11 @@
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-// Route::middleware('web')->group(function () {
+ Route::middleware('web')->group(function () {
     Route::get('/sanctum/csrf-cookie', function () {
         return response()->json(['message' => 'CSRF cookie set']);
     });
-    
+
         // Home route (this will be the first route the user will visit)
         Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -56,16 +53,21 @@
         // Route::get('/redirect', function () {
         //     // لن يتم تنفيذ الكود هنا، يتم التوجيه بناءً على الدور
         // })->middleware('role.redirect:admin,/admin/dashboard,instructor,/instructor/dashboard');
- Route::middleware(['auth:sanctum'])->group(function () {
-        // مسارات لوحة التحكم الأخرى
-        Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-        Route::get('/instructor/dashboard', [InstructorDashboardController::class, 'index'])->name('instructor.dashboard');
-        
-        
+
+    Route::middleware(['auth:sanctum'])->group(function () {
+            // مسارات لوحة التحكم الأخرى
+            Route::prefix('admin')->group(function () {
+                Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+                //Route::get('/admin-user', [AdminUserController::class, 'index'])->name('admin.admin-user');
+                Route::resource('users', AdminUserController::class);
+
+            });
+
         // Signup routes
         Route::get('/signup', [SignupController::class, 'create'])->name('signup');
         Route::post('/signup', [SignupController::class, 'store'])->name('signup.submit');
 
+        Route::post('/users/update', [AdminUserController::class, 'updateUsers'])->name('users.update');
 
         // مسارات لوحة التحكم باستخدام 'auth:sanctum' للتحقق من المصادقة
         
@@ -101,5 +103,5 @@
                 Route::put('/courses/{courseId}/students/{studentId}', [CourseUserController::class, 'update'])->name('instructor.students.update');
                 Route::delete('/courses/{courseId}/students/{studentId}', [CourseUserController::class, 'destroy'])->name('instructor.students.destroy');
             });
-        // });
+        });
     });

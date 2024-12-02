@@ -28,9 +28,9 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('b ',userRole); } // طباعة الدور لتأكيد أنه تم استرجاعه بشكل صحيح
 
                 // التوجيه بناءً على الدور
-                if (userRole === 'admin') {
+                if (userRole === 'Admin') {
                     window.location.href = '/admin/dashboard';  // تحويل إلى لوحة تحكم المدير
-                } else if (userRole === 'instructor') {
+                } else if (userRole === 'Instructor') {
                     window.location.href = '/instructor/dashboard';  // تحويل إلى لوحة تحكم المدرب
                 } else {
                     console.log(userRole);

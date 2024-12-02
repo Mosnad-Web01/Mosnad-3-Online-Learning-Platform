@@ -14,6 +14,7 @@ class AuthController extends Controller
         $this->authService = $authService;
     }
 
+    // Registration function
     public function register(Request $request)
     {
         $user = $this->authService->register($request->all());
@@ -24,20 +25,26 @@ class AuthController extends Controller
         ], 201);
     }
 
+    // Login function
     public function login(Request $request)
     {
-        $data = $this->authService->login($request->only('email', 'password'));
+        try {
+            $data = $this->authService->login($request->only('email', 'password'));
 
-        return response()->json([
-            'message' => 'Login successful.',
-            'user' => $data['user'],
-        ])->cookie('XSRF-TOKEN', $data['xsrf_token'], 60 * 24, '/', null, false, false);
+            return response()->json([
+                'message' => 'Login successful.',
+                'user' => $data['user'],
+            ])->cookie('XSRF-TOKEN', $data['xsrf_token'], 60 * 24, '/', null, false, false);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 403); // Return 403 Forbidden for blocked users
+        }
     }
 
+    // Logout function
     public function logout()
     {
         $message = $this->authService->logout();
 
-        return response()->json($message)->cookie('XSRF-TOKEN', '', -1);
+        return response()->json($message)->cookie('XSRF-TOKEN', '', -1); // Clear XSRF-TOKEN cookie
     }
 }
