@@ -87,13 +87,15 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class, 'role_user');
     }
 
+    public function hasRole($role)
+{
+    return $this->roles()->where('name', $role)->exists();
+}
+
     /**
      * Check if the user has a specific role.
      */
-    public function hasRole($role)
-    {
-        return $this->roles()->where('name', $role)->exists();
-    }
+    
 
     /**
      * Relationship with the UserProfile model.
