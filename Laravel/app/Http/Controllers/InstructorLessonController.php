@@ -3,165 +3,92 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lesson;
-use App\Models\Course; // استيراد موديل الدورة
+use App\Models\Course;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\Response;
 
 class InstructorLessonController extends Controller
 {
-    /**
-     * Constructor to apply authentication middleware and authorization.
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
-    /**
-     * Display a listing of the lessons for a specific course.
-     */
     public function index($courseId)
     {
-        // تحقق من أن الدورة تخص المدرس الحالي
-        $course = Course::where('id', $courseId)->where('user_id', auth()->id())->first();
-
-        if (!$course) {
-            return response()->json(['message' => 'Unauthorized or course not found'], Response::HTTP_FORBIDDEN);
-        }
-
-        // Fetch all lessons for the specific course
-        $lessons = Lesson::where('course_id', $courseId)->get();
-
-        // Add video URL to each lesson if available
-        foreach ($lessons as $lesson) {
-            if ($lesson->video_url) {
-                $lesson->video_url = asset('storage/' . $lesson->video_url);
-            }
-        }
-
-        // Return lessons in a JSON response
-        return response()->json($lessons, Response::HTTP_OK);
+        $course = Course::where('instructor_id', Auth::id())->findOrFail($courseId);
+        $lessons = $course->lessons; // جلب الدروس المرتبطة بالدورة
+        return view('instructor.lessons.index', compact('course', 'lessons'));
     }
 
-    /**
-     * Show the form for creating a new lesson.
-     */
     public function create($courseId)
     {
-        // تحقق من أن الدورة تخص المدرس الحالي
-        $course = Course::where('id', $courseId)->where('user_id', auth()->id())->first();
-
-        if (!$course) {
-            return response()->json(['message' => 'Unauthorized or course not found'], Response::HTTP_FORBIDDEN);
-        }
-
-        // Show the form or response for creating a new lesson (can be an API response or a view)
-        return response()->json(['message' => 'Show lesson creation form'], Response::HTTP_OK);
+        $course = Course::where('instructor_id', Auth::id())->findOrFail($courseId);
+        return view('instructor.lessons.create', compact('course'));
     }
 
-    /**
-     * Store a newly created lesson.
-     */
     public function store(Request $request, $courseId)
     {
-        // تحقق من أن الدورة تخص المدرس الحالي
-        $course = Course::where('id', $courseId)->where('user_id', auth()->id())->first();
-
-        if (!$course) {
-            return response()->json(['message' => 'Unauthorized or course not found'], Response::HTTP_FORBIDDEN);
-        }
-
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'video_url' => 'nullable|file|mimes:mp4,avi,mkv|max:10240', // Validation for video file
         ]);
 
-        // Handle video file upload if provided
+        // Handle video upload
         $videoPath = null;
         if ($request->hasFile('video_url')) {
+            // Generating a unique name for the video file
             $videoName = uniqid() . '.' . $request->file('video_url')->getClientOriginalExtension();
-            $videoPath = $request->file('video_url')->storeAs('public/lessons/videos', $videoName); // Store video with a unique name
+            // Storing the video file in the 'public/lessons/videos' directory
+            $videoPath = $request->file('video_url')->storeAs('public/lessons/videos', $videoName);
         }
 
-        // Create the lesson record
+        // Create the lesson
         $lesson = Lesson::create([
             'course_id' => $courseId,
             'title' => $request->title,
             'content' => $request->content,
-            'video_url' => $videoPath, // Store the video path
+            'video_url' => $videoPath, // Save the path to the video
         ]);
 
-        return response()->json($lesson, Response::HTTP_CREATED);
+        return redirect()->route('instructor.lessons.index', $courseId)->with('success', 'Lesson created successfully.');
     }
 
-    /**
-     * Show the form for editing the specified lesson.
-     */
     public function edit($courseId, $lessonId)
     {
-        // تحقق من أن الدورة والدروس تخص المدرس الحالي
-        $course = Course::where('id', $courseId)->where('user_id', auth()->id())->first();
-        $lesson = Lesson::where('course_id', $courseId)->find($lessonId);
-
-        if (!$course || !$lesson) {
-            return response()->json(['message' => 'Unauthorized or lesson not found'], Response::HTTP_FORBIDDEN);
-        }
-
-        // Show the form or response for editing the lesson (can be an API response or a view)
-        return response()->json(['message' => 'Show lesson edit form'], Response::HTTP_OK);
+        $course = Course::where('instructor_id', Auth::id())->findOrFail($courseId);
+        $lesson = $course->lessons()->findOrFail($lessonId);
+        return view('instructor.lessons.edit', compact('course', 'lesson'));
     }
 
-    /**
-     * Update the specified lesson.
-     */
     public function update(Request $request, $courseId, $lessonId)
     {
-        // تحقق من أن الدورة والدروس تخص المدرس الحالي
-        $course = Course::where('id', $courseId)->where('user_id', auth()->id())->first();
         $lesson = Lesson::where('course_id', $courseId)->findOrFail($lessonId);
-
-        if (!$course) {
-            return response()->json(['message' => 'Unauthorized or course not found'], Response::HTTP_FORBIDDEN);
-        }
-
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'video_url' => 'nullable|file|mimes:mp4,avi,mkv|max:10240', // Validation for video file
+            'video_url' => 'nullable|file|mimes:mp4,avi,mkv|max:10240', // Validate the video format
         ]);
 
-        // Handle video file upload and deletion if provided
+        // Handle video upload and deletion
         if ($request->hasFile('video_url')) {
             // Delete the old video if it exists
             if ($lesson->video_url && Storage::exists($lesson->video_url)) {
                 Storage::delete($lesson->video_url);
             }
 
+            // Upload the new video
             $videoName = uniqid() . '.' . $request->file('video_url')->getClientOriginalExtension();
-            $videoPath = $request->file('video_url')->storeAs('public/lessons/videos', $videoName); // Store video with a unique name
-            $lesson->video_url = $videoPath;
+            $videoPath = $request->file('video_url')->storeAs('public/lessons/videos', $videoName);
+            $lesson->video_url = $videoPath; // Update the video path
         }
 
-        // Update lesson record
-        $lesson->update($request->only(['title', 'content'])); // Update only title and content
+        // Update the lesson's title and content
+        $lesson->update($request->only(['title', 'content']));
 
-        return response()->json($lesson, Response::HTTP_OK);
+        return redirect()->route('instructor.lessons.index', $courseId)->with('success', 'Lesson updated successfully.');
     }
 
-    /**
-     * Remove the specified lesson.
-     */
     public function destroy($courseId, $lessonId)
     {
-        // تحقق من أن الدورة والدروس تخص المدرس الحالي
-        $course = Course::where('id', $courseId)->where('user_id', auth()->id())->first();
         $lesson = Lesson::where('course_id', $courseId)->findOrFail($lessonId);
-
-        if (!$course) {
-            return response()->json(['message' => 'Unauthorized or course not found'], Response::HTTP_FORBIDDEN);
-        }
 
         // Delete the video if it exists
         if ($lesson->video_url && Storage::exists($lesson->video_url)) {
@@ -169,6 +96,6 @@ class InstructorLessonController extends Controller
         }
 
         $lesson->delete();
-        return response()->json(['message' => 'Lesson deleted successfully'], Response::HTTP_OK);
+        return redirect()->route('instructor.lessons.index', $courseId)->with('success', 'Lesson deleted successfully.');
     }
 }

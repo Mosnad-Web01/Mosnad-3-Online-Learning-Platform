@@ -120,11 +120,11 @@ class CourseController extends Controller
     // public function index(Request $request)
     // {
     //     $user = $request->user();
-    
+
     //     if (!$user) {
     //         return response()->json(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
     //     }
-    
+
     //     if ($user->role === 'student') {
     //         $courses = $user->courses()->with(['category', 'instructor', 'lessons'])->get();
     //     } elseif ($user->role === 'instructor') {
@@ -132,14 +132,14 @@ class CourseController extends Controller
     //     } else {
     //         $courses = Course::with(['category', 'instructor', 'lessons'])->get();
     //     }
-    
+
     //     // إضافة رابط الصورة
     //     foreach ($courses as $course) {
     //         if ($course->image) {
     //             $course->image_url = asset('storage/' . $course->image);
     //         }
     //     }
-    
+
     //     return response()->json($courses, Response::HTTP_OK);
     // }
     // ------Code for test Token-----
@@ -157,7 +157,7 @@ class CourseController extends Controller
     //      ], 403);
     // }
     public function index(Request $request)
- {  
+ {
 
     // جلب جميع الكورسات مع العلاقات المرتبطة
     $courses = Course::with(['category', 'instructor', 'lessons'])->get();
@@ -173,7 +173,7 @@ class CourseController extends Controller
     return response()->json($courses, Response::HTTP_OK);
 }
 
-    
+
 
     /**
      * Display the specified course.
@@ -190,4 +190,23 @@ class CourseController extends Controller
         }
         return response()->json(['message' => 'Course not found'], Response::HTTP_NOT_FOUND);
     }
+    public function home()
+    {
+        $courses = Course::latest()->take(6)->get(); // جلب آخر 6 كورسات
+        return view('home', compact('courses'));
+    }
+    public function showDetails($id)
+{
+    // جلب الدورة مع الفئة، المدرب، والدروس
+    $course = Course::with(['category', 'instructor', 'lessons'])->findOrFail($id);
+
+    // إضافة رابط الصورة إذا كانت موجودة
+    if ($course->image) {
+        $course->image_url = asset('storage/' . $course->image);
+    }
+
+    // إعادة العرض مع البيانات
+    return view('courses.show', compact('course'));
+}
+
 }
