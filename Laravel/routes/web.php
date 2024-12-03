@@ -54,7 +54,9 @@ Route::middleware('web')->group(function () {
 Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
 
         // مسارات لوحة التحكم للمسؤول
-        Route::prefix('admin')->group(function () {
+        Route::prefix('admin')
+        ->middleware(['role:Admin'])
+        ->group(function () {
             Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
             Route::resource('/users', AdminUserController::class);
         });
