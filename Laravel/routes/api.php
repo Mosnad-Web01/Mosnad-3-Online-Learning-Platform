@@ -51,6 +51,8 @@ Route::middleware('web')->group(function () {
         Route::put('{id}', [CourseCategoryController::class, 'update']);
         Route::delete('{id}', [CourseCategoryController::class, 'destroy']);
     });
+
+    
     Route::middleware('auth:sanctum')->group(function () {
         // مسارات تتطلب مصادقة باستخدام Sanctum
         Route::get('/user', [UserController::class, 'show']);

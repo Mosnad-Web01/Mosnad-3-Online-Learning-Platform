@@ -9,6 +9,7 @@ export default {
         './resources/**/*.js',
         './resources/**/*.vue',
     ],
+    darkMode: 'class', // تفعيل الوضع الليلي بناءً على الفئة 'dark'
     theme: {
         extend: {
             fontFamily: {
