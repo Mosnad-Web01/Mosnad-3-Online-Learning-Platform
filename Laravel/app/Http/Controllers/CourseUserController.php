@@ -65,4 +65,19 @@ class CourseUserController extends Controller
 
         return response()->json(['message' => 'Course enrollment deleted successfully']);
     }
+    public function getByUserAndCourse(Request $request)
+    {
+        $userId = $request->query('user_id');
+        $courseId = $request->query('course_id');
+
+        if ($userId && $courseId) {
+            return CourseUser::where('user_id', $userId)
+                             ->where('course_id', $courseId)
+                             ->firstOrFail();
+        }
+
+        return response()->json(['error' => 'Invalid parameters'], 400);
+    }
+
+
 }

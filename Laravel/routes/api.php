@@ -87,7 +87,7 @@ Route::middleware('web')->group(function () {
         // مسارات المشرفين
         Route::prefix('admin')->middleware('role:admin')->group(function () {
             Route::get('/dashboard', [AdminController::class, 'dashboard']);
-            Route::get('/users', [AdminController::class, 'listUsers']);
+            Route::resource('/users', [AdminController::class, 'listUsers']);
         });
 
         // مسارات المعلمين
