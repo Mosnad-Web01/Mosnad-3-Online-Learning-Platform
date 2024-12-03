@@ -58,29 +58,33 @@ class AdminUserController extends Controller
      */
     public function edit(User $user)
     {
-        return view('users.edit', compact('user')); // عرض صفحة تعديل مستخدم معين
+        return view('admin.users.edit', compact('user')); // عرض صفحة تعديل مستخدم معين
     }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, User $user)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8|confirmed',
-        ]);
+{
+    $validated = $request->validate([
+        'reason' => 'required|string|max:255', // Reason is required and should be a string with a maximum length of 255 characters
+        'end_date' => 'required|date|after:today', // End date is required and must be a date after today
+        'is_suspended' => 'nullable|boolean', // Optional boolean field to indicate suspension status
+    ]);
 
-        $user->update([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => $validated['password'] ? bcrypt($validated['password']) : $user->password,
-        ]);
+    // Update user data based on the validated input
+    $user->update([
+        'is_suspended' => $request->has('is_suspended') ? $request->input('is_suspended') : $user->is_suspended, // Check if 'is_suspended' is provided, otherwise keep the current value
+        'suspension_reason' => $validated['reason'], // Use validated data
+        'suspension_start_date' => now(),
+        'suspension_end_date' => $validated['end_date'], // Use validated data
+        //  'suspended_by' => auth()->id(), // Optionally include the user who suspended
+    ]);
 
-        return redirect()->route('users.index')
-            ->with('success', 'User updated successfully.');
-    }
+    return redirect()->route('users.index')
+        ->with('success', 'User updated successfully.');
+}
+
 
     /**
      * Remove the specified resource from storage.

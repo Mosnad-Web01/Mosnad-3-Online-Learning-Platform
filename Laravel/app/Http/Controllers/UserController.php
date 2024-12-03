@@ -75,7 +75,7 @@ class UserController extends Controller
             'suspension_reason' => $request->input('reason'),
             'suspension_start_date' => now(),
             'suspension_end_date' => $request->input('end_date'),
-            // 'suspended_by' => auth()->id(),
+            'suspended_by' => auth()->id(),
         ]);
 
         return response()->json(['message' => 'User suspended successfully']);
