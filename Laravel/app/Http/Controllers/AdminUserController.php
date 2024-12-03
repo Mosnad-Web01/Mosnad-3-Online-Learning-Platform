@@ -10,11 +10,23 @@ class AdminUserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $users = User::all(); // جلب كل المستخدمين
-        return view('admin.users.index', compact('users')); // عرض صفحة قائمة المستخدمين
+    public function index(Request $request)
+{
+    $query = User::query();
+
+    if ($request->has('search') && $request->search) {
+        $searchTerm = $request->search;
+        $query->where(function($q) use ($searchTerm) {
+            $q->where('name', 'like', '%' . $searchTerm . '%')
+              ->orWhere('email', 'like', '%' . $searchTerm . '%')
+              ->orWhere('role', 'like', '%' . $searchTerm . '%');
+        });
     }
+
+    $users = $query->paginate(10);  // إرجاع النتائج مع التصفية بناءً على البحث
+    return view('admin.users.index', compact('users'));
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -67,19 +79,27 @@ class AdminUserController extends Controller
     public function update(Request $request, User $user)
 {
     $validated = $request->validate([
-        'reason' => 'required|string|max:255', // Reason is required and should be a string with a maximum length of 255 characters
-        'end_date' => 'required|date|after:today', // End date is required and must be a date after today
-        'is_suspended' => 'nullable|boolean', // Optional boolean field to indicate suspension status
-    ]);
+        // Conditionally require fields based on the value of is_suspended
+        'suspension_reason' => 'required_if:is_suspended,true|string|max:255', // Only required if is_suspended is true
+        'end_date' => 'required_if:is_suspended,true|date|after:today', // Only required if is_suspended is true
+        'role' => 'required|in:admin,student,instructor', // Ensure role is one of the valid options
 
-    // Update user data based on the validated input
-    $user->update([
-        'is_suspended' => $request->has('is_suspended') ? $request->input('is_suspended') : $user->is_suspended, // Check if 'is_suspended' is provided, otherwise keep the current value
-        'suspension_reason' => $validated['reason'], // Use validated data
-        'suspension_start_date' => now(),
-        'suspension_end_date' => $validated['end_date'], // Use validated data
-        //  'suspended_by' => auth()->id(), // Optionally include the user who suspended
     ]);
+    
+    // Manually set the boolean value based on the checkbox
+    $isSuspended = filter_var($request->input('is_suspended'), FILTER_VALIDATE_BOOLEAN);
+    
+    // Update user data based on validated input
+    $user->update([
+        'is_suspended' => $isSuspended, // Save boolean value
+        'suspension_reason' => $request->input('suspension_reason'), // Use validated data
+        'suspension_start_date' => now(),
+        'suspension_end_date' => $request->input('end_date'), // Use validated data
+         'suspended_by' => auth()->id(), // Optionally include the user who suspended
+         'role' => $request->input('role'), // Add role field to the update
+
+    ]);
+    
 
     return redirect()->route('users.index')
         ->with('success', 'User updated successfully.');

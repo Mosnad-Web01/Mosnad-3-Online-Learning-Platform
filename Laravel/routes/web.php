@@ -60,11 +60,12 @@ Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
         });
 
         // مسارات لوحة التحكم للمدرب
-        Route::prefix('instructor')->group(function () {
-
+        Route::prefix('instructor')
+        ->middleware(['role:Admin,Instructor'])
+        ->group(function () {
             // لوحة تحكم المدرب
             Route::get('/dashboard', [InstructorDashboardController::class, 'index'])->name('instructor.dashboard');
-
+    
             // مسارات إدارة الدورات التدريبية
             Route::get('/courses', [InstructorCourseController::class, 'index'])->name('instructor.courses.index');
             Route::get('/courses/create', [InstructorCourseController::class, 'create'])->name('instructor.courses.create');
@@ -72,7 +73,8 @@ Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
             Route::get('/courses/{id}/edit', [InstructorCourseController::class, 'edit'])->name('instructor.courses.edit');
             Route::put('/courses/{id}', [InstructorCourseController::class, 'update'])->name('instructor.courses.update');
             Route::delete('/courses/{id}', [InstructorCourseController::class, 'destroy'])->name('instructor.courses.destroy');
-
+        
+    
             // مسارات إدارة الدروس
             Route::get('/instructor/courses/{courseId}/lessons', [InstructorLessonController::class, 'index'])->name('instructor.lessons.index');
             Route::get('/courses/{courseId}/lessons/create', [InstructorLessonController::class, 'create'])->name('instructor.lessons.create');

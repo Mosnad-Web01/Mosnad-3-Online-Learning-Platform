@@ -82,10 +82,10 @@ class User extends Authenticatable
     /**
      * Relationship with the Role model.
      */
-    public function roles()
-    {
-        return $this->belongsToMany(Role::class, 'role_user');
-    }
+    // public function roles()
+    // {
+    //     return $this->belongsToMany(Role::class, 'role_user');
+    // }
 
     public function hasRole($role)
 {

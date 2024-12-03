@@ -1,5 +1,5 @@
-<x-layout>
+<x-layout-admin>
 
   
 
-</x-layout>
+</x-layout-admin>

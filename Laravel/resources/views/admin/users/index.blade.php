@@ -175,4 +175,13 @@
             </div>
         </div>
     </section>
+    <script>
+    document.getElementById('simple-search').addEventListener('input', function(event) {
+        let searchTerm = event.target.value;
+        let url = new URL(window.location.href);
+        url.searchParams.set('search', searchTerm);  // إضافة النص إلى معلمات الاستعلام
+        window.location.href = url;  // إعادة تحميل الصفحة مع معلمات البحث الجديدة
+    });
+</script>
+
 </x-layout-admin>
