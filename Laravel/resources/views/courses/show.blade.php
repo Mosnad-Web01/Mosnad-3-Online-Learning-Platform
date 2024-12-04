@@ -1,7 +1,7 @@
 <x-layout>
     <div class="flex">
         <!-- المحتوى الرئيسي -->
-        <main class="flex-1 ml-72 mt-8"> <!-- إضافة هامش يسار -->
+        <main class="flex-1 mt-8"> <!-- إضافة هامش يسار -->
             <div class="bg-white dark:bg-gray-800 text-black dark:text-white min-h-screen py-8 px-4">
                 <div class="w-full px-0 py-0">
                     <!-- قسم تفاصيل الدورة مع حركة -->

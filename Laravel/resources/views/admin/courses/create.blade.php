@@ -10,7 +10,7 @@
                 <div class="mb-4 text-red-500 text-sm">{{ session('error') }}</div>
             @endif
 
-            <form action="{{ route('instructor.courses.store') }}" method="POST" enctype="multipart/form-data" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 space-y-6">
+            <form action="{{ route('admin.courses.store') }}" method="POST" enctype="multipart/form-data" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 space-y-6">
                 @csrf
 
                 {{-- Course Name --}}
@@ -55,6 +55,20 @@
                     @error('category_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
 
+                {{-- Instructor --}}
+                <div class="mb-4">
+                    <label for="instructor_id" class="block text-gray-700 dark:text-gray-300 font-medium">Instructor</label>
+                    <select name="instructor_id" id="instructor_id" required
+                            class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">
+                        @foreach ($instructors as $instructor)
+                            <option value="{{ $instructor->id }}" {{ old('instructor_id') == $instructor->id ? 'selected' : '' }}>
+                                {{ $instructor->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('instructor_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                </div>
+
                 {{-- Price --}}
                 <div class="mb-4">
                     <label class="block text-gray-700 dark:text-gray-300 font-medium">Is the Course Free?</label>
@@ -74,7 +88,6 @@
                            class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4" {{ old('is_free') == 1 ? 'readonly' : '' }}>
                     @error('price') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
-
 
                 {{-- Dates --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -96,50 +109,34 @@
                 {{-- Language --}}
                 <div class="mb-4">
                     <label for="language" class="block text-gray-700 dark:text-gray-300 font-medium">Language</label>
-                    <input type="text" name="language" id="language" value="{{ old('language') }}"
-                           class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">
+                    <select name="language" id="language" required
+                            class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">
+                        <option value="English" {{ old('language') == 'English' ? 'selected' : '' }}>English</option>
+                        <option value="Arabic" {{ old('language') == 'Arabic' ? 'selected' : '' }}>Arabic</option>
+                    </select>
                     @error('language') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
 
-                {{-- Requirements --}}
-                <div class="mb-4">
-                    <label for="requirements" class="block text-gray-700 dark:text-gray-300 font-medium">Requirements</label>
-                    <textarea name="requirements" id="requirements" rows="3"
-                              class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">{{ old('requirements') }}</textarea>
-                    @error('requirements') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
-
-                {{-- Learning Outcomes --}}
-                <div class="mb-4">
-                    <label for="learning_outcomes" class="block text-gray-700 dark:text-gray-300 font-medium">Learning Outcomes</label>
-                    <textarea name="learning_outcomes" id="learning_outcomes" rows="3"
-                              class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">{{ old('learning_outcomes') }}</textarea>
-                    @error('learning_outcomes') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
-
-                {{-- Image --}}
-                <div class="mb-4">
-                    <label for="image" class="block text-gray-700 dark:text-gray-300 font-medium">Course Image</label>
-                    <input type="file" name="image" id="image"
-                           class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">
-                    @error('image') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
-
                 {{-- Submit Button --}}
-                <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-600 transition duration-300">
-                    Create Course
-                </button>
+                <div class="flex justify-center">
+                    <button type="submit" class="w-full md:w-auto px-6 py-2.5 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none">
+                        Create Course
+                    </button>
+                </div>
             </form>
         </div>
     </section>
-    <script>
-        // Toggle the price field based on the radio selection
-        function togglePriceField(isFree) {
-            const priceInput = document.getElementById('price');
-            priceInput.readOnly = isFree;
-            if (isFree) {
-                priceInput.value = 0;  // Set the price to 0 if it's free
-            }
-        }
-    </script>
 </x-layout>
+
+<script>
+    // Handle the price field visibility based on the course's free status
+    function togglePriceField(isFree) {
+        const priceField = document.getElementById('price');
+        if (isFree) {
+            priceField.setAttribute('readonly', true);
+            priceField.value = '';  // Clear price if free
+        } else {
+            priceField.removeAttribute('readonly');
+        }
+    }
+</script>

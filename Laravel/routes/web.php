@@ -16,7 +16,14 @@ use App\Http\Controllers\{
     LessonCompletionController,
     CourseCategoryController,
     CourseController,
-    InstructorCategoryController
+    InstructorCategoryController,
+    AdminLessonController,
+    AdminCourseController,
+    AdminCategoryController,
+    AdminController,
+    InstructorController,
+    UserController
+
 };
 
 // مجموعة مسارات الويب
@@ -34,6 +41,8 @@ Route::middleware('web')->group(function () {
     Route::get('/login', [WebAuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [WebAuthController::class, 'login'])->name('login.submit');
     Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
+    Route::post('/admin/logout', [AdminController::class, 'logout']);
+    Route::post('/instructor/logout', [InstructorController::class, 'logout']);
 
     // مسارات تسجيل المستخدم الجديد
     Route::get('/signup', [SignupController::class, 'create'])->name('signup');
@@ -75,6 +84,9 @@ Route::middleware('web')->group(function () {
             Route::get('/courses/{courseId}/lessons/{lessonId}/edit', [InstructorLessonController::class, 'edit'])->name('instructor.lessons.edit');
             Route::put('/courses/{courseId}/lessons/{lessonId}', [InstructorLessonController::class, 'update'])->name('instructor.lessons.update');
             Route::delete('/courses/{courseId}/lessons/{lessonId}', [InstructorLessonController::class, 'destroy'])->name('instructor.lessons.destroy');
+            Route::delete('/instructor/lessons/{courseId}/{lessonId}/images/{imageIndex}', [InstructorLessonController::class, 'deleteImage'])
+             ->name('instructor.lessons.deleteImage');
+
 
             // مسارات إدارة الطلاب
             Route::get('/courses/{courseId}/students', [CourseUserController::class, 'index'])->name('instructor.students.index');
@@ -83,6 +95,49 @@ Route::middleware('web')->group(function () {
             Route::delete('/courses/{courseId}/students/{studentId}', [CourseUserController::class, 'destroy'])->name('instructor.students.destroy');
         });
     });
+    Route::middleware(['auth:sanctum'])->group(function () {
+
+        // مسارات لوحة تحكم الإدمن
+        Route::prefix('admin')->name('admin.')->group(function () {
+            // لوحة تحكم الإدمن
+            Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+            // مسارات إدارة فئات الكورسات
+            Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
+            Route::get('/categories/create', [AdminCategoryController::class, 'create'])->name('categories.create');
+            Route::post('/categories', [AdminCategoryController::class, 'store'])->name('categories.store');
+            Route::get('/categories/{id}/edit', [AdminCategoryController::class, 'edit'])->name('categories.edit');
+            Route::put('/categories/{id}', [AdminCategoryController::class, 'update'])->name('categories.update');
+            Route::delete('/categories/{id}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
+
+            // مسارات إدارة الدورات
+            Route::get('/courses', [AdminCourseController::class, 'index'])->name('courses.index');
+            Route::get('/courses/create', [AdminCourseController::class, 'create'])->name('courses.create');
+            Route::post('/courses', [AdminCourseController::class, 'store'])->name('courses.store');
+            Route::get('/courses/{id}/edit', [AdminCourseController::class, 'edit'])->name('courses.edit');
+            Route::put('/courses/{id}', [AdminCourseController::class, 'update'])->name('courses.update');
+            Route::delete('/courses/{id}', [AdminCourseController::class, 'destroy'])->name('courses.destroy');
+
+            // مسارات إدارة الدروس
+            Route::get('/courses/{courseId}/lessons', [AdminLessonController::class, 'index'])->name('lessons.index');
+            Route::get('/courses/{courseId}/lessons/create', [AdminLessonController::class, 'create'])->name('lessons.create');
+            Route::post('/courses/{courseId}/lessons', [AdminLessonController::class, 'store'])->name('lessons.store');
+            Route::get('/courses/{courseId}/lessons/{lessonId}/edit', [AdminLessonController::class, 'edit'])->name('lessons.edit');
+            Route::put('/courses/{courseId}/lessons/{lessonId}', [AdminLessonController::class, 'update'])->name('lessons.update');
+            Route::delete('/courses/{courseId}/lessons/{lessonId}', [AdminLessonController::class, 'destroy'])->name('lessons.destroy');
+
+            // مسارات إدارة المستخدمين
+            Route::get('/users', [UserController::class, 'index'])->name('users.index');
+            Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+            Route::post('/users', [UserController::class, 'store'])->name('users.store');
+            Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
+            Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+            Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+        });
+
+    });
+
+
 
     // مسارات إضافية متعلقة بالدورات التدريبية
     Route::get('/', [CourseController::class, 'home'])->name('home');
@@ -92,4 +147,5 @@ Route::middleware('web')->group(function () {
     Route::prefix('instructor')->middleware('auth')->name('instructor.')->group(function () {
         Route::resource('categories', InstructorCategoryController::class);
     });
+
 });

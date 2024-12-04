@@ -52,7 +52,7 @@ Route::middleware('web')->group(function () {
         Route::delete('{id}', [CourseCategoryController::class, 'destroy']);
     });
 
-    
+
     Route::middleware('auth:sanctum')->group(function () {
         // مسارات تتطلب مصادقة باستخدام Sanctum
         Route::get('/user', [UserController::class, 'show']);
@@ -99,11 +99,9 @@ Route::middleware('web')->group(function () {
 
 
         // مسارات الالتحاق بالدورات
-        Route::prefix('enrollments')->group(function () {
-            Route::get('/', [EnrollmentController::class, 'index']);
-            Route::post('/', [EnrollmentController::class, 'store']);
-            Route::put('{enrollment}', [EnrollmentController::class, 'update']);
-            Route::delete('{enrollment}', [EnrollmentController::class, 'destroy']);
+        Route::middleware('auth:api')->group(function () {
+            Route::post('/courses/{courseId}/enroll', [EnrollmentController::class, 'enroll']);
+            Route::patch('/courses/{courseId}/progress', [EnrollmentController::class, 'updateProgress']);
         });
 
         // مسارات إكمال الدروس

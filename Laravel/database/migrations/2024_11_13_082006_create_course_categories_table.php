@@ -14,13 +14,14 @@ return new class extends Migration
         Schema::create('course_categories', function (Blueprint $table) {
             $table->id();
             $table->string('name', 50)->unique();
+            $table->string('image')->nullable();  // إضافة الحقل لصورة الفئة
+            $table->text('description')->nullable();  // إضافة الحقل للوصف
             $table->timestamps();
         });
     }
-    
+
     public function down()
     {
         Schema::dropIfExists('course_categories');
     }
-    
 };

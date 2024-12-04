@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CourseCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class InstructorCategoryController extends Controller
 {
@@ -35,6 +36,8 @@ class InstructorCategoryController extends Controller
         // التحقق من صحة البيانات
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:50|unique:course_categories,name',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'description' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -43,9 +46,18 @@ class InstructorCategoryController extends Controller
                              ->withInput();
         }
 
+        // تخزين الصورة إذا كانت موجودة
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imageName = uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
+            $imagePath = $request->file('image')->storeAs('public/categories/' . $request->name, $imageName); // تخزين الصورة داخل مجلد الفئة
+        }
+
         // إنشاء الفئة
         CourseCategory::create([
             'name' => $request->name,
+            'image' => $imagePath,  // حفظ مسار الصورة
+            'description' => $request->description,  // حفظ الوصف
         ]);
 
         return redirect()->route('instructor.categories.index')
@@ -71,6 +83,8 @@ class InstructorCategoryController extends Controller
         // التحقق من صحة البيانات
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:50|unique:course_categories,name,' . $id,
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'description' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -82,9 +96,23 @@ class InstructorCategoryController extends Controller
         // جلب الفئة بناءً على المعرف
         $category = CourseCategory::findOrFail($id);
 
+        // تخزين الصورة الجديدة إذا كانت موجودة
+        $imagePath = $category->image; // حفظ المسار الحالي
+        if ($request->hasFile('image')) {
+            // حذف الصورة القديمة إذا كانت موجودة
+            if ($imagePath && Storage::exists($imagePath)) {
+                Storage::delete($imagePath);
+            }
+
+            $imageName = uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
+            $imagePath = $request->file('image')->storeAs('public/categories/' . $category->name, $imageName); // تخزين الصورة داخل مجلد الفئة
+        }
+
         // تحديث الفئة
         $category->update([
             'name' => $request->name,
+            'image' => $imagePath,  // تحديث مسار الصورة
+            'description' => $request->description,  // تحديث الوصف
         ]);
 
         return redirect()->route('instructor.categories.index')
@@ -98,6 +126,11 @@ class InstructorCategoryController extends Controller
     {
         // جلب الفئة بناءً على المعرف
         $category = CourseCategory::findOrFail($id);
+
+        // حذف الصورة المرتبطة بالفئة
+        if ($category->image && Storage::exists($category->image)) {
+            Storage::delete($category->image);
+        }
 
         // حذف الفئة
         $category->delete();

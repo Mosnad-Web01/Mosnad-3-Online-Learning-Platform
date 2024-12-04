@@ -9,7 +9,8 @@ class CourseCategory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'image', 'description'];  // إضافة الصورة والوصف
+
 
     public function courses()
     {

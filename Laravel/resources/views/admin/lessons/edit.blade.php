@@ -12,7 +12,7 @@
                 <div class="mb-4 text-red-500 text-sm">{{ session('error') }}</div>
             @endif
 
-            <form action="{{ route('instructor.lessons.update', [$course->id, $lesson->id]) }}" method="POST" enctype="multipart/form-data" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 space-y-6">
+            <form action="{{ route('admin.lessons.update', [$course->id, $lesson->id]) }}" method="POST" enctype="multipart/form-data" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 space-y-6">
                 @csrf
                 @method('PUT')
 
@@ -45,37 +45,24 @@
                     @error('video') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
 
-                {{-- Images --}}
-                <div class="mb-4">
-                    <label for="images" class="block text-gray-700 dark:text-gray-300 font-medium">Upload New Images</label>
-                    <input type="file" name="images[]" id="images" accept="image/*" multiple
-                        class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">
                     @if($lesson->images)
-                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Current Images:</p>
-                        <ul class="mt-2 list-disc list-inside">
-                            @foreach($lesson->images as $image)
-                                <li><a href="{{ asset('storage/' . $image) }}" target="_blank" class="text-blue-500 underline">{{ basename($image) }}</a></li>
-                            @endforeach
-                        </ul>
-                    @endif
-                    @error('images.*') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
+                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Current Images:</p>
+                    <ul class="mt-2 list-disc list-inside">
+                        @foreach($lesson->images as $image)
+                            <li>{{ $image }}</li> <!-- Or display the image itself, based on your needs -->
+                        @endforeach
+                    </ul>
+                @endif
 
-                {{-- Files --}}
-                <div class="mb-4">
-                    <label for="files" class="block text-gray-700 dark:text-gray-300 font-medium">Upload New Files</label>
-                    <input type="file" name="files[]" id="files" accept=".pdf,.docx,.txt" multiple
-                        class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">
-                    @if($lesson->files)
-                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Current Files:</p>
-                        <ul class="mt-2 list-disc list-inside">
-                            @foreach($lesson->files as $file)
-                                <li><a href="{{ asset('storage/' . $file) }}" target="_blank" class="text-blue-500 underline">{{ basename($file) }}</a></li>
-                            @endforeach
-                        </ul>
-                    @endif
-                    @error('files.*') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
+                @if($lesson->files)
+                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Current Files:</p>
+                    <ul class="mt-2 list-disc list-inside">
+                        @foreach($lesson->files as $file)
+                            <li>{{ $file }}</li> <!-- Or display the file details -->
+                        @endforeach
+                    </ul>
+                @endif
+
 
                 {{-- Order --}}
                 <div class="mb-4">
