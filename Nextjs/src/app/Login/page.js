@@ -13,9 +13,9 @@ export default function Login() {
     e.preventDefault();
     try {
       const response = await loginUser({ email, password }); // استدعاء API لتسجيل الدخول
-      localStorage.setItem("studentId", response.data.student.id); // تخزين studentId
+      // localStorage.setItem("studentId", response.data.student.id); // تخزين studentId
       setError(""); // إزالة رسالة الخطأ
-      router.push("/Profile"); // التوجيه إلى صفحة الملف الشخصي عند النجاح
+       router.push("/"); // التوجيه إلى صفحة الملف الشخصي عند النجاح
     } catch (error) {
       setError(
         error.response?.data?.error || "Invalid credentials. Please try again."
