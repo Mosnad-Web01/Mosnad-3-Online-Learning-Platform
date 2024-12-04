@@ -51,12 +51,18 @@ Route::middleware('web')->group(function () {
         Route::put('{id}', [CourseCategoryController::class, 'update']);
         Route::delete('{id}', [CourseCategoryController::class, 'destroy']);
     });
-
-    
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum'])->group(function () {
         // مسارات تتطلب مصادقة باستخدام Sanctum
-        Route::get('/user', [UserController::class, 'show']);
         Route::post('/logout', [AuthController::class, 'logout']);
+        
+        Route::get('/users', [UserController::class, 'index'])->name('api.users.index');  // View all users
+        Route::post('/users/{user}/suspend', [UserController::class, 'suspend']);
+        Route::post('/users/{user}/unsuspend', [UserController::class, 'unsuspend']);
+        Route::post('/users/{user}/assign-role', [UserController::class, 'assignRole']);  // Assign role
+        Route::post('/users/{user}/modify-role', [UserController::class, 'modifyRole']);  // Modify role
+        Route::delete('/users/{user}', [UserController::class, 'destroy']);  // Delete user
+
+
 
         // مسارات الدروس
         Route::prefix('courses/{courseId}/lessons')->name('courses.lessons.')->group(function () {

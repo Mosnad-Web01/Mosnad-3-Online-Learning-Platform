@@ -16,7 +16,8 @@ use App\Http\Controllers\{
     LessonCompletionController,
     CourseCategoryController,
     CourseController,
-    InstructorCategoryController
+    InstructorCategoryController,
+    AdminUserController
 };
 
 // مجموعة مسارات الويب
@@ -33,33 +34,40 @@ Route::middleware('web')->group(function () {
     // مسارات تسجيل الدخول والخروج
     Route::get('/login', [WebAuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [WebAuthController::class, 'login'])->name('login.submit');
-    Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
 
     // مسارات تسجيل المستخدم الجديد
     Route::get('/signup', [SignupController::class, 'create'])->name('signup');
     Route::post('/signup', [SignupController::class, 'store'])->name('signup.submit');
 
-    // مسار لوحة التحكم العام (يتحقق من المصادقة)
-    Route::get('/dashboard', function () {
-        $user = Auth::user();
-        if (!$user) {
-            return redirect('/login');
-        }
-        return view('dashboard');
-    });
+   
 
     // مجموعة مسارات مصادقة المستخدم باستخدام Sanctum
     Route::middleware(['auth:sanctum'])->group(function () {
+ // مسار لوحة التحكم العام (يتحقق من المصادقة)
+ Route::get('/dashboard', function () {
+    $user = Auth::user();
+    if (!$user) {
+        return redirect('/login');
+    }
+    return view('dashboard');
+});
+Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
 
         // مسارات لوحة التحكم للمسؤول
-        Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+        Route::prefix('admin')
+        ->middleware(['role:Admin'])
+        ->group(function () {
+            Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+            Route::resource('/users', AdminUserController::class);
+        });
 
         // مسارات لوحة التحكم للمدرب
-        Route::prefix('instructor')->group(function () {
-
+        Route::prefix('instructor')
+        ->middleware(['role:Admin,Instructor'])
+        ->group(function () {
             // لوحة تحكم المدرب
             Route::get('/dashboard', [InstructorDashboardController::class, 'index'])->name('instructor.dashboard');
-
+    
             // مسارات إدارة الدورات التدريبية
             Route::get('/courses', [InstructorCourseController::class, 'index'])->name('instructor.courses.index');
             Route::get('/courses/create', [InstructorCourseController::class, 'create'])->name('instructor.courses.create');
@@ -67,7 +75,8 @@ Route::middleware('web')->group(function () {
             Route::get('/courses/{id}/edit', [InstructorCourseController::class, 'edit'])->name('instructor.courses.edit');
             Route::put('/courses/{id}', [InstructorCourseController::class, 'update'])->name('instructor.courses.update');
             Route::delete('/courses/{id}', [InstructorCourseController::class, 'destroy'])->name('instructor.courses.destroy');
-
+        
+    
             // مسارات إدارة الدروس
             Route::get('/instructor/courses/{courseId}/lessons', [InstructorLessonController::class, 'index'])->name('instructor.lessons.index');
             Route::get('/courses/{courseId}/lessons/create', [InstructorLessonController::class, 'create'])->name('instructor.lessons.create');
