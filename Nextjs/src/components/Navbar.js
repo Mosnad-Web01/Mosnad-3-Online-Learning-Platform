@@ -5,7 +5,9 @@ import { FaSearch, FaMoon, FaSun, FaUser, FaBars, FaTimes } from "react-icons/fa
 import dynamic from "next/dynamic";
 import NavbarDropdown from "../components/NavbarDropdown";
 import Image from 'next/image';
-import { logoutStudent, getCurrentStudent } from "../services/api";
+// import { logoutStudent, getCurrentStudent } from "../services/api";
+import { fetchCurrentUser } from "@/services/api";
+
 import { toast } from "react-toastify";
 
 // Delay loading of `react-scroll` to avoid conflicts with SSR
@@ -28,20 +30,20 @@ const Navbar = () => {
     }
   }, []);
 
-  useEffect(() => {
-    // جلب بيانات الطالب الحالي عند التحميل
-    const fetchStudentData = async () => {
-      try {
-        const studentData = await getCurrentStudent();
-        setUser(studentData);
-      } catch (error) {
-        console.error("Error fetching student data:", error);
-        // يمكن إضافة معالجة إضافية إذا لزم الأمر
-      }
-    };
+  // useEffect(() => {
+  //   // جلب بيانات الطالب الحالي عند التحميل
+  //   const fetchStudentData = async () => {
+  //     try {
+  //       const studentData = await fetchCurrentUser();
+  //       setUser(studentData);
+  //     } catch (error) {
+  //       console.error("Error fetching student data:", error);
+  //       // يمكن إضافة معالجة إضافية إذا لزم الأمر
+  //     }
+  //   };
 
-    fetchStudentData();
-  }, []);
+  //   fetchStudentData();
+  // }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -65,8 +67,8 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await logoutStudent();
-      localStorage.removeItem("loggedInUser");
+      await logout();
+      // localStorage.removeItem("loggedInUser");
       setUser(null);
       toast.success("Logged out successfully");
     } catch (error) {
