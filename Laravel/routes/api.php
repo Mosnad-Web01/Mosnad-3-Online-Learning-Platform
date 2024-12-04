@@ -21,6 +21,9 @@ use App\Http\Controllers\PaymentController;
 Route::middleware('web')->get('/sanctum/csrf-cookie', function (Request $request) {
     return response()->json(['message' => 'CSRF token set', 'cookie' => $request]);
 });
+// مسارات عامة لا تتطلب مصادقة
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('web')->group(function () {
     // web Middleware:
@@ -28,9 +31,7 @@ Route::middleware('web')->group(function () {
     // Relies on cookies for authentication and state management.
     // Provides CSRF protection by default.
 
-    // مسارات عامة لا تتطلب مصادقة
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
+    
 
     // مسارات  تتطلب مصادقة
 

@@ -21,16 +21,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // بعد نجاح تسجيل الدخول، استرجاع الدور من الاستجابة
                 const userRole = response.data.user.role; // تأكد من أن الدور يتم إرجاعه في الاستجابة
-
         
                 // التوجيه بناءً على الدور
                 if (userRole === 'Admin') {
                     window.location.href = '/admin/dashboard';  // تحويل إلى لوحة تحكم المدير
                 } else if (userRole === 'Instructor') {
                     window.location.href = '/instructor/dashboard';  // تحويل إلى لوحة تحكم المدرب
-                } else {
-                     window.location.href = '/login';  // تحويل إلى لوحة تحكم أخرى للمستخدمين العاديين
-                }
+                } 
+                // else {
+                //      window.location.href = '/login';  // تحويل إلى لوحة تحكم أخرى للمستخدمين العاديين
+                // }
             })
             .catch(error => {
                 console.log(error);
