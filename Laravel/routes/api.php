@@ -42,8 +42,8 @@ Route::middleware('web')->group(function () {
         Route::put('{id}', [CourseController::class, 'update']);
         Route::delete('{id}', [CourseController::class, 'destroy']);
     });
+    
     // مسارات الفئات
-
     Route::prefix('categories')->group(function () {
         Route::post('/', [CourseCategoryController::class, 'store']);
         Route::get('/', [CourseCategoryController::class, 'index']);
@@ -52,11 +52,16 @@ Route::middleware('web')->group(function () {
         Route::delete('{id}', [CourseCategoryController::class, 'destroy']);
     });
 
-
     Route::middleware('auth:sanctum')->group(function () {
         // مسارات تتطلب مصادقة باستخدام Sanctum
-        Route::get('/user', [UserController::class, 'show']);
         Route::post('/logout', [AuthController::class, 'logout']);
+        
+        Route::get('/users', [UserController::class, 'index'])->name('api.users.index');  // View all users
+        Route::post('/users/{user}/suspend', [UserController::class, 'suspend']);
+        Route::post('/users/{user}/unsuspend', [UserController::class, 'unsuspend']);
+        Route::post('/users/{user}/assign-role', [UserController::class, 'assignRole']);  // Assign role
+        Route::post('/users/{user}/modify-role', [UserController::class, 'modifyRole']);  // Modify role
+        Route::delete('/users/{user}', [UserController::class, 'destroy']);  // Delete user
 
         // مسارات الدروس
         Route::prefix('courses/{courseId}/lessons')->name('courses.lessons.')->group(function () {
@@ -66,7 +71,6 @@ Route::middleware('web')->group(function () {
             Route::put('{lessonId}', [LessonController::class, 'update'])->name('update');
             Route::delete('{lessonId}', [LessonController::class, 'destroy'])->name('destroy');
         });
-
 
         // ملف تعريف المستخدم
         Route::prefix('user-profiles')->group(function () {
@@ -89,14 +93,6 @@ Route::middleware('web')->group(function () {
             Route::get('/courses', [InstructorController::class, 'myCourses']);
             Route::post('/course', [InstructorController::class, 'createCourse']);
         });
-
-        // // مسارات الطلاب
-        // Route::prefix('student')->middleware('role:student')->group(function () {
-        //     Route::get('/courses', [StudentController::class, 'enrolledCourses']);
-        //     Route::post('/enroll', [StudentController::class, 'enrollCourse']);
-        // });
-
-
 
         // مسارات الالتحاق بالدورات
         Route::middleware('auth:api')->group(function () {

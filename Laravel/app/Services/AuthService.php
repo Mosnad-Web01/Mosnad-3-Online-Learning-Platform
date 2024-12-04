@@ -19,6 +19,8 @@ class AuthService
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
+            'role' => 'required|in:instructor,student,admin', // التحقق من الدور
+
         ])->validate();
 
         // إنشاء المستخدم
@@ -26,6 +28,8 @@ class AuthService
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'role' => $data['role'],
+            'is_suspended' => 0, // تعيين حالة الإيقاف إلى 0 (غير موقوف)
         ]);
 
         // تعيين الدور الافتراضي
@@ -49,7 +53,12 @@ class AuthService
         }
 
         $user = Auth::user();
-
+        if ($user->is_suspended) {
+            return response()->json([
+                
+                'message' => 'Your account is suspended. Reason: ' . $user->suspension_reason
+            ], 403);
+        }
         // إنشاء XSRF-TOKEN
         $xsrfToken = csrf_token();
 

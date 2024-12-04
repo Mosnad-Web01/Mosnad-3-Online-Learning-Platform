@@ -22,8 +22,8 @@ use App\Http\Controllers\{
     AdminCategoryController,
     AdminController,
     InstructorController,
-    UserController
-
+    UserController,
+    AdminUserController
 };
 
 // مجموعة مسارات الويب
@@ -48,27 +48,32 @@ Route::middleware('web')->group(function () {
     Route::get('/signup', [SignupController::class, 'create'])->name('signup');
     Route::post('/signup', [SignupController::class, 'store'])->name('signup.submit');
 
-    // مسار لوحة التحكم العام (يتحقق من المصادقة)
-    Route::get('/dashboard', function () {
-        $user = Auth::user();
-        if (!$user) {
-            return redirect('/login');
-        }
-        return view('dashboard');
-    });
-
     // مجموعة مسارات مصادقة المستخدم باستخدام Sanctum
     Route::middleware(['auth:sanctum'])->group(function () {
+        // مسار لوحة التحكم العام (يتحقق من المصادقة)
+        Route::get('/dashboard', function () {
+            $user = Auth::user();
+            if (!$user) {
+                return redirect('/login');
+            }
+            return view('dashboard');
+        });
 
         // مسارات لوحة التحكم للمسؤول
-        Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+        Route::prefix('admin')
+        ->middleware(['role:Admin'])
+        ->group(function () {
+            Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+            Route::resource('/users', AdminUserController::class);
+        });
 
         // مسارات لوحة التحكم للمدرب
-        Route::prefix('instructor')->group(function () {
-
+        Route::prefix('instructor')
+        ->middleware(['role:Admin,Instructor'])
+        ->group(function () {
             // لوحة تحكم المدرب
             Route::get('/dashboard', [InstructorDashboardController::class, 'index'])->name('instructor.dashboard');
-
+    
             // مسارات إدارة الدورات التدريبية
             Route::get('/courses', [InstructorCourseController::class, 'index'])->name('instructor.courses.index');
             Route::get('/courses/create', [InstructorCourseController::class, 'create'])->name('instructor.courses.create');
@@ -76,7 +81,7 @@ Route::middleware('web')->group(function () {
             Route::get('/courses/{id}/edit', [InstructorCourseController::class, 'edit'])->name('instructor.courses.edit');
             Route::put('/courses/{id}', [InstructorCourseController::class, 'update'])->name('instructor.courses.update');
             Route::delete('/courses/{id}', [InstructorCourseController::class, 'destroy'])->name('instructor.courses.destroy');
-
+        
             // مسارات إدارة الدروس
             Route::get('/instructor/courses/{courseId}/lessons', [InstructorLessonController::class, 'index'])->name('instructor.lessons.index');
             Route::get('/courses/{courseId}/lessons/create', [InstructorLessonController::class, 'create'])->name('instructor.lessons.create');
@@ -87,15 +92,12 @@ Route::middleware('web')->group(function () {
             Route::delete('/instructor/lessons/{courseId}/{lessonId}/images/{imageIndex}', [InstructorLessonController::class, 'deleteImage'])
              ->name('instructor.lessons.deleteImage');
 
-
             // مسارات إدارة الطلاب
             Route::get('/courses/{courseId}/students', [CourseUserController::class, 'index'])->name('instructor.students.index');
             Route::get('/courses/{courseId}/students/{studentId}/edit', [CourseUserController::class, 'edit'])->name('instructor.students.edit');
             Route::put('/courses/{courseId}/students/{studentId}', [CourseUserController::class, 'update'])->name('instructor.students.update');
             Route::delete('/courses/{courseId}/students/{studentId}', [CourseUserController::class, 'destroy'])->name('instructor.students.destroy');
         });
-    });
-    Route::middleware(['auth:sanctum'])->group(function () {
 
         // مسارات لوحة تحكم الإدمن
         Route::prefix('admin')->name('admin.')->group(function () {
@@ -134,10 +136,7 @@ Route::middleware('web')->group(function () {
             Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
             Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
         });
-
     });
-
-
 
     // مسارات إضافية متعلقة بالدورات التدريبية
     Route::get('/', [CourseController::class, 'home'])->name('home');
