@@ -18,57 +18,108 @@ class LessonController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'video_url' => 'nullable|file|mimes:mp4,avi,mkv|max:10240', // Validation for video file
+            'video_url' => 'nullable|file|mimes:mp4,avi,mkv|max:10240',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'files.*' => 'nullable|file|max:5120', // 5MB max per file
         ]);
 
-        // Handle video file upload if provided
+        // Handle video upload
         $videoPath = null;
         if ($request->hasFile('video_url')) {
-            $videoName = uniqid() . '.' . $request->file('video_url')->getClientOriginalExtension();
-            $videoPath = $request->file('video_url')->storeAs('public/lessons/videos', $videoName); // Store video with a unique name
+            $videoPath = $request->file('video_url')->store('public/lessons/videos');
         }
 
-        // Create the lesson record
+        // Handle images upload
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $imagePaths[] = $image->store('public/lessons/images');
+            }
+        }
+
+        // Handle files upload
+        $filePaths = [];
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
+                $filePaths[] = $file->store('public/lessons/files');
+            }
+        }
+
+        // Create the lesson
         $lesson = Lesson::create([
             'course_id' => $courseId,
             'title' => $request->title,
             'content' => $request->content,
-            'video_url' => $videoPath, // Store the video path
+            'video_url' => $videoPath,
+            'images' => json_encode($imagePaths), // Save as JSON
+            'files' => json_encode($filePaths),   // Save as JSON
+            'order' => $request->order,
         ]);
 
         return response()->json($lesson, Response::HTTP_CREATED);
     }
 
+
     /**
      * Update the specified lesson.
      */
     public function update(Request $request, $courseId, $lessonId)
-    {
-        $lesson = Lesson::where('course_id', $courseId)->findOrFail($lessonId);
+{
+    $lesson = Lesson::where('course_id', $courseId)->findOrFail($lessonId);
 
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'video_url' => 'nullable|file|mimes:mp4,avi,mkv|max:10240', // Validation for video file
-        ]);
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'content' => 'required|string',
+        'video_url' => 'nullable|file|mimes:mp4,avi,mkv|max:10240',
+        'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'files.*' => 'nullable|file|max:5120',
+    ]);
 
-        // Handle video file upload and deletion if provided
-        if ($request->hasFile('video_url')) {
-            // Delete the old video if it exists
-            if ($lesson->video_url && Storage::exists($lesson->video_url)) {
-                Storage::delete($lesson->video_url);
-            }
-
-            $videoName = uniqid() . '.' . $request->file('video_url')->getClientOriginalExtension();
-            $videoPath = $request->file('video_url')->storeAs('public/lessons/videos', $videoName); // Store video with a unique name
-            $lesson->video_url = $videoPath;
+    // Handle video update
+    if ($request->hasFile('video_url')) {
+        if ($lesson->video_url && Storage::exists($lesson->video_url)) {
+            Storage::delete($lesson->video_url);
         }
-
-        // Update lesson record
-        $lesson->update($request->only(['title', 'content'])); // Update only title and content
-
-        return response()->json($lesson, Response::HTTP_OK);
+        $lesson->video_url = $request->file('video_url')->store('public/lessons/videos');
     }
+
+    // Handle images update
+    if ($request->hasFile('images')) {
+        if ($lesson->images) {
+            foreach (json_decode($lesson->images) as $imagePath) {
+                if (Storage::exists($imagePath)) {
+                    Storage::delete($imagePath);
+                }
+            }
+        }
+        $imagePaths = [];
+        foreach ($request->file('images') as $image) {
+            $imagePaths[] = $image->store('public/lessons/images');
+        }
+        $lesson->images = json_encode($imagePaths);
+    }
+
+    // Handle files update
+    if ($request->hasFile('files')) {
+        if ($lesson->files) {
+            foreach (json_decode($lesson->files) as $filePath) {
+                if (Storage::exists($filePath)) {
+                    Storage::delete($filePath);
+                }
+            }
+        }
+        $filePaths = [];
+        foreach ($request->file('files') as $file) {
+            $filePaths[] = $file->store('public/lessons/files');
+        }
+        $lesson->files = json_encode($filePaths);
+    }
+
+    // Update other fields
+    $lesson->update($request->only(['title', 'content', 'order']));
+
+    return response()->json($lesson, Response::HTTP_OK);
+}
 
     /**
      * Remove the specified lesson.
@@ -90,35 +141,31 @@ class LessonController extends Controller
      * Display a listing of the lessons.
      */
     public function index($courseId)
-    {
-        // Fetch all lessons for a specific course
-        $lessons = Lesson::where('course_id', $courseId)->get();
+{
+    $lessons = Lesson::where('course_id', $courseId)->get();
 
-        // Add video URL to each lesson if available
-        foreach ($lessons as $lesson) {
-            if ($lesson->video_url) {
-                $lesson->video_url = asset('storage/' . $lesson->video_url);
-            }
+    foreach ($lessons as $lesson) {
+        if ($lesson->video_url) {
+            $lesson->video_url = asset('storage/' . $lesson->video_url);
         }
-
-        // Return lessons in a JSON response
-        return response()->json($lessons, Response::HTTP_OK);
+        $lesson->images = $lesson->images ? array_map(fn($path) => asset('storage/' . $path), json_decode($lesson->images)) : [];
+        $lesson->files = $lesson->files ? array_map(fn($path) => asset('storage/' . $path), json_decode($lesson->files)) : [];
     }
 
-    /**
-     * Display the specified lesson.
-     */
-    public function show($courseId, $lessonId)
-    {
-        $lesson = Lesson::where('course_id', $courseId)->find($lessonId);
-        if ($lesson) {
-            // If video exists, generate the URL to access it
-            if ($lesson->video_url) {
-                $lesson->video_url = asset('storage/' . $lesson->video_url);
-            }
+    return response()->json($lessons, Response::HTTP_OK);
+}
 
-            return response()->json($lesson, Response::HTTP_OK);
-        }
-        return response()->json(['message' => 'Lesson not found'], Response::HTTP_NOT_FOUND);
+public function show($courseId, $lessonId)
+{
+    $lesson = Lesson::where('course_id', $courseId)->findOrFail($lessonId);
+
+    if ($lesson->video_url) {
+        $lesson->video_url = asset('storage/' . $lesson->video_url);
     }
+    $lesson->images = $lesson->images ? array_map(fn($path) => asset('storage/' . $path), json_decode($lesson->images)) : [];
+    $lesson->files = $lesson->files ? array_map(fn($path) => asset('storage/' . $path), json_decode($lesson->files)) : [];
+
+    return response()->json($lesson, Response::HTTP_OK);
+}
+
 }

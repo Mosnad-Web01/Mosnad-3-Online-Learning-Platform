@@ -7,24 +7,27 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-class InstructorCourseController extends Controller
+class AdminCourseController extends Controller
 {
+    /**
+     * Display a listing of all courses.
+     */
+    public function index()
+    {
+        // عرض جميع الكورسات بغض النظر عن المعلم المرتبط بها
+        $courses = Course::all();
 
+        return view('admin.courses.index', compact('courses'));
+    }
 
-public function index()
-{
-    // استخدام Auth::user() بدلاً من auth()->user()
-    $courses = Course::where('instructor_id', Auth::user()->id)->get();
-
-    return view('instructor.courses.index', compact('courses'));
-}
     /**
      * Show the form for creating a new course.
      */
     public function create()
     {
-        $categories = \App\Models\CourseCategory::all(); // استيراد النموذج بشكل صحيح
-        return view('instructor.courses.create', compact('categories'));
+        $categories = \App\Models\CourseCategory::all();
+        $instructors = \App\Models\User::where('role', 'instructor')->get(); // افتراض وجود حقل role
+        return view('admin.courses.create', compact('categories', 'instructors'));
     }
 
     /**
@@ -39,12 +42,13 @@ public function index()
             'level' => 'required|in:Beginner,Intermediate,Advanced',
             'category_id' => 'required|exists:course_categories,id',
             'price' => 'required|numeric|min:0',
-            'is_free' => 'required|boolean', // إضافة هذا السطر للتحقق من حقل is_free
+            'is_free' => 'required|boolean',
             'start_date' => 'required|date|before_or_equal:end_date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'language' => 'nullable|string|max:50',
             'requirements' => 'nullable|string',
             'learning_outcomes' => 'nullable|string',
+            'instructor_id' => 'required|exists:users,id', // تحقق من وجود المدرب
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
@@ -56,24 +60,11 @@ public function index()
         }
 
         // Create the course
-        $course = Course::create([
-            'course_name' => $validated['course_name'],
-            'description' => $validated['description'],
-            'level' => $validated['level'],
-            'category_id' => $validated['category_id'],
-            'price' => $validated['price'],
-            'is_free' => $validated['is_free'], // حفظ القيمة المحددة
-            'start_date' => $validated['start_date'],
-            'end_date' => $validated['end_date'],
-            'instructor_id' => Auth::id(),
-            'language' => $validated['language'],
-            'requirements' => $validated['requirements'],
-            'learning_outcomes' => $validated['learning_outcomes'],
+        Course::create(array_merge($validated, [
             'image' => $imagePath,
-        ]);
+        ]));
 
-        // Redirect back with success message
-        return redirect()->route('instructor.courses.index')
+        return redirect()->route('admin.courses.index')
                          ->with('success', 'Course created successfully.');
     }
 
@@ -83,9 +74,10 @@ public function index()
      */
     public function edit($id)
     {
-        $course = Course::where('instructor_id', Auth::id())->findOrFail($id);
-    $categories = \App\Models\CourseCategory::all();  // إضافة هذا السطر لاسترجاع الفئات
-    return view('instructor.courses.edit', compact('course', 'categories'));  // تمرير الفئات
+        $course = Course::findOrFail($id);
+        $categories = \App\Models\CourseCategory::all();
+        $instructors = \App\Models\User::where('role', 'instructor')->get(); // افتراض وجود حقل role
+        return view('admin.courses.edit', compact('course', 'categories', 'instructors'));
     }
 
     /**
@@ -93,41 +85,37 @@ public function index()
      */
     public function update(Request $request, $id)
     {
-        $course = Course::where('instructor_id', Auth::id())->findOrFail($id);
+        $course = Course::findOrFail($id);
 
-        $request->validate([
+        $validated = $request->validate([
             'course_name' => 'required|string|max:255',
             'description' => 'required|string',
             'level' => 'required|in:Beginner,Intermediate,Advanced',
             'category_id' => 'required|exists:course_categories,id',
             'price' => 'required|numeric',
-            'is_free' => 'required|boolean', // إضافة هذا السطر للتحقق من حقل is_free
+            'is_free' => 'required|boolean',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
             'language' => 'nullable|string',
             'requirements' => 'nullable|string',
             'learning_outcomes' => 'nullable|string',
+            'instructor_id' => 'required|exists:users,id', // تحقق من وجود المدرب
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        // التعامل مع الصورة إذا كانت مرفوعة
         if ($request->hasFile('image')) {
             if ($course->image && Storage::exists($course->image)) {
                 Storage::delete($course->image);
             }
 
             $imageName = uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
-            $imagePath = $request->file('image')->storeAs('public/courses/' . $course->course_name, $imageName);
-            $course->image = $imagePath;
+            $imagePath = $request->file('image')->storeAs('public/courses', $imageName);
+            $validated['image'] = $imagePath;
         }
 
-        // تحديث الدورة
-        $course->update($request->only([
-            'course_name', 'description', 'level', 'category_id', 'price',
-            'is_free', 'start_date', 'end_date', 'language', 'requirements', 'learning_outcomes', 'image'
-        ]));
+        $course->update($validated);
 
-        return redirect()->route('instructor.courses.index')->with('success', 'Course updated successfully.');
+        return redirect()->route('admin.courses.index')->with('success', 'Course updated successfully.');
     }
 
 
@@ -136,13 +124,19 @@ public function index()
      */
     public function destroy($id)
     {
-        $course = Course::where('instructor_id', Auth::id())->findOrFail($id);
+        $course = Course::findOrFail($id);
 
+        // حذف الدروس المرتبطة بالدورة
+        $course->lessons()->delete(); // افترض أن هناك علاقة بين Course و Lesson
+
+        // حذف الصورة إذا كانت موجودة
         if ($course->image && Storage::exists($course->image)) {
             Storage::delete($course->image);
         }
 
+        // حذف الدورة
         $course->delete();
-        return redirect()->route('instructor.courses.index')->with('success', 'Course deleted successfully.');
+
+        return redirect()->route('admin.courses.index')->with('success', 'Course deleted successfully.');
     }
 }

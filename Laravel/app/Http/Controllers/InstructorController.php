@@ -20,4 +20,13 @@ class InstructorController extends Controller
         // إرجاع الدورات كـ JSON
         return response()->json($courses);
     }
+     // دالة لتسجيل الخروج
+     public function logout(Request $request)
+     {
+         Auth::logout(); // تسجيل الخروج
+         $request->session()->invalidate(); // تعطيل الجلسة الحالية
+         $request->session()->regenerateToken(); // تجديد التوكن
+
+         return response()->json(['message' => 'تم تسجيل الخروج بنجاح']);
+     }
 }

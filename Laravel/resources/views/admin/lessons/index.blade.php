@@ -3,7 +3,7 @@
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Lessons for {{ $course->course_name }}</h1>
-                <a href="{{ route('instructor.lessons.create', $course->id) }}"
+                <a href="{{ route('admin.lessons.create', $course->id) }}"
                    class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
                     Add New Lesson
                 </a>
@@ -30,8 +30,9 @@
                             @else
                                 <p class="text-sm text-gray-500 dark:text-gray-400">No video uploaded</p>
                             @endif
+
                             {{-- عرض الصور --}}
-                            @if ($lesson->images && is_array(json_decode($lesson->images, true)))
+                            @if ($lesson->images && is_string($lesson->images) && is_array(json_decode($lesson->images, true)))
                                 <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">Images:</p>
                                 @foreach (json_decode($lesson->images, true) as $image)
                                     <a href="{{ asset('storage/' . ($image['path'] ?? '')) }}" target="_blank" class="block mt-1 text-blue-500">
@@ -43,7 +44,7 @@
                             @endif
 
                             {{-- عرض الملفات --}}
-                            @if ($lesson->files && is_array(json_decode($lesson->files, true)))
+                            @if ($lesson->files && is_string($lesson->files) && is_array(json_decode($lesson->files, true)))
                                 <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">Files:</p>
                                 @foreach (json_decode($lesson->files, true) as $file)
                                     <a href="{{ asset('storage/' . ($file['path'] ?? '')) }}" target="_blank" class="block mt-1 text-blue-500">
@@ -54,13 +55,12 @@
                                 <p class="text-sm text-gray-500 dark:text-gray-400">No files uploaded</p>
                             @endif
 
-
                             <div class="flex mt-4">
-                                <a href="{{ route('instructor.lessons.edit', [$course->id, $lesson->id]) }}"
-                                   class="text-blue-500 hover:text-blue-600 mr-2">
+                                <a href="{{ route('admin.lessons.edit', [$course->id, $lesson->id]) }}"
+                                   class="text-blue-500 hover:text-blue-600 mr-2 edit-button">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
-                                <form action="{{ route('instructor.lessons.destroy', [$course->id, $lesson->id]) }}" method="POST">
+                                <form action="{{ route('admin.lessons.destroy', [$course->id, $lesson->id]) }}" method="POST" class="delete-form">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-500 hover:text-red-600">
@@ -81,6 +81,41 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        // تأكيد حذف الدرس
+        document.querySelectorAll('.delete-form').forEach(form => {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault(); // منع الإرسال الفوري
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to undo this action!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit(); // إذا تم تأكيد الحذف، يتم إرسال النموذج
+                    }
+                });
+            });
+        });
+
+        // تأكيد تعديل الدرس
+        document.querySelectorAll('.edit-button').forEach(button => {
+            button.addEventListener('click', function (event) {
+                Swal.fire({
+                    title: 'Are you sure you want to edit this lesson?',
+                    text: "You can always modify it later!",
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, edit it!',
+                    cancelButtonText: 'Cancel',
+                });
+            });
+        });
+
+        // عرض الفيديو عند النقر على زر "View Video"
         document.querySelectorAll('.view-video').forEach(button => {
             button.addEventListener('click', function () {
                 const videoUrl = button.getAttribute('data-video-url');

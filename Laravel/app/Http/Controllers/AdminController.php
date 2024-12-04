@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
@@ -25,5 +26,13 @@ class AdminController extends Controller
         ]);
 
         return response()->json($user, 201); // إرجاع المستخدم الجديد مع حالة 201
+    }
+    public function logout(Request $request)
+    {
+        Auth::logout(); // تسجيل الخروج
+        $request->session()->invalidate(); // تعطيل الجلسة الحالية
+        $request->session()->regenerateToken(); // تجديد التوكن
+
+        return response()->json(['message' => 'تم تسجيل الخروج بنجاح']);
     }
 }

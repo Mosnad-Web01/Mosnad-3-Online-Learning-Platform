@@ -58,9 +58,21 @@
 
                 {{-- Price --}}
                 <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 font-medium">Is the Course Free?</label>
+                    <div class="flex items-center">
+                        <input type="radio" id="is_free" name="is_free" value="1" {{ old('is_free', $course->is_free) == 1 ? 'checked' : '' }} onclick="togglePriceField(true)">
+                        <label for="is_free" class="ml-2 text-gray-700 dark:text-gray-300">Yes</label>
+                        <input type="radio" id="is_paid" name="is_free" value="0" {{ old('is_free', $course->is_free) == 0 ? 'checked' : '' }} onclick="togglePriceField(false)">
+                        <label for="is_paid" class="ml-2 text-gray-700 dark:text-gray-300">No</label>
+                    </div>
+                    @error('is_free') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                </div>
+
+                {{-- Price Field --}}
+                <div class="mb-4">
                     <label for="price" class="block text-gray-700 dark:text-gray-300 font-medium">Price</label>
                     <input type="number" name="price" id="price" value="{{ old('price', $course->price) }}" required step="0.01"
-                           class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">
+                        class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4" {{ old('is_free', $course->is_free) == 1 ? 'readonly' : '' }}>
                     @error('price') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
 
@@ -123,4 +135,14 @@
             </form>
         </div>
     </section>
+    <script>
+        // Toggle the price field based on the radio selection
+        function togglePriceField(isFree) {
+            const priceInput = document.getElementById('price');
+            priceInput.readOnly = isFree;
+            if (isFree) {
+                priceInput.value = 0;  // Set the price to 0 if it's free
+            }
+        }
+    </script>
 </x-layout>

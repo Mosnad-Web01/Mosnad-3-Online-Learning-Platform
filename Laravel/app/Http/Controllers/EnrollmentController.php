@@ -2,90 +2,81 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Enrollment;
 use Illuminate\Http\Request;
+use App\Models\Enrollment;
+use App\Models\CourseUser;
+use App\Models\Course;
 use Illuminate\Support\Facades\Auth;
 
 class EnrollmentController extends Controller
 {
-    public function index()
+    /**
+     * تسجيل الطالب في دورة.
+     */
+    public function enroll(Request $request, $courseId)
     {
-        // عرض جميع التسجيلات مع العلاقات
-        return Enrollment::with(['course', 'student', 'completions'])->get();
-    }
+        $userId = Auth::id();
 
-    public function store(Request $request)
-    {
-        // تحقق من أن الطالب الذي يحاول التسجيل هو نفسه الطالب المسجل دخولًا
-        $student = Auth::user();  // الحصول على الطالب من التوكن
-        if (!$student) {
-            return response()->json(['error' => 'Unauthorized'], 403);  // الطالب غير مصرح له
+        // التحقق من الدورة
+        $course = Course::findOrFail($courseId);
+
+        // التحقق إذا كان الطالب مسجلاً بالفعل
+        $existingEnrollment = Enrollment::where('student_id', $userId)
+            ->where('course_id', $courseId)
+            ->first();
+
+        if ($existingEnrollment) {
+            return response()->json(['message' => 'Already enrolled in this course'], 400);
         }
 
-        // تحقق من صحة البيانات المدخلة
-        $validated = $request->validate([
-            'course_id' => 'required|exists:courses,id',
-            'student_id' => 'required|exists:users,id|unique:enrollments,student_id,NULL,id,course_id,' . $request->course_id,
+        // التحقق من حالة الدفع إذا كانت الدورة مدفوعة
+        if ($course->is_free) {
+            $paymentStatus = CourseUser::where('user_id', $userId)
+                ->where('course_id', $courseId)
+                ->value('payment_status');
+
+            if ($paymentStatus !== 'free') {
+                return response()->json(['message' => 'Payment required for this course'], 403);
+            }
+        }
+
+        // تسجيل الطالب
+        $enrollment = Enrollment::create([
+            'student_id' => $userId,
+            'course_id' => $courseId,
         ]);
 
-        // التأكد من أن الطالب الذي يحاول التسجيل هو نفسه الذي يتم استخدامه في التوكن
-        if ($student->id !== $validated['student_id']) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        // إنشاء تسجيل جديد
-        $enrollment = Enrollment::create($validated);
-
-        return response()->json(['message' => 'Enrollment created successfully', 'enrollment' => $enrollment], 201);
+        return response()->json(['message' => 'Enrollment successful', 'enrollment' => $enrollment], 200);
     }
 
-    public function update(Request $request, Enrollment $enrollment)
+    /**
+     * تحديث تقدم الطالب في الدورة.
+     */
+    public function updateProgress(Request $request, $courseId)
     {
-        $student = Auth::user();
-        if (!$student) {
-            return response()->json(['error' => 'Unauthorized'], 403);  // الطالب غير مصرح له
+        $userId = Auth::id();
+
+        // جلب التسجيل
+        $enrollment = Enrollment::where('student_id', $userId)
+            ->where('course_id', $courseId)
+            ->firstOrFail();
+
+        // تحديث نسبة التقدم
+        $progress = $request->input('progress');
+
+        if ($progress < 0 || $progress > 100) {
+            return response()->json(['message' => 'Invalid progress value'], 400);
         }
 
-        // التحقق من أن الطالب هو نفسه الطالب المرتبط بهذا التسجيل
-        if ($student->id !== $enrollment->student_id && $student->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        $enrollment->progress = $progress;
+
+        // إذا اكتملت الدورة، تسجيل تاريخ الإتمام
+        if ($progress == 100 && !$enrollment->completion_date) {
+            $enrollment->completion_date = now();
         }
 
-        // تحقق من صحة البيانات المدخلة
-        $validated = $request->validate([
-            'progress' => 'nullable|integer|min:0|max:100',
-            'completion_date' => 'nullable|date',
-        ]);
+        $enrollment->save();
 
-        // تحديث بيانات التسجيل
-        $enrollment->update($validated);
-
-        return response()->json(['message' => 'Enrollment updated successfully', 'enrollment' => $enrollment], 200);
-    }
-
-
-    public function destroy(Enrollment $enrollment)
-    {
-        // حذف التسجيل
-        $enrollment->delete();
-
-        return response()->json(['message' => 'Enrollment deleted successfully'], 200);
-    }
-
-    public function checkEnrollment(Request $request, $courseId)
-    {
-        // التحقق من صحة الطلب
-        $validated = $request->validate([
-            'student_id' => 'required|exists:users,id',
-        ]);
-
-        $studentId = $validated['student_id'];
-
-        // التحقق من وجود تسجيل
-        $isEnrolled = Enrollment::where('course_id', $courseId)
-            ->where('student_id', $studentId)
-            ->exists();
-
-        return response()->json(['isEnrolled' => $isEnrolled], 200);
+        return response()->json(['message' => 'Progress updated successfully', 'enrollment' => $enrollment], 200);
     }
 }

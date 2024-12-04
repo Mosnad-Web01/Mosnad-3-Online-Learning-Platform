@@ -29,22 +29,28 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         try {
+            // Attempt to log the user in
             $data = $this->authService->login($request->only('email', 'password'));
 
+            // Return a successful login response with the user data and XSRF-TOKEN
             return response()->json([
                 'message' => 'Login successful.',
                 'user' => $data['user'],
             ])->cookie('XSRF-TOKEN', $data['xsrf_token'], 60 * 24, '/', null, false, false);
+
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 403); // Return 403 Forbidden for blocked users
+            // Handle exceptions (e.g., blocked users) and return a 403 Forbidden response
+            return response()->json(['message' => $e->getMessage()], 403);
         }
     }
 
     // Logout function
     public function logout()
     {
+        // Call the AuthService to handle logout
         $message = $this->authService->logout();
 
-        return response()->json($message)->cookie('XSRF-TOKEN', '', -1); // Clear XSRF-TOKEN cookie
+        // Clear the XSRF-TOKEN cookie after logout
+        return response()->json($message)->cookie('XSRF-TOKEN', '', -1);
     }
 }

@@ -22,51 +22,45 @@ class CourseSeeder extends Seeder
         $instructor3 = User::where('email', 'instructor3@example.com')->first();
 
         // التأكد من وجود الفئات
-        $category1 = CourseCategory::first(); // أول فئة
-        $category2 = CourseCategory::skip(1)->first(); // ثاني فئة
-        $category3 = CourseCategory::skip(2)->first(); // ثالث فئة
+        $categories = CourseCategory::all();
 
         // إضافة الدورات
-        Course::create([
-            'course_name' => 'Complete Web Development Bootcamp',
-            'description' => 'Learn front-end and back-end web development from scratch.',
-            'level' => 'Beginner',
-            'category_id' => $category1->id,
-            'price' => 99.99,
-            'start_date' => '2024-01-01',
-            'end_date' => '2024-06-01',
-            'instructor_id' => $instructor1->id,
-            'language' => 'English', // إضافة اللغة
-            'requirements' => 'Basic understanding of computers and the internet.', // إضافة المتطلبات
-            'learning_outcomes' => 'Build fully responsive websites and web applications.', // إضافة نتائج التعلم
-        ]);
+        // 10 دورات مجانية
+        foreach ($categories as $index => $category) {
+            Course::create([
+                'course_name' => "Free Course " . $category->name,
+                'description' => "This is a free course about " . $category->name,
+                'level' => 'Beginner',
+                'category_id' => $category->id,
+                'price' => 0.00,
+                'start_date' => now(),
+                'end_date' => now()->addMonths(3),
+                'instructor_id' => $instructor1->id,
+                'language' => 'Arabic',
+                'requirements' => 'No specific requirements.',
+                'learning_outcomes' => 'Basic understanding of the topic.',
+                'is_free' => true,
+                'image' => 'https://via.placeholder.com/150?text=Free+' . urlencode($category->name),
+            ]);
+        }
 
-        Course::create([
-            'course_name' => 'Mastering Data Science with Python',
-            'description' => 'Learn how to use Python for Data Science and Machine Learning.',
-            'level' => 'Intermediate',
-            'category_id' => $category2->id,
-            'price' => 149.99,
-            'start_date' => '2024-02-01',
-            'end_date' => '2024-07-01',
-            'instructor_id' => $instructor2->id,
-            'language' => 'English', // إضافة اللغة
-            'requirements' => 'Basic knowledge of Python programming and statistics.', // إضافة المتطلبات
-            'learning_outcomes' => 'Analyze data, build machine learning models using Python.', // إضافة نتائج التعلم
-        ]);
-
-        Course::create([
-            'course_name' => 'Machine Learning with TensorFlow',
-            'description' => 'Understand the fundamentals of Machine Learning with TensorFlow.',
-            'level' => 'Advanced',
-            'category_id' => $category3->id,
-            'price' => 199.99,
-            'start_date' => '2024-03-01',
-            'end_date' => '2024-08-01',
-            'instructor_id' => $instructor3->id,
-            'language' => 'English', // إضافة اللغة
-            'requirements' => 'Strong knowledge of Python and machine learning concepts.', // إضافة المتطلبات
-            'learning_outcomes' => 'Implement advanced machine learning models using TensorFlow.', // إضافة نتائج التعلم
-        ]);
+        // 10 دورات مدفوعة
+        foreach ($categories as $index => $category) {
+            Course::create([
+                'course_name' => "Premium Course " . $category->name,
+                'description' => "This is a premium course about " . $category->name,
+                'level' => 'Intermediate',
+                'category_id' => $category->id,
+                'price' => rand(50, 200), // عشوائيًا بين 50 و 200 دولار
+                'start_date' => now(),
+                'end_date' => now()->addMonths(6),
+                'instructor_id' => $instructor2->id,
+                'language' => 'Arabic',
+                'requirements' => 'Basic knowledge in the field.',
+                'learning_outcomes' => 'In-depth knowledge and advanced techniques.',
+                'is_free' => false,
+                'image' => 'https://via.placeholder.com/150?text=Premium+' . urlencode($category->name),
+            ]);
+        }
     }
 }

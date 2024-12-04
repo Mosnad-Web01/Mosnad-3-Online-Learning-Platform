@@ -27,75 +27,168 @@ class InstructorLessonController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'video_url' => 'nullable|file|mimes:mp4,avi,mkv|max:10240', // Validation for video file
+            'content' => 'nullable|string',
+            'video' => 'nullable|file|mimes:mp4,avi,mkv|max:10240',
+            'images.*' => 'nullable|file|mimes:jpeg,jpg,png,gif|max:2048',
+            'files.*' => 'nullable|file|max:5120',
+            'order' => 'nullable|integer',
         ]);
 
-        // Handle video upload
         $videoPath = null;
-        if ($request->hasFile('video_url')) {
-            // Generating a unique name for the video file
-            $videoName = uniqid() . '.' . $request->file('video_url')->getClientOriginalExtension();
-            // Storing the video file in the 'public/lessons/videos' directory
-            $videoPath = $request->file('video_url')->storeAs('public/lessons/videos', $videoName);
+        if ($request->hasFile('video')) {
+            $videoPath = $request->file('video')->store("lessons/$courseId/videos");
         }
 
-        // Create the lesson
+        $images = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $imagePath = $image->store("lessons/$courseId/images");
+                $images[] = $imagePath;
+            }
+        }
+
+        $files = [];
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
+                $filePath = $file->store("lessons/$courseId/files");
+                $files[] = $filePath;
+            }
+        }
+
+        // حفظ البيانات في قاعدة البيانات
         $lesson = Lesson::create([
             'course_id' => $courseId,
             'title' => $request->title,
             'content' => $request->content,
-            'video_url' => $videoPath, // Save the path to the video
+            'video_path' => $videoPath,
+            'images' => json_encode($images),
+            'files' => json_encode($files),
+            'order' => $request->order ?? 0,
         ]);
 
-        return redirect()->route('instructor.lessons.index', $courseId)->with('success', 'Lesson created successfully.');
+        return redirect()->route('instructor.lessons.index', $courseId)
+                         ->with('success', 'Lesson created successfully.');
     }
+
 
     public function edit($courseId, $lessonId)
-    {
-        $course = Course::where('instructor_id', Auth::id())->findOrFail($courseId);
-        $lesson = $course->lessons()->findOrFail($lessonId);
-        return view('instructor.lessons.edit', compact('course', 'lesson'));
+{
+    $course = Course::where('instructor_id', Auth::id())->findOrFail($courseId);
+    $lesson = $course->lessons()->findOrFail($lessonId);
+
+    // تأكد من تحويل البيانات المخزنة كـ JSON إلى مصفوفة
+    $lesson->images = json_decode($lesson->images, true) ?? [];
+    $lesson->files = json_decode($lesson->files, true) ?? [];
+
+    return view('instructor.lessons.edit', compact('course', 'lesson'));
+}
+
+
+public function update(Request $request, $courseId, $lessonId)
+{
+    $lesson = Lesson::where('course_id', $courseId)->findOrFail($lessonId);
+
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'content' => 'nullable|string',
+        'video' => 'nullable|file|mimes:mp4,avi,mkv|max:10240',
+        'images.*' => 'nullable|file|mimes:jpeg,jpg,png,gif|max:2048',
+        'files.*' => 'nullable|file|max:5120',
+        'order' => 'nullable|integer',
+    ]);
+
+    // التعامل مع الفيديو
+    if ($request->hasFile('video')) {
+        // حذف الفيديو القديم إذا كان موجوداً
+        if ($lesson->video_path && Storage::exists($lesson->video_path)) {
+            Storage::delete($lesson->video_path);
+        }
+        // رفع الفيديو الجديد
+        $lesson->video_path = $request->file('video')->store('lessons/videos');
     }
 
-    public function update(Request $request, $courseId, $lessonId)
-    {
-        $lesson = Lesson::where('course_id', $courseId)->findOrFail($lessonId);
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'video_url' => 'nullable|file|mimes:mp4,avi,mkv|max:10240', // Validate the video format
-        ]);
-
-        // Handle video upload and deletion
-        if ($request->hasFile('video_url')) {
-            // Delete the old video if it exists
-            if ($lesson->video_url && Storage::exists($lesson->video_url)) {
-                Storage::delete($lesson->video_url);
+    // التعامل مع الصور
+    if ($request->hasFile('images')) {
+        $images = json_decode($lesson->images, true) ?? [];
+        // حذف الصور القديمة من التخزين
+        foreach ($images as $image) {
+            if (Storage::exists($image['path'])) {
+                Storage::delete($image['path']);
             }
-
-            // Upload the new video
-            $videoName = uniqid() . '.' . $request->file('video_url')->getClientOriginalExtension();
-            $videoPath = $request->file('video_url')->storeAs('public/lessons/videos', $videoName);
-            $lesson->video_url = $videoPath; // Update the video path
         }
 
-        // Update the lesson's title and content
-        $lesson->update($request->only(['title', 'content']));
+        // رفع الصور الجديدة
+        $newImages = [];
+        foreach ($request->file('images') as $image) {
+            $imagePath = $image->store('lessons/images');
+            $newImages[] = ['path' => $imagePath];
+        }
 
-        return redirect()->route('instructor.lessons.index', $courseId)->with('success', 'Lesson updated successfully.');
+        // حفظ الصور الجديدة في قاعدة البيانات
+        $lesson->images = json_encode($newImages);
     }
+
+    // التعامل مع الملفات
+    if ($request->hasFile('files')) {
+        $files = json_decode($lesson->files, true) ?? [];
+        // حذف الملفات القديمة من التخزين
+        foreach ($files as $file) {
+            if (Storage::exists($file['path'])) {
+                Storage::delete($file['path']);
+            }
+        }
+
+        // رفع الملفات الجديدة
+        $newFiles = [];
+        foreach ($request->file('files') as $file) {
+            $filePath = $file->store('lessons/files');
+            $newFiles[] = ['path' => $filePath];
+        }
+
+        // حفظ الملفات الجديدة في قاعدة البيانات
+        $lesson->files = json_encode($newFiles);
+    }
+
+    // تحديث باقي البيانات في قاعدة البيانات
+    $lesson->update([
+        'title' => $request->title,
+        'content' => $request->content,
+        'order' => $request->order ?? 0,
+    ]);
+
+    return redirect()->route('instructor.lessons.index', $courseId)->with('success', 'Lesson updated successfully.');
+}
+
 
     public function destroy($courseId, $lessonId)
     {
         $lesson = Lesson::where('course_id', $courseId)->findOrFail($lessonId);
 
-        // Delete the video if it exists
-        if ($lesson->video_url && Storage::exists($lesson->video_url)) {
-            Storage::delete($lesson->video_url);
+        if ($lesson->video_path && Storage::exists($lesson->video_path)) {
+            Storage::delete($lesson->video_path);
+        }
+
+        $images = json_decode($lesson->images, true);
+        if ($images) {
+            foreach ($images as $image) {
+                if (Storage::exists($image['path'])) {
+                    Storage::delete($image['path']);
+                }
+            }
+        }
+
+        $files = json_decode($lesson->files, true);
+        if ($files) {
+            foreach ($files as $file) {
+                if (Storage::exists($file['path'])) {
+                    Storage::delete($file['path']);
+                }
+            }
         }
 
         $lesson->delete();
+
         return redirect()->route('instructor.lessons.index', $courseId)->with('success', 'Lesson deleted successfully.');
     }
+
 }
