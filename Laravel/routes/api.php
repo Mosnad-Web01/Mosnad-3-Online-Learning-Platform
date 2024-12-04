@@ -42,8 +42,8 @@ Route::middleware('web')->group(function () {
         Route::put('{id}', [CourseController::class, 'update']);
         Route::delete('{id}', [CourseController::class, 'destroy']);
     });
+    
     // مسارات الفئات
-
     Route::prefix('categories')->group(function () {
         Route::post('/', [CourseCategoryController::class, 'store']);
         Route::get('/', [CourseCategoryController::class, 'index']);
@@ -51,7 +51,8 @@ Route::middleware('web')->group(function () {
         Route::put('{id}', [CourseCategoryController::class, 'update']);
         Route::delete('{id}', [CourseCategoryController::class, 'destroy']);
     });
-    Route::middleware(['auth:sanctum'])->group(function () {
+
+    Route::middleware('auth:sanctum')->group(function () {
         // مسارات تتطلب مصادقة باستخدام Sanctum
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::resource('/users', UserController::class);
@@ -63,8 +64,6 @@ Route::middleware('web')->group(function () {
         // Route::post('/users/{user}/modify-role', [UserController::class, 'modifyRole']);  // Modify role
         // Route::delete('/users/{user}', [UserController::class, 'destroy']);  // Delete user
 
-
-
         // مسارات الدروس
         Route::prefix('courses/{courseId}/lessons')->name('courses.lessons.')->group(function () {
             Route::post('/', [LessonController::class, 'store'])->name('store');
@@ -73,7 +72,6 @@ Route::middleware('web')->group(function () {
             Route::put('{lessonId}', [LessonController::class, 'update'])->name('update');
             Route::delete('{lessonId}', [LessonController::class, 'destroy'])->name('destroy');
         });
-
 
         // ملف تعريف المستخدم
         Route::prefix('user-profiles')->group(function () {
@@ -97,20 +95,10 @@ Route::middleware('web')->group(function () {
             Route::post('/course', [InstructorController::class, 'createCourse']);
         });
 
-        // // مسارات الطلاب
-        // Route::prefix('student')->middleware('role:student')->group(function () {
-        //     Route::get('/courses', [StudentController::class, 'enrolledCourses']);
-        //     Route::post('/enroll', [StudentController::class, 'enrollCourse']);
-        // });
-
-
-
         // مسارات الالتحاق بالدورات
-        Route::prefix('enrollments')->group(function () {
-            Route::get('/', [EnrollmentController::class, 'index']);
-            Route::post('/', [EnrollmentController::class, 'store']);
-            Route::put('{enrollment}', [EnrollmentController::class, 'update']);
-            Route::delete('{enrollment}', [EnrollmentController::class, 'destroy']);
+        Route::middleware('auth:api')->group(function () {
+            Route::post('/courses/{courseId}/enroll', [EnrollmentController::class, 'enroll']);
+            Route::patch('/courses/{courseId}/progress', [EnrollmentController::class, 'updateProgress']);
         });
 
         // مسارات إكمال الدروس

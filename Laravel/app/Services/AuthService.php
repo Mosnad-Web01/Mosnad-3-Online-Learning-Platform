@@ -7,6 +7,8 @@ use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Request;
+
 
 class AuthService
 {
@@ -66,12 +68,18 @@ class AuthService
         ];
     }
 
-    public function logout()
-    {
-        Auth::logout();
 
-        return [
-            'message' => 'Logged out successfully.',
-        ];
+    // دالة لتسجيل الخروج
+    public function logout(Request $request) // Ensure this matches the calling context
+    {
+        if ($request->isMethod('post')) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect('/login')->with('message', 'Logged out successfully.');
+        }
+
+        abort(405); // Method Not Allowed
     }
-}
+    }

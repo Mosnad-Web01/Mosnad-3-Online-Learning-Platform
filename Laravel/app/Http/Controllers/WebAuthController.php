@@ -50,9 +50,13 @@ class WebAuthController extends Controller
     }
 
     // معالج تسجيل الخروج
-    public function logout()
+
+    public function logout(Request $request)
     {
-        $this->authService->logout();
+        // تمرير الكائن Request
+        $this->authService->logout($request);
+
+        // إعادة التوجيه إلى صفحة تسجيل الدخول مع رسالة نجاح
         return redirect()->route('login')->with('success', 'Logged out successfully.');
     }
 }

@@ -1,7 +1,7 @@
 <x-layout>
     <section class="bg-gray-50 dark:bg-gray-900 py-10 px-4 sm:px-6 lg:px-8 mt-8">
         <div class="max-w-4xl mx-auto">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">Create a New Course</h1>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">Edit Course (Admin)</h1>
 
             {{-- Success or Error Message --}}
             @if(session('success'))
@@ -10,13 +10,14 @@
                 <div class="mb-4 text-red-500 text-sm">{{ session('error') }}</div>
             @endif
 
-            <form action="{{ route('instructor.courses.store') }}" method="POST" enctype="multipart/form-data" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 space-y-6">
+            <form action="{{ route('admin.courses.update', $course->id) }}" method="POST" enctype="multipart/form-data" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 space-y-6">
                 @csrf
+                @method('PUT')
 
                 {{-- Course Name --}}
                 <div class="mb-4">
                     <label for="course_name" class="block text-gray-700 dark:text-gray-300 font-medium">Course Name</label>
-                    <input type="text" name="course_name" id="course_name" value="{{ old('course_name') }}" required
+                    <input type="text" name="course_name" id="course_name" value="{{ old('course_name', $course->course_name) }}" required
                            class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">
                     @error('course_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
@@ -25,7 +26,7 @@
                 <div class="mb-4">
                     <label for="description" class="block text-gray-700 dark:text-gray-300 font-medium">Description</label>
                     <textarea name="description" id="description" rows="4" required
-                              class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">{{ old('description') }}</textarea>
+                              class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">{{ old('description', $course->description) }}</textarea>
                     @error('description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
 
@@ -34,9 +35,9 @@
                     <label for="level" class="block text-gray-700 dark:text-gray-300 font-medium">Level</label>
                     <select name="level" id="level" required
                             class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">
-                        <option value="Beginner" {{ old('level') === 'Beginner' ? 'selected' : '' }}>Beginner</option>
-                        <option value="Intermediate" {{ old('level') === 'Intermediate' ? 'selected' : '' }}>Intermediate</option>
-                        <option value="Advanced" {{ old('level') === 'Advanced' ? 'selected' : '' }}>Advanced</option>
+                        <option value="Beginner" {{ old('level', $course->level) === 'Beginner' ? 'selected' : '' }}>Beginner</option>
+                        <option value="Intermediate" {{ old('level', $course->level) === 'Intermediate' ? 'selected' : '' }}>Intermediate</option>
+                        <option value="Advanced" {{ old('level', $course->level) === 'Advanced' ? 'selected' : '' }}>Advanced</option>
                     </select>
                     @error('level') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
@@ -47,7 +48,7 @@
                     <select name="category_id" id="category_id" required
                             class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">
                         @foreach ($categories as $category)
-                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                            <option value="{{ $category->id }}" {{ old('category_id', $course->category_id) == $category->id ? 'selected' : '' }}>
                                 {{ $category->name }}
                             </option>
                         @endforeach
@@ -55,13 +56,27 @@
                     @error('category_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
 
+                {{-- Instructor --}}
+                <div class="mb-4">
+                    <label for="instructor_id" class="block text-gray-700 dark:text-gray-300 font-medium">Instructor</label>
+                    <select name="instructor_id" id="instructor_id" required
+                            class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">
+                        @foreach ($instructors as $instructor)
+                            <option value="{{ $instructor->id }}" {{ old('instructor_id', $course->instructor_id) == $instructor->id ? 'selected' : '' }}>
+                                {{ $instructor->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('instructor_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                </div>
+
                 {{-- Price --}}
                 <div class="mb-4">
                     <label class="block text-gray-700 dark:text-gray-300 font-medium">Is the Course Free?</label>
                     <div class="flex items-center">
-                        <input type="radio" id="is_free" name="is_free" value="1" {{ old('is_free') == 1 ? 'checked' : '' }} onclick="togglePriceField(true)">
+                        <input type="radio" id="is_free" name="is_free" value="1" {{ old('is_free', $course->is_free) == 1 ? 'checked' : '' }} onclick="togglePriceField(true)">
                         <label for="is_free" class="ml-2 text-gray-700 dark:text-gray-300">Yes</label>
-                        <input type="radio" id="is_paid" name="is_free" value="0" {{ old('is_free') == 0 ? 'checked' : '' }} onclick="togglePriceField(false)">
+                        <input type="radio" id="is_paid" name="is_free" value="0" {{ old('is_free', $course->is_free) == 0 ? 'checked' : '' }} onclick="togglePriceField(false)">
                         <label for="is_paid" class="ml-2 text-gray-700 dark:text-gray-300">No</label>
                     </div>
                     @error('is_free') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -70,76 +85,55 @@
                 {{-- Price Field --}}
                 <div class="mb-4">
                     <label for="price" class="block text-gray-700 dark:text-gray-300 font-medium">Price</label>
-                    <input type="number" name="price" id="price" value="{{ old('price') }}" required step="0.01"
-                           class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4" {{ old('is_free') == 1 ? 'readonly' : '' }}>
+                    <input type="number" name="price" id="price" value="{{ old('price', $course->price) }}" required step="0.01"
+                        class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4" {{ old('is_free', $course->is_free) == 1 ? 'readonly' : '' }}>
                     @error('price') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
-
 
                 {{-- Dates --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="mb-4">
                         <label for="start_date" class="block text-gray-700 dark:text-gray-300 font-medium">Start Date</label>
-                        <input type="date" name="start_date" id="start_date" value="{{ old('start_date') }}" required
+                        <input type="date" name="start_date" id="start_date" value="{{ old('start_date', $course->start_date) }}" required
                                class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">
                         @error('start_date') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="mb-4">
                         <label for="end_date" class="block text-gray-700 dark:text-gray-300 font-medium">End Date</label>
-                        <input type="date" name="end_date" id="end_date" value="{{ old('end_date') }}" required
+                        <input type="date" name="end_date" id="end_date" value="{{ old('end_date', $course->end_date) }}" required
                                class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">
                         @error('end_date') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                 </div>
 
-                {{-- Language --}}
-                <div class="mb-4">
-                    <label for="language" class="block text-gray-700 dark:text-gray-300 font-medium">Language</label>
-                    <input type="text" name="language" id="language" value="{{ old('language') }}"
-                           class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">
-                    @error('language') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
-
-                {{-- Requirements --}}
-                <div class="mb-4">
-                    <label for="requirements" class="block text-gray-700 dark:text-gray-300 font-medium">Requirements</label>
-                    <textarea name="requirements" id="requirements" rows="3"
-                              class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">{{ old('requirements') }}</textarea>
-                    @error('requirements') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
-
-                {{-- Learning Outcomes --}}
-                <div class="mb-4">
-                    <label for="learning_outcomes" class="block text-gray-700 dark:text-gray-300 font-medium">Learning Outcomes</label>
-                    <textarea name="learning_outcomes" id="learning_outcomes" rows="3"
-                              class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">{{ old('learning_outcomes') }}</textarea>
-                    @error('learning_outcomes') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
-
                 {{-- Image --}}
                 <div class="mb-4">
                     <label for="image" class="block text-gray-700 dark:text-gray-300 font-medium">Course Image</label>
-                    <input type="file" name="image" id="image"
-                           class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none py-2 px-4">
+                    <input type="file" name="image" id="image" class="mt-2 block w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-lg py-2 px-4">
                     @error('image') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
 
                 {{-- Submit Button --}}
-                <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-600 transition duration-300">
-                    Create Course
-                </button>
+                <div class="mt-6 flex justify-center">
+                    <button type="submit" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none">
+                        Update Course
+                    </button>
+                </div>
             </form>
         </div>
     </section>
-    <script>
-        // Toggle the price field based on the radio selection
-        function togglePriceField(isFree) {
-            const priceInput = document.getElementById('price');
-            priceInput.readOnly = isFree;
-            if (isFree) {
-                priceInput.value = 0;  // Set the price to 0 if it's free
-            }
-        }
-    </script>
 </x-layout>
+
+<script>
+    // Toggle the price field based on whether the course is free or not
+    function togglePriceField(isFree) {
+        const priceField = document.getElementById('price');
+        if (isFree) {
+            priceField.readOnly = true;
+            priceField.value = '';
+        } else {
+            priceField.readOnly = false;
+        }
+    }
+</script>
