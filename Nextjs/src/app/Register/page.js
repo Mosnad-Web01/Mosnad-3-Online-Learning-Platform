@@ -21,7 +21,7 @@ export default function Register() {
 
       // الانتقال إلى صفحة تسجيل الدخول بعد ثانية واحدة
       setTimeout(() => {
-        router.push("/Login"); // تغيير المسار إلى صفحة تسجيل الدخول
+        router.push("/login"); // تغيير المسار إلى صفحة تسجيل الدخول
       }, 1000);
     } catch (error) {
       setErrorMessage(
@@ -88,7 +88,7 @@ export default function Register() {
         <p className="mt-4 text-sm text-center">
           لديك حساب بالفعل؟{" "}
           <a
-            href="/Login"
+            href="/login"
             className="text-blue-500 hover:underline"
           >
             سجل الدخول
