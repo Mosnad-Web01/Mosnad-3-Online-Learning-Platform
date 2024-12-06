@@ -5,7 +5,6 @@ import CourseSection from '../components/CourseSection';
 import About from '../components/About';
 import ContactSection from '../components/ContactSection';
 async function HomePage() {
-  // استدعاء getCsrfToken للحصول على التوكن من بيئة الخادم
  
   return (
     <>
