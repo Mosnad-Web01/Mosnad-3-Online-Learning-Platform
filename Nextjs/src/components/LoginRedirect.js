@@ -6,7 +6,7 @@ const LoginRedirect = () => {
   const router = useRouter();
 
   const redirectToLogin = () => {
-    router.push('/Login'); 
+    router.push('/login'); 
   };
 
   return (
