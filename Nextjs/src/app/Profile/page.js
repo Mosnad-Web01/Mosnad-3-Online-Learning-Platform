@@ -5,7 +5,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaPen } from "react-icons/fa";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { fetchStudentById } from "../../services/api";
+import { fetchUserprofile } from "../../services/api";
+//import { useUser } from '@/context/userContext'; // استدعاء سياق المستخدم
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -60,36 +61,18 @@ export default function Profile() {
     localStorage.setItem("isPurple", JSON.stringify(isPurple));
   }, [darkMode, isPurple]);
 
-  // Fetch user data from the API
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchData = async () => {
       try {
-        const studentId = localStorage.getItem("studentId");
-        if (!studentId) {
-          router.push("/Login");
-          return;
-        }
-        const response = await fetchStudentById(studentId); // استدعاء API لجلب بيانات المستخدم
-        setUser(response.data); // ضبط بيانات المستخدم
-        setError(null);
-      } catch (err) {
-        setError("Failed to load user data.");
-      } finally {
-        setLoading(false); // إيقاف عرض التحميل
+        const user = await fetchUserprofile(); // Fetch current user data
+        setUser(user); // Update state with user data
+      } catch (error) {
+        router.push("/login");
       }
     };
-
-    fetchUser();
-  }, [router]);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        Loading...
-      </div>
-    );
-  }
-
+    fetchData();
+  }, []);
+  
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen">
