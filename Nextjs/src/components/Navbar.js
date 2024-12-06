@@ -8,6 +8,7 @@ import NavbarDropdown from "../components/NavbarDropdown";
 import Image from "next/image";
 import { logout, fetchCurrentUser } from "@/services/api"; // Import API functions
 import { toast } from "react-toastify";
+import { useUser } from "@/context/UserContext"; // استدعاء سياق المستخدم
 
 // Dynamically load the ScrollLink to avoid SSR issues
 const ScrollLink = dynamic(() => import("react-scroll").then((mod) => mod.Link), { ssr: false });
@@ -15,7 +16,7 @@ const ScrollLink = dynamic(() => import("react-scroll").then((mod) => mod.Link),
 const Navbar = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState(null); // State to hold user data
+  const { user, setUser } = useUser(); 
 
   // Load theme preference on component mount
   useEffect(() => {
@@ -41,15 +42,21 @@ const Navbar = () => {
   // Fetch user data on component mount
   useEffect(() => {
     const fetchData = async () => {
+      if (!user) {
+        return;
+      }
+  
       try {
-        const user = await fetchCurrentUser(); // Fetch current user data
-        setUser(user); // Update state with user data
+        const userData = await fetchCurrentUser(); 
+        setUser(userData); 
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
     };
+  
     fetchData();
-  }, []);
+  }, [user]); 
+  
 
   const toggleTheme = () => setIsDarkMode((prev) => !prev);
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);

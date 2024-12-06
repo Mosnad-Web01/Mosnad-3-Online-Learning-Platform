@@ -1,11 +1,14 @@
 // src/context/userContext.js
-'use client';
-import { createContext, useState, useContext } from 'react';
+"use client";
 
-const UserContext = createContext();
+import { createContext, useState, useContext } from "react";
 
+// إنشاء سياق المستخدم
+const UserContext = createContext(null);
+
+// مكون المزود (Provider) لإدارة الحالة
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // Define user state here
+  const [user, setUser] = useState(null); // حالة المستخدم
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
@@ -14,8 +17,11 @@ export const UserProvider = ({ children }) => {
   );
 };
 
+// هوك مخصص للوصول إلى سياق المستخدم
 export const useUser = () => {
   const context = useContext(UserContext);
-  
+  if (!context) {
+    throw new Error("useUser must be used within a UserProvider");
+  }
   return context;
 };

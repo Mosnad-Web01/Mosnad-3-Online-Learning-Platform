@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { FaPen } from "react-icons/fa";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { fetchUserprofile } from "../../services/api";
-//import { useUser } from '@/context/userContext'; // استدعاء سياق المستخدم
 
 export default function Profile() {
   const [user, setUser] = useState(null);
