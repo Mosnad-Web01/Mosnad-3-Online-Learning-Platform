@@ -61,7 +61,7 @@ Route::middleware('web')->group(function () {
 
         // مسارات لوحة التحكم للمسؤول
         Route::prefix('admin')
-        ->middleware(['role:Admin'])
+        // ->middleware(['role:Admin'])
         ->group(function () {
             Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
             Route::resource('/users', AdminUserController::class);
@@ -69,7 +69,7 @@ Route::middleware('web')->group(function () {
 
         // مسارات لوحة التحكم للمدرب
         Route::prefix('instructor')
-        ->middleware(['role:Admin,Instructor'])
+        // ->middleware(['role:Admin,Instructor'])
         ->group(function () {
             // لوحة تحكم المدرب
             Route::get('/dashboard', [InstructorDashboardController::class, 'index'])->name('instructor.dashboard');

@@ -8,43 +8,53 @@ const api = axios.create({
 });
 
 // دالة مساعدة للحصول على التوكن إذا لم يكن موجودًا
-const getCsrfToken = () => {
-  return axios.get('http://localhost:8000/api/sanctum/csrf-cookie', {
-    withCredentials: true, // إرسال الكوكيز مع الطلب
-  }).then(() => {
-    return document.cookie
-      .split('; ')
-      .find(row => row.startsWith('XSRF-TOKEN='))
-      ?.split('=')[1];
-  });
+export const getCsrfToken = async () => {
+  try {
+    // Fetch the CSRF token from the backend
+    await axios.get('http://localhost:8000/api/sanctum/csrf-cookie', {
+      withCredentials: true, // Send cookies with the request
+    });
+
+    // Check if the environment is client-side
+    if (typeof window !== 'undefined') {
+      console.log('Running on the client side');
+      const cookieString = document.cookie;
+      const xsrfCookie = cookieString
+        .split('; ')
+        .find((row) => row.startsWith('XSRF-TOKEN='));
+      return xsrfCookie ? xsrfCookie.split('=')[1] : null;
+    } else {
+      console.log('Running on the server side');
+      throw new Error('This function does not support server-side execution.');
+    }
+  } catch (error) {
+    console.error('Error getting CSRF token:', error);
+    return null;
+  }
 };
-// تحليل الكوكي للحصول على قيمة معينة
-function getCookie(name) {
-  const cookies = document.cookie.split('; ');
-  const tokenCookie = cookies.find(cookie => cookie.startsWith(`${name}=`));
-  return tokenCookie ? tokenCookie.split('=')[1] : null;
-}
+
+
+export function getCookie(name, req ) {
+  // إذا كانت بيئة العميل
+  console.log("getCookie" );
+    const cookies = document.cookie.split('; ');
+    const tokenCookie = cookies.find(cookie => cookie.startsWith(`${name}=`));
+    return tokenCookie ? tokenCookie.split('=')[1] : null;
+  
+};
+
+
 // تعيين التوكن XSRF بشكل افتراضي في رؤوس الطلبات
 api.interceptors.request.use(async (config) => {
   
-    let csrfToken = getCookie('XSRF-TOKEN'); // قراءة الكوكي "XSRF-TOKEN"
-    //let token = getCookie('token'); // قراءة الكوكي "token"
-
-  // إذا لم يكن التوكن موجودًا، قم بطلبه وانتظره
+    let csrfToken = getCookie('XSRF-TOKEN'); 
   if (!csrfToken) {
     csrfToken = await getCsrfToken();
   }
-
-  // إذا كان التوكن موجودًا، تعيينه في الرؤوس
   if (csrfToken) {
-    console.log('csrfToken ',csrfToken);
-
     config.headers['X-XSRF-TOKEN'] = decodeURIComponent(csrfToken);
   }
-  // if (token) {
-  //   config.headers['Authorization'] = `Bearer ${decodeURIComponent(token)}`; // إضافة التوكن للهيدر
-  // }
-  // // تعيين Content-Type إلى 'application/json' إذا لم يكن محددًا
+ 
   if (!config.headers['Content-Type']) {
     config.headers['Content-Type'] = 'application/json';
   }
@@ -52,28 +62,26 @@ api.interceptors.request.use(async (config) => {
   
   return config;
 }, (error) => {
-  // معالجة الأخطاء في حال وجودها
   return Promise.reject(error);
 });
 
-// دوال التعامل مع API
 export const loginUser = ({ email, password }) => {
   console.log("Email:", email);
 console.log("Password:", password);
 
   return api.post('/login', { email, password }).then((response) => {
-    // لا حاجة لتخزين التوكن في الكوكيز يدويًا، حيث يتولى Sanctum هذا الأمر
     return response;
   });
 };
 
-// دوال أخرى (أمثلة)...
 export const fetchUserprofile = () => api.get(`/user-profiles`);
+
 export const fetchCurrentUser = () => api.get('/users');
 
-// تسجيل الخروج
 export const logout = async () => {
   try {
+    console.log('Logout ');
+
     const response = await api.post('/logout');
     console.log('Logout response:', response.data);
     return response.data;

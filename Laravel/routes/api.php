@@ -27,10 +27,11 @@ Route::middleware('web')->group(function () {
     // Includes support for sessions.
     // Relies on cookies for authentication and state management.
     // Provides CSRF protection by default.
+// مسارات عامة لا تتطلب مصادقة
 
-    // مسارات عامة لا تتطلب مصادقة
-    Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+    
 
     // مسارات  تتطلب مصادقة
 
@@ -51,12 +52,12 @@ Route::middleware('web')->group(function () {
         Route::put('{id}', [CourseCategoryController::class, 'update']);
         Route::delete('{id}', [CourseCategoryController::class, 'destroy']);
     });
+      
+  Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::middleware('auth:sanctum')->group(function () {
         // مسارات تتطلب مصادقة باستخدام Sanctum
-        Route::post('/logout', [AuthController::class, 'logout']);
         Route::resource('/users', UserController::class);
-
         // Route::get('/users', [UserController::class, 'index'])->name('api.users.index');  // View all users
         // Route::post('/users/{user}/suspend', [UserController::class, 'suspend']);
         // Route::post('/users/{user}/unsuspend', [UserController::class, 'unsuspend']);

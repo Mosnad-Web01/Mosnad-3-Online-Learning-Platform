@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Http\Request;
 use App\Services\AuthService;
@@ -31,26 +32,45 @@ class AuthController extends Controller
         try {
             // Attempt to log the user in
             $data = $this->authService->login($request->only('email', 'password'));
-
-            // Return a successful login response with the user data and XSRF-TOKEN
+    
+            // Return a successful login response with the user data and cookies
             return response()->json([
                 'message' => 'Login successful.',
                 'user' => $data['user'],
-            ])->cookie('XSRF-TOKEN', $data['xsrf_token'], 60 * 24, '/', null, false, false);
-
+            ])
+            ->cookie('XSRF-TOKEN', $data['xsrf_token'], 60 * 24, '/', null, false, false)
+            ->cookie('user', json_encode([
+                'name' => $data['user']['name'],
+                'email' => $data['user']['email'],
+            ]), 60);
+    
         } catch (\Exception $e) {
             // Handle exceptions (e.g., blocked users) and return a 403 Forbidden response
             return response()->json(['message' => $e->getMessage()], 403);
         }
     }
-
+    
     // Logout function
-    public function logout()
+    public function logout(Request $request)
     {
-        // Call the AuthService to handle logout
-        $message = $this->authService->logout();
-
-        // Clear the XSRF-TOKEN cookie after logout
-        return response()->json($message)->cookie('XSRF-TOKEN', '', -1);
+        try {
+            // تسجيل الخروج
+            Auth::logout();
+            
+            // حذف الجلسة من قاعدة البيانات
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+    
+            // إعادة استجابة النجاح
+            return response()->json(['message' => 'Logged out successfully'], 200)
+                ->withCookie(cookie()->forget('XSRF-TOKEN'))
+                ->withCookie(cookie()->forget('laravel_session'));
+        } catch (\Exception $e) {
+            // تسجيل الأخطاء
+            \Log::error($e);
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
+    
+
 }

@@ -7,7 +7,7 @@ import ScrollableCourseList from '@/components/ScrollableCourseList';
 import Link from 'next/link';
 import Image from 'next/image'; 
 import { motion } from 'framer-motion'; 
-import { apiClient } from '@/services/api';
+import api from '@/services/api';
 
 
 const CourseDetails = () => {
@@ -64,7 +64,7 @@ const CourseDetails = () => {
 
   const checkEnrollment = async () => {
     try {
-      const response = await axios.get('/api/check-enrollment');
+      const response = await axios.get('/payments');
       if (response.data && response.data.get) {
         // متابعة العمليات إذا كانت البيانات صحيحة
       } else {

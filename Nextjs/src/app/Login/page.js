@@ -2,18 +2,20 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation"; // للتنقل بين الصفحات
 import { loginUser } from "../../services/api";
+// import { useUser } from '@/context/userContext'; // استدعاء سياق المستخدم
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-
+  const { user, setUser } = useState(null); // استدعاء المستخدم من السياق
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await loginUser({ email, password }); // استدعاء API لتسجيل الدخول
       // localStorage.setItem("studentId", response.data.student.id); // تخزين studentId
+
       setError(""); // إزالة رسالة الخطأ
        router.push("/"); // التوجيه إلى صفحة الملف الشخصي عند النجاح
     } catch (error) {
