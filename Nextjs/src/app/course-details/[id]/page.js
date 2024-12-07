@@ -75,7 +75,7 @@ const CourseDetails = () => {
     fetchCourseDetails();
 
   }, [id]);
-  //  // Fetch user data on component mount
+  
   
   useEffect(() => {
     // استرجاع بيانات المستخدم من الكوكيز

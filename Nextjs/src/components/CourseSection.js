@@ -10,26 +10,20 @@ const CourseSection = () => {
   const [filter, setFilter] = useState({ type: null, value: null });
 
   useEffect(() => {
-    const loadCourses = async () => {
+    const loadData = async () => {
       try {
-        const response = await fetchCourses();
-        setCourses(response.data);
+        const [courseRes, categoryRes] = await Promise.all([
+          fetchCourses(),
+          fetchCategories(),
+        ]);
+        setCourses(courseRes.data || []);
+        setCategories(categoryRes.data || []);
       } catch (error) {
-        console.error('Failed to fetch courses:', error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    const loadCategories = async () => {
-      try {
-        const response = await fetchCategories();
-        setCategories(response.data);
-      } catch (error) {
-        console.error('Failed to fetch categories:', error);
-      }
-    };
-
-    loadCourses();
-    loadCategories();
+    loadData();
   }, []);
 
   const handleFilterSelect = (filterOption) => setFilter(filterOption);

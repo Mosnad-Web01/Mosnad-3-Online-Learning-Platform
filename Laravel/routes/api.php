@@ -22,18 +22,11 @@ Route::middleware('web')->get('/sanctum/csrf-cookie', function (Request $request
     return response()->json(['message' => 'CSRF token set', 'cookie' => $request]);
 });
 
-Route::middleware('web')->group(function () {
-    // web Middleware:
-    // Includes support for sessions.
-    // Relies on cookies for authentication and state management.
-    // Provides CSRF protection by default.
-// مسارات عامة لا تتطلب مصادقة
-
+// مجموعة المسارات الخاصة بـ API
+Route::middleware('api')->group(function () {
+    // مسارات عامة لا تتطلب مصادقة
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
-    
-
-    // مسارات  تتطلب مصادقة
 
     // مسارات الدورات
     Route::prefix('courses')->group(function () {
@@ -43,7 +36,7 @@ Route::middleware('web')->group(function () {
         Route::put('{id}', [CourseController::class, 'update']);
         Route::delete('{id}', [CourseController::class, 'destroy']);
     });
-    
+
     // مسارات الفئات
     Route::prefix('categories')->group(function () {
         Route::post('/', [CourseCategoryController::class, 'store']);
@@ -52,18 +45,14 @@ Route::middleware('web')->group(function () {
         Route::put('{id}', [CourseCategoryController::class, 'update']);
         Route::delete('{id}', [CourseCategoryController::class, 'destroy']);
     });
-      
-  Route::post('/logout', [AuthController::class, 'logout']);
 
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    // المسارات التي تتطلب مصادقة باستخدام Sanctum
     Route::middleware('auth:sanctum')->group(function () {
-        // مسارات تتطلب مصادقة باستخدام Sanctum
+
+        // مسارات المستخدمين
         Route::resource('/users', UserController::class);
-        // Route::get('/users', [UserController::class, 'index'])->name('api.users.index');  // View all users
-        // Route::post('/users/{user}/suspend', [UserController::class, 'suspend']);
-        // Route::post('/users/{user}/unsuspend', [UserController::class, 'unsuspend']);
-        // Route::post('/users/{user}/assign-role', [UserController::class, 'assignRole']);  // Assign role
-        // Route::post('/users/{user}/modify-role', [UserController::class, 'modifyRole']);  // Modify role
-        // Route::delete('/users/{user}', [UserController::class, 'destroy']);  // Delete user
 
         // مسارات الدروس
         Route::prefix('courses/{courseId}/lessons')->name('courses.lessons.')->group(function () {
@@ -95,18 +84,24 @@ Route::middleware('web')->group(function () {
             Route::get('/courses', [InstructorController::class, 'myCourses']);
             Route::post('/course', [InstructorController::class, 'createCourse']);
         });
+    // مسارات الالتحاق بالدورات
+    Route::prefix('enrollments')->middleware('auth')->group(function () {
+        // تسجيل طالب في دورة
+        Route::post('/courses/{courseId}/enroll', [EnrollmentController::class, 'enroll'])
+            ->name('enrollments.enroll');
 
-        // // مسارات الالتحاق بالدورات
-        // Route::middleware('auth:api')->group(function () {
-        //     Route::post('/courses/{courseId}/enroll', [EnrollmentController::class, 'enroll']);
-        //     Route::patch('/courses/{courseId}/progress', [EnrollmentController::class, 'updateProgress']);
-        // });
- // مسارات الالتحاق بالدورات
- Route::prefix('enrollments')->group(function () {
-           Route::post('/courses/{courseId}/enroll', [EnrollmentController::class, 'enroll']);
-            Route::patch('/courses/{courseId}/progress', [EnrollmentController::class, 'updateProgress']);
-        });
+        // تحديث تقدم الطالب في الدورة
+        Route::patch('/courses/{courseId}/progress', [EnrollmentController::class, 'updateProgress'])
+            ->name('enrollments.updateProgress');
 
+        // الحصول على جميع تسجيلات الطالب
+        Route::get('/courses', [EnrollmentController::class, 'getStudentEnrollments'])
+            ->name('enrollments.getStudentEnrollments');
+
+        // الحصول على معلومات تسجيل معينة
+        Route::get('/courses/{courseId}', [EnrollmentController::class, 'getEnrollment'])
+            ->name('enrollments.getEnrollment');
+    });
         // مسارات إكمال الدروس
         Route::prefix('lesson-completions')->group(function () {
             Route::get('/', [LessonCompletionController::class, 'index']);
