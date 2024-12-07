@@ -11,21 +11,22 @@ class AdminUserController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-{
-    $query = User::query();
+    {
+        $query = User::query();
 
-    if ($request->has('search') && $request->search) {
-        $searchTerm = $request->search;
-        $query->where(function($q) use ($searchTerm) {
-            $q->where('name', 'like', '%' . $searchTerm . '%')
-              ->orWhere('email', 'like', '%' . $searchTerm . '%')
-              ->orWhere('role', 'like', '%' . $searchTerm . '%');
-        });
+        if ($request->has('search') && $request->search) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('email', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('role', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        $users = $query->paginate(10);
+        return view('admin.users.index', compact('users')); // عرض صفحة HTML
     }
 
-    $users = $query->paginate(10);  // إرجاع النتائج مع التصفية بناءً على البحث
-    return view('admin.users.index', compact('users'));
-}
 
 
     /**
@@ -33,7 +34,7 @@ class AdminUserController extends Controller
      */
     public function create()
     {
-        return view('users.create'); // عرض صفحة إنشاء مستخدم جديد
+        return view('admin.users.create'); // عرض صفحة إنشاء مستخدم جديد
     }
 
     /**
@@ -70,8 +71,9 @@ class AdminUserController extends Controller
      */
     public function edit(User $user)
     {
-        return view('admin.users.edit', compact('user')); // عرض صفحة تعديل مستخدم معين
+        return view('admin.users.edit', compact('user'));
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -85,10 +87,10 @@ class AdminUserController extends Controller
         'role' => 'required|in:admin,student,instructor', // Ensure role is one of the valid options
 
     ]);
-    
+
     // Manually set the boolean value based on the checkbox
     $isSuspended = filter_var($request->input('is_suspended'), FILTER_VALIDATE_BOOLEAN);
-    
+
     // Update user data based on validated input
     $user->update([
         'is_suspended' => $isSuspended, // Save boolean value
@@ -99,7 +101,7 @@ class AdminUserController extends Controller
          'role' => $request->input('role'), // Add role field to the update
 
     ]);
-    
+
 
     return redirect()->route('users.index')
         ->with('success', 'User updated successfully.');
