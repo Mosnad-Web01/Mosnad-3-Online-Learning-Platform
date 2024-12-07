@@ -3,8 +3,8 @@
 
 
         <!-- المحتوى الرئيسي -->
-        <main class="flex-1">
-            <div class="bg-white dark:bg-gray-900 min-h-screen">
+        <main class="row-start-2 row-end-3 col-start-1 bg-white dark:bg-gray-900 text-gray-900 dark:text-white lg:col-start-2 col-end-3 overflow-y-auto p-4">
+        <div class="bg-white dark:bg-gray-900 min-h-screen">
                 <!-- Hero Section -->
                 <section class="text-center py-20 bg-blue-500 dark:bg-gray-900 text-white">
                     <h1 class="text-4xl font-bold mb-4">Welcome to Our Online Course Dashboard</h1>

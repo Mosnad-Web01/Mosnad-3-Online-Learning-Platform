@@ -3,7 +3,8 @@
     $role = $user ? $user->role : null;
 @endphp
 
-<header>
+ <header class="row-start-1 row-end-2 col-span-2 bg-gray-100 dark:bg-gray-900 lg:col-span-1 lg:col-end-3 flex flex-col lg:flex-row">
+>
     <nav class="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
         <div class="px-3 py-3 lg:px-5 lg:pl-3">
             <div class="flex items-center rtl:space-x-reverse space-x-4">
