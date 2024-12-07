@@ -67,7 +67,7 @@
                 </li>
 
                 <!-- Links for Admin -->
-                @if ($role === 'admin')
+                @if ($role === 'Admin')
                     <li>
                         <a href="/admin/dashboard" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                             <i class="fas fa-cogs"></i>
@@ -108,7 +108,7 @@
                 @endif
 
                 <!-- Links for Instructor -->
-                @if ($role === 'instructor')
+                @if ($role === 'Instructor')
                     <li>
                         <a href="/instructor/dashboard" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                             <i class="fas fa-chalkboard-teacher"></i>
