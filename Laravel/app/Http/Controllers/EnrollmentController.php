@@ -11,31 +11,37 @@ use Illuminate\Support\Facades\Auth;
 class EnrollmentController extends Controller
 {
     /**
+     * التحقق إذا كان الطالب مسجلاً في دورة.
+     */
+    private function isStudentEnrolled($userId, $courseId)
+    {
+        return Enrollment::where('student_id', $userId)
+            ->where('course_id', $courseId)
+            ->exists();
+    }
+
+    /**
      * تسجيل الطالب في دورة.
      */
     public function enroll(Request $request, $courseId)
     {
         $userId = Auth::id();
 
-        // التحقق من الدورة
+        // التحقق من وجود الدورة
         $course = Course::findOrFail($courseId);
 
         // التحقق إذا كان الطالب مسجلاً بالفعل
-        $existingEnrollment = Enrollment::where('student_id', $userId)
-            ->where('course_id', $courseId)
-            ->first();
-
-        if ($existingEnrollment) {
+        if ($this->isStudentEnrolled($userId, $courseId)) {
             return response()->json(['message' => 'Already enrolled in this course'], 400);
         }
 
         // التحقق من حالة الدفع إذا كانت الدورة مدفوعة
-        if ($course->is_free) {
+        if (!$course->is_free) {
             $paymentStatus = CourseUser::where('user_id', $userId)
                 ->where('course_id', $courseId)
                 ->value('payment_status');
 
-            if ($paymentStatus !== 'free') {
+            if ($paymentStatus !== 'paid') {
                 return response()->json(['message' => 'Payment required for this course'], 403);
             }
         }
@@ -56,15 +62,14 @@ class EnrollmentController extends Controller
     {
         $userId = Auth::id();
 
-        // جلب التسجيل
+        // التحقق من تسجيل الطالب في الدورة
         $enrollment = Enrollment::where('student_id', $userId)
             ->where('course_id', $courseId)
             ->firstOrFail();
 
-        // تحديث نسبة التقدم
+        // التحقق من صحة نسبة التقدم
         $progress = $request->input('progress');
-
-        if ($progress < 0 || $progress > 100) {
+        if (!is_numeric($progress) || $progress < 0 || $progress > 100) {
             return response()->json(['message' => 'Invalid progress value'], 400);
         }
 
@@ -78,5 +83,32 @@ class EnrollmentController extends Controller
         $enrollment->save();
 
         return response()->json(['message' => 'Progress updated successfully', 'enrollment' => $enrollment], 200);
+    }
+
+    /**
+     * الحصول على جميع تسجيلات الطالب.
+     */
+    public function getStudentEnrollments()
+    {
+        $userId = Auth::id();
+        $enrollments = Enrollment::with('course')->where('student_id', $userId)->get();
+
+        return response()->json(['enrollments' => $enrollments], 200);
+    }
+
+    /**
+     * الحصول على تسجيل معين.
+     */
+    public function getEnrollment($courseId)
+    {
+        $userId = Auth::id();
+
+        // التحقق من تسجيل الطالب في الدورة
+        $enrollment = Enrollment::with('course')
+            ->where('student_id', $userId)
+            ->where('course_id', $courseId)
+            ->firstOrFail();
+
+        return response()->json(['enrollment' => $enrollment], 200);
     }
 }
