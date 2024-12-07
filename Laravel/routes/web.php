@@ -59,21 +59,15 @@ Route::middleware('web')->group(function () {
             return view('dashboard');
         });
 
-        // مسارات لوحة التحكم للمسؤول
-        Route::prefix('admin')
-        // ->middleware(['role:Admin'])
-        ->group(function () {
-            Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-            Route::resource('/users', AdminUserController::class);
-        });
+
 
         // مسارات لوحة التحكم للمدرب
         Route::prefix('instructor')
-        // ->middleware(['role:Admin,Instructor'])
+         ->middleware(['role:Admin,Instructor'])
         ->group(function () {
             // لوحة تحكم المدرب
             Route::get('/dashboard', [InstructorDashboardController::class, 'index'])->name('instructor.dashboard');
-    
+
             // مسارات إدارة الدورات التدريبية
             Route::get('/courses', [InstructorCourseController::class, 'index'])->name('instructor.courses.index');
             Route::get('/courses/create', [InstructorCourseController::class, 'create'])->name('instructor.courses.create');
@@ -81,7 +75,7 @@ Route::middleware('web')->group(function () {
             Route::get('/courses/{id}/edit', [InstructorCourseController::class, 'edit'])->name('instructor.courses.edit');
             Route::put('/courses/{id}', [InstructorCourseController::class, 'update'])->name('instructor.courses.update');
             Route::delete('/courses/{id}', [InstructorCourseController::class, 'destroy'])->name('instructor.courses.destroy');
-        
+
             // مسارات إدارة الدروس
             Route::get('/instructor/courses/{courseId}/lessons', [InstructorLessonController::class, 'index'])->name('instructor.lessons.index');
             Route::get('/courses/{courseId}/lessons/create', [InstructorLessonController::class, 'create'])->name('instructor.lessons.create');
@@ -100,7 +94,10 @@ Route::middleware('web')->group(function () {
         });
 
         // مسارات لوحة تحكم الإدمن
-        Route::prefix('admin')->name('admin.')->group(function () {
+        Route::prefix('admin')->name('admin.')
+        ->middleware(['role:Admin'])
+        ->group(function () {
+
             // لوحة تحكم الإدمن
             Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
@@ -128,13 +125,9 @@ Route::middleware('web')->group(function () {
             Route::put('/courses/{courseId}/lessons/{lessonId}', [AdminLessonController::class, 'update'])->name('lessons.update');
             Route::delete('/courses/{courseId}/lessons/{lessonId}', [AdminLessonController::class, 'destroy'])->name('lessons.destroy');
 
-            // مسارات إدارة المستخدمين
-            Route::get('/users', [UserController::class, 'index'])->name('users.index');
-            Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
-            Route::post('/users', [UserController::class, 'store'])->name('users.store');
-            Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
-            Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
-            Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+            Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+            Route::resource('/users', AdminUserController::class);
+
         });
     });
 

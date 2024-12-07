@@ -40,13 +40,6 @@
                                     <a href="{{ route('admin.users.edit', $user->id) }}" class="text-blue-500 hover:text-blue-600 mr-2">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
-                                    <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-500 hover:text-red-600">
-                                            <i class="fas fa-trash-alt"></i> Delete
-                                        </button>
-                                    </form>
                                 </td>
                             </tr>
                         @endforeach
@@ -56,24 +49,5 @@
         </div>
     </section>
 
-    <script>
-        document.querySelectorAll('.delete-form').forEach(form => {
-            form.addEventListener('submit', function (e) {
-                e.preventDefault(); // Prevent form submission directly
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: 'Do you really want to delete this user?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, delete it!',
-                    cancelButtonText: 'No, cancel!',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit(); // Submit the form if confirmed
-                    }
-                });
-            });
-        });
-    </script>
+
 </x-layout>
