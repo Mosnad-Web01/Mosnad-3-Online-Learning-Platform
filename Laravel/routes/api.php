@@ -96,9 +96,14 @@ Route::middleware('web')->group(function () {
             Route::post('/course', [InstructorController::class, 'createCourse']);
         });
 
-        // مسارات الالتحاق بالدورات
-        Route::middleware('auth:api')->group(function () {
-            Route::post('/courses/{courseId}/enroll', [EnrollmentController::class, 'enroll']);
+        // // مسارات الالتحاق بالدورات
+        // Route::middleware('auth:api')->group(function () {
+        //     Route::post('/courses/{courseId}/enroll', [EnrollmentController::class, 'enroll']);
+        //     Route::patch('/courses/{courseId}/progress', [EnrollmentController::class, 'updateProgress']);
+        // });
+ // مسارات الالتحاق بالدورات
+ Route::prefix('enrollments')->group(function () {
+           Route::post('/courses/{courseId}/enroll', [EnrollmentController::class, 'enroll']);
             Route::patch('/courses/{courseId}/progress', [EnrollmentController::class, 'updateProgress']);
         });
 

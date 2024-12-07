@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation"; // للتنقل بين الصفحات
 import { loginUser } from "../../services/api";
 import { useUser } from '@/context/UserContext'; // استدعاء سياق المستخدم
-
+import Cookies from "js-cookie"; 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,7 +16,15 @@ export default function Login() {
     e.preventDefault();
     try {
       const response = await loginUser({ email, password }); // استدعاء API لتسجيل الدخول
-      setUser(response.data.user); // تحديث حالة المستخدم في السياق
+       // حفظ المستخدم في الكوكي
+       Cookies.set("user", JSON.stringify(response.data.user), {
+        expires: 7, // مدة الحفظ (7 أيام)
+        path: "/", // متاح لكل المسارات
+        // secure: true, // استخدم هذا في حالة HTTPS
+        // sameSite: "", // لتجنب مشاكل CSRF
+      });
+            setUser(response.data.user); // تحديث حالة المستخدم في السياق
+
       setError(""); // إزالة رسالة الخطأ
       router.push("/"); // التوجيه إلى الصفحة الرئيسية
     } catch (error) {

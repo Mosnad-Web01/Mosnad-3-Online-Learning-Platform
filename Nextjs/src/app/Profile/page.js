@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaPen } from "react-icons/fa";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { fetchUserprofile } from "../../services/api";
+import { fetchUserprofile } from "@/services/api";
 
 export default function Profile() {
   const [user, setUser] = useState(null);

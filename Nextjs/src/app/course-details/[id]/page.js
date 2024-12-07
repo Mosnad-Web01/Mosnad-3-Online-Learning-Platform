@@ -8,6 +8,8 @@ import Link from 'next/link';
 import Image from 'next/image'; 
 import { motion } from 'framer-motion'; 
 import api from '@/services/api';
+import { useUser } from '@/context/UserContext';
+import Cookies from "js-cookie"; 
 
 
 const CourseDetails = () => {
@@ -19,37 +21,49 @@ const CourseDetails = () => {
   const [averageCourseRating, setAverageCourseRating] = useState(0);
   const [isEnrolled, setIsEnrolled] = useState(false);  // حالة التسجيل
   const [isProcessing, setIsProcessing] = useState(false); // للتأكد من عدم تكرار النقرات
+  const { user } = useUser(); // جلب بيانات المستخدم من الـ context
 
   useEffect(() => {
+    const checkEnrollment = async (courseId) => {
+      try {
+        const response = await api.get('/payments', { params: { courseId } });
+        if (response.data && response.data.isEnrolled) {
+          return { isEnrolled: response.data.isEnrolled };
+        } else {
+          return { isEnrolled: false };
+        }
+      } catch (error) {
+        console.error('Error checking enrollment:', error);
+        return { isEnrolled: false };
+      }
+    };
+  
     const fetchCourseDetails = async () => {
       try {
         const response = await fetchCourseById(id);
-    
         if (response && response.data) {
           const courseData = response.data;
-    
+  
           setCourse(courseData);
           setInstructor(courseData.instructor);
-    
+  
           const courseRatings = courseData.ratings || [];
           const avgRating =
             courseRatings.length === 0
               ? 0
               : courseRatings.reduce((total, rating) => total + rating.courseRating, 0) / courseRatings.length;
           setAverageCourseRating(avgRating);
-    
+  
           const relatedResponse = await fetchCourses();
           if (relatedResponse && relatedResponse.data) {
             const allCourses = relatedResponse.data;
             const related = allCourses.filter(c => c.category_id === courseData.category_id && c.id !== courseData.id);
             setRelatedCourses(related);
           }
-    
-          // تحقق من حالة التسجيل
+  
+          // Check enrollment status
           const enrollmentResponse = await checkEnrollment(courseData.id);
-          if (enrollmentResponse && enrollmentResponse.data) {
-            setIsEnrolled(enrollmentResponse.data.isEnrolled);
-          }
+          setIsEnrolled(enrollmentResponse.isEnrolled);
         } else {
           console.error('Error: No data in the response');
         }
@@ -57,47 +71,36 @@ const CourseDetails = () => {
         console.error("Error fetching course details:", error);
       }
     };
-    
-
-    fetchCourseDetails();
-  }, [id]);
-
-  const checkEnrollment = async () => {
-    try {
-      const response = await axios.get('/payments');
-      if (response.data && response.data.get) {
-        // متابعة العمليات إذا كانت البيانات صحيحة
-      } else {
-        console.error('Data is missing or not in expected format');
-        return { isEnrolled: false };
-      }
-    } catch (error) {
-      console.error('Error checking enrollment:', error);
-      return { isEnrolled: false };
-    }
-  };
   
+    fetchCourseDetails();
 
+  }, [id]);
+  //  // Fetch user data on component mount
+  
+  useEffect(() => {
+    // استرجاع بيانات المستخدم من الكوكيز
+    const userCookie = Cookies.get('user'); // استرجاع الكوكيز المحفوظة
+    if (userCookie) {
+      try {
+        const user = JSON.parse(userCookie); // تحليل بيانات المستخدم
+        setUser(user);
+      } catch (error) {
+        console.error('Error parsing user cookie:', error);
+      }
+    }
+  }, []);
+  console.log('user',user);
   const handleEnrollment = async () => {
+  
     if (isProcessing) return; // منع النقرات المتكررة
     setIsProcessing(true);
-  
     try {
-      const studentId = localStorage.getItem('studentId'); // استرجاع معرّف الطالب
-      if (!studentId) {
-        console.error('Student ID not found');
-        return;
-      }
-  
-      if (course.price === 0) {
-        // إذا كانت الدورة مجانية، يتم التسجيل تلقائيًا
-        await createEnrollment({ courseId: course.id, studentId });
+      // const studentId = user.id;
+      if (course.price == 0) {
+        await createEnrollment({ courseId: course.id });
         setIsEnrolled(true);
-      } else {
-        if (!isEnrolled) {
-          // إذا كانت الدورة مدفوعة، نقله إلى الدفع
-          router.push(`/payment/${course.id}?studentId=${studentId}`);
-        }
+      } else if (!isEnrolled) {
+        router.push(`/payment/${course.id}?studentId`);
       }
     } catch (error) {
       console.error('Error during enrollment:', error);
@@ -105,7 +108,6 @@ const CourseDetails = () => {
       setIsProcessing(false);
     }
   };
-  
   
 
   if (!course || !instructor) return <p>Course or instructor not found</p>;
@@ -155,7 +157,7 @@ const CourseDetails = () => {
               </div>
               {/* زر الالتحاق بالدورة */}
               <button
-                onClick={handleEnrollment}
+                 onClick={handleEnrollment}
                 className="mt-4 py-2 px-6 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
               >
                 {course.price === 0 || isEnrolled ? 'Go to Lessons' : 'Enroll Now'}
@@ -275,5 +277,4 @@ const CourseDetails = () => {
     </motion.div>
   );
 };
-
 export default CourseDetails;
