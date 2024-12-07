@@ -48,7 +48,7 @@ const Navbar = () => {
   
       try {
         const userData = await fetchCurrentUser(); 
-        setUser(userData); 
+        //setUser(userData); 
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -67,6 +67,8 @@ const Navbar = () => {
 
       await logout(); // Call the logout API
       setUser(null); // Clear user data
+      Cookies.remove("user"); // حذف الكوكيز
+
       toast.success("Logged out successfully!");
     } catch (error) {
       toast.error("Failed to log out. Please try again.");

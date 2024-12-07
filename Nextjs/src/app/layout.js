@@ -22,7 +22,6 @@ export const metadata = {
 
 // تعديل RootLayout للحصول على بيانات المستخدم بشكل غير متزامن
 export default  function RootLayout({ children }) {
-  // جلب بيانات المستخدم بشكل غير متزامن
 
   return (
     <html lang="en">

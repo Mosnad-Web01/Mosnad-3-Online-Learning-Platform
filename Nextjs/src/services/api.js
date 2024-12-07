@@ -120,11 +120,13 @@ export const deleteLesson = (courseId, lessonId) =>
   api.delete(`/courses/${courseId}/lessons/${lessonId}`);
 
 // التسجيلات (Enrollments)
-export const fetchEnrollments = () => api.get('/enrollments');
-export const fetchEnrollmentById = (id) => api.get(`/enrollments/${id}`);
-export const createEnrollment = (data) => api.post('/enrollments', data);
-export const updateEnrollment = (id, data) => api.put(`/enrollments/${id}`, data);
-export const deleteEnrollment = (id) => api.delete(`/enrollments/${id}`);
+// export const fetchEnrollments = () => api.get('/enrollments');
+// export const fetchEnrollmentById = (id) => api.get(`/enrollments/${id}`);
+// export const createEnrollment = (data) => api.post('/enrollments', data);
+// export const updateEnrollment = (id, data) => api.put(`/enrollments/${id}`, data);
+// export const deleteEnrollment = (id) => api.delete(`/enrollments/${id}`);
+export const createEnrollment = (data) => api.post(`/enrollments/courses/${data.courseId}/enroll`, data);
+export const updateProgress = (data) => api.patch(`/enrollments/courses/${data.courseId}/progress`, data);
 
 // إكمالات الدروس (Lesson Completions)
 export const fetchLessonCompletions = () => api.get('/lesson-completions');
