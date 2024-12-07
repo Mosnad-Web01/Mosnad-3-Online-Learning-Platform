@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation"; // استخدم هذه المكتبة للتنقل بين الصفحات
+import { useRouter } from "next/navigation"; 
 import { registerStudent } from "../../services/api";
 
 export default function Register() {
@@ -9,13 +9,17 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const router = useRouter(); // استخدم الـ router
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await registerStudent({ name, email, password }); // إرسال البيانات إلى API
-      localStorage.setItem("studentId", response.data.student.id); // تخزين studentId
+      // إضافة CSRF token هنا إن لزم الأمر
+      const csrfToken = await getCsrfToken(); // استرجاع التوكن من الـ API إذا لزم الأمر
+
+      const response = await registerStudent({ name, email, password, csrfToken });
+
+      localStorage.setItem("studentId", response.data.user.id); // تخزين studentId
       setSuccessMessage(response.data.message); // عرض رسالة النجاح
       setErrorMessage(""); // إخفاء رسالة الخطأ
 
@@ -86,12 +90,12 @@ export default function Register() {
           Register
         </button>
         <p className="mt-4 text-sm text-center">
-          لديك حساب بالفعل؟{" "}
+          Already have an account?{" "}
           <a
             href="/login"
             className="text-blue-500 hover:underline"
           >
-            سجل الدخول
+            Login here
           </a>
         </p>
       </form>

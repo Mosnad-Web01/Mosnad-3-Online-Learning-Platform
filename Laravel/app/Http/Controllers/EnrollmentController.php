@@ -26,19 +26,21 @@ class EnrollmentController extends Controller
             ->first();
 
         if ($existingEnrollment) {
-            return response()->json(['message' => 'Already enrolled in this course'], 400);
+            return response()->json(['isEnrolled' => true], 200);
         }
 
         // التحقق من حالة الدفع إذا كانت الدورة مدفوعة
-        if ($course->is_free) {
+        if (!$course->is_free) {
+            // التحقق من حالة الدفع إذا لم تكن الدورة مجانية
             $paymentStatus = CourseUser::where('user_id', $userId)
                 ->where('course_id', $courseId)
                 ->value('payment_status');
 
-            if ($paymentStatus !== 'free') {
+            if ($paymentStatus !== 'paid') {
                 return response()->json(['message' => 'Payment required for this course'], 403);
             }
         }
+
 
         // تسجيل الطالب
         $enrollment = Enrollment::create([
