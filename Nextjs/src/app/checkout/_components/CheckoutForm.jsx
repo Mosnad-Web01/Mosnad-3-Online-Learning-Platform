@@ -25,8 +25,6 @@ const CheckoutForm = ({amount,studentID,corseId}) => {
             setErrorMessage(error.message);
           }
 
-      // Create Order
-          AddOrder();
 
 
     // Trigger form validation and wallet collection
@@ -57,6 +55,8 @@ const CheckoutForm = ({amount,studentID,corseId}) => {
             // Show error to your customer (for example, payment details incomplete)
             console.log(result.error.message);
           } else {
+                  // قم هنا ببناءاو باستدعاء الدالة التي تقوم باضافة الكورس الى المستخدم لانه سيتم استدعاء الدالة في حالة فقط نجح الشراء والخصم من البطاقة
+
             // Your customer will be redirected to your `return_url`. For some payment
             // methods like iDEAL, your customer will be redirected to an intermediate
             // site first to authorize the payment, then redirected to the `return_url`.
