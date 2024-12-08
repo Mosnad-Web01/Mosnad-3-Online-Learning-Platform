@@ -37,6 +37,7 @@ class EnrollmentController extends Controller
 
         // التحقق من حالة الدفع إذا كانت الدورة مدفوعة
         if (!$course->is_free) {
+            // التحقق من حالة الدفع إذا لم تكن الدورة مجانية
             $paymentStatus = CourseUser::where('user_id', $userId)
                 ->where('course_id', $courseId)
                 ->value('payment_status');
@@ -45,6 +46,7 @@ class EnrollmentController extends Controller
                 return response()->json(['message' => 'Payment required for this course'], 403);
             }
         }
+
 
         // تسجيل الطالب
         $enrollment = Enrollment::create([

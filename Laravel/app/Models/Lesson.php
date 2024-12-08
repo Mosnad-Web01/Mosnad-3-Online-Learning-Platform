@@ -29,4 +29,34 @@ class Lesson extends Model
     {
         return $this->belongsTo(Course::class);
     }
+
+    // إضافة خصائص محسوبة للوصول إلى الروابط الأمامية
+    protected $appends = ['video_url', 'images_urls', 'files_urls'];
+
+    public function getVideoUrlAttribute()
+    {
+        return $this->video_path ? url('storage/' . $this->video_path) : null;
+    }
+
+    public function getImagesUrlsAttribute()
+    {
+        if (!$this->images) {
+            return [];
+        }
+
+        return array_map(function ($image) {
+            return url('storage/' . $image);
+        }, $this->images);
+    }
+
+    public function getFilesUrlsAttribute()
+    {
+        if (!$this->files) {
+            return [];
+        }
+
+        return array_map(function ($file) {
+            return url('storage/' . $file);
+        }, $this->files);
+    }
 }

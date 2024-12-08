@@ -1,6 +1,6 @@
-import React from 'react';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import React from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const CategoryCard = ({ category }) => {
   const router = useRouter();
@@ -10,7 +10,9 @@ const CategoryCard = ({ category }) => {
   };
 
   // Assuming your Laravel app serves images from the public directory
-  const imageUrl = category.image ? `/storage/categories/${category.name}/${category.image}` : '/images/default-category.jpg';
+  const imageUrl = category.image
+    ? `/storage/categories/${category.name}/${category.image}`
+    : "/images/default-category.jpg";
 
   return (
     <div
@@ -19,7 +21,7 @@ const CategoryCard = ({ category }) => {
     >
       <div className="w-full h-[200px]">
         <Image
-          src={imageUrl}
+          src={`http://localhost:8000${imageUrl}`} // ملاحظة تعديل عنوان الصورة ليشمل الدومين المحلي
           alt={category.name}
           width={500}
           height={192}
