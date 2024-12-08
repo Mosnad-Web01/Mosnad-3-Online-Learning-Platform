@@ -103,8 +103,8 @@ export const createCategory = (data) => api.post('/categories', data);
 export const updateCategory = (id, data) => api.put(`/categories/${id}`, data);
 export const deleteCategory = (id) => api.delete(`/categories/${id}`);
 
-// الكورسات (Courses)
-export const fetchCourses = () => api.get('/courses')
+// التعامل مع الكورسات (Courses)
+export const fetchCourses = () => api.get('/courses');
 export const fetchCourseById = (id) => api.get(`/courses/${id}`);
 export const createCourse = (data) => api.post('/courses', data);
 export const updateCourse = (id, data) => api.put(`/courses/${id}`, data);
