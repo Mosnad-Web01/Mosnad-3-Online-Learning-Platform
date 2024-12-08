@@ -47,7 +47,7 @@ const CheckoutForm = ({amount,studentID,corseId}) => {
             clientSecret,
             elements,
             confirmParams: {
-              return_url: "http://localhost:3000/payment-confirm",
+              return_url: "/",
             },
           });
       
@@ -61,6 +61,8 @@ const CheckoutForm = ({amount,studentID,corseId}) => {
             // methods like iDEAL, your customer will be redirected to an intermediate
             // site first to authorize the payment, then redirected to the `return_url`.
           }
+
+
         };
 
       
