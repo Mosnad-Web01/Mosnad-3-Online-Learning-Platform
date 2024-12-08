@@ -116,7 +116,7 @@ cd Mosnad-3-Online-Learning-Platform
    npm run dev
    ```
 
-### Step 2: Set Up Next.js Frontend
+### Step 3: Set Up Next.js Frontend
 
 1. Navigate to the Next.js directory:
 
