@@ -1,8 +1,11 @@
 <x-layout>
+<div class="lg:ml-[4rem] mt-16 lg:mt-0 flex-grow w-full bg-gray-100 dark:bg-gray-900">
 
-    <section class=" bg-white dark:bg-gray-900 antialiased">
-        <div class="max-w-screen-xl px-4 py-8 mx-auto lg:px-6 sm:py-16 lg:py-24">
-            <div class="max-w-3xl mx-auto text-center">
+    <section class="bg-gray-50 dark:bg-gray-900 py-10 mt-10 ml-[6rem] flex items-center justify-start rtl:justify-end">
+    <div class="flex items-center justify-start rtl:justify-end">
+    <div class="min-h-screen flex flex-col">
+
+           <div class="max-w-3xl mx-auto text-center">
                 <h2 class="text-4xl font-extrabold leading-tight tracking-tight text-gray-900 dark:text-white">
                     Instructor Dashboard
                 </h2>

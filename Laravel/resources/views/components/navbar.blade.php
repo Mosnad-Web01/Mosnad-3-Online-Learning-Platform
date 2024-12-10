@@ -1,24 +1,61 @@
 @php
-    $user = Auth::user();
-    $role = $user ? $user->role : null;
+$user = Auth::user();
+$role = $user ? $user->role : null;
 @endphp
+@php
+$sidebarLinks = [];
 
- <header class="row-start-1 row-end-2 col-span-2 bg-gray-100 dark:bg-gray-900 lg:col-span-1 lg:col-end-3 flex flex-col lg:flex-row">
->
+if ($role === 'Admin') {
+$sidebarLinks = [
+['href' => route('home'), 'icon' => 'tachometer-alt', 'text' => 'Dashboard'],
+['href' => '/admin/dashboard', 'icon' => 'cogs', 'text' => 'Admin Dashboard'],
+['href' => '/admin/categories', 'icon' => 'list-alt', 'text' => 'Manage Categories'],
+['href' => '/admin/courses', 'icon' => 'book', 'text' => 'Manage Courses'],
+['href' => isset($courseId) ? "/admin/courses/$courseId/lessons" : '/admin/courses', 'icon' => 'bookmark', 'text' => isset($courseId) ? 'Manage Lessons' : 'Select a Course to Manage Lessons'],
+['href' => '/admin/users', 'icon' => 'users', 'text' => 'Manage Users'],
+];
+} elseif ($role === 'Instructor') {
+$sidebarLinks = [
+['href' => '/instructor/dashboard', 'icon' => 'chalkboard-teacher', 'text' => 'Instructor Dashboard'],
+['href' => '/instructor/courses', 'icon' => 'edit', 'text' => 'Manage Courses'],
+['href' => '/instructor/students', 'icon' => 'users', 'text' => 'Manage Students'],
+['href' => '/instructor/categories', 'icon' => 'tags', 'text' => 'Manage Categories'],
+['href' => isset($courseId) ? "/instructor/courses/$courseId/lessons" : '/instructor/courses', 'icon' => 'bookmark', 'text' => isset($courseId) ? 'Manage Lessons' : 'Select a Course to Manage Lessons'],
+];
+} elseif (!$role) {
+$sidebarLinks = [
+['href' => '/login', 'icon' => 'sign-in-alt', 'text' => 'Login'],
+['href' => '/signup', 'icon' => 'user-plus', 'text' => 'Sign Up'],
+];
+}
+@endphp
+<header class="flex flex-col lg:flex-row">
+    <!-- Navbar -->
     <nav class="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
         <div class="px-3 py-3 lg:px-5 lg:pl-3">
-            <div class="flex items-center rtl:space-x-reverse space-x-4">
+            <div class="flex items-center">
+                <!-- Logo Section -->
                 <div class="flex items-center justify-start rtl:justify-end">
-                    <a href="/home" class="flex ms-2 md:me-24">
-                        <img src="https://flowbite.com/docs/images/logo.svg" class="h-8 me-3" alt="App Logo" />
-                        <span class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white hidden sm:block">MyApp</span>
-                    </a>
+                    <!-- Logo Section -->
+                    <x-logo
+                        href="/"
+                        showText="true" />
+
+
                 </div>
-                <div class="flex items-center space-x-4">
+
+                <!-- Right Section -->
+                <div class="flex items-center space-x-4 ms-auto rtl:space-x-reverse">
                     <!-- Dark Mode Toggle Icon -->
                     <button id="theme-toggle" type="button" class="text-gray-900 dark:text-white">
                         <i class="fas fa-moon"></i>
                     </button>
+
+                    <!-- User Dropdown Menu -->
+                    @php
+                    $user = Auth::user();
+                    $role = $user ? $user->role : null;
+                    @endphp
 
                     <!-- User Dropdown Menu -->
                     <div class="relative">
@@ -34,6 +71,31 @@
                                 <li>
                                     <a href="/settings" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Settings</a>
                                 </li>
+
+                                <!-- Dynamic Dropdown Links based on Role -->
+                                @if ($role === 'Admin')
+                                <li>
+                                    <a href="/admin/dashboard" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Admin Dashboard</a>
+                                </li>
+                                <li>
+                                    <a href="/admin/users" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Manage Users</a>
+                                </li>
+                                @elseif ($role === 'Instructor')
+                                <li>
+                                    <a href="/instructor/dashboard" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Instructor Dashboard</a>
+                                </li>
+                                <li>
+                                    <a href="/instructor/courses" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Manage Courses</a>
+                                </li>
+                                @else
+                                <li>
+                                    <a href="/login" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Login</a>
+                                </li>
+                                <li>
+                                    <a href="/signup" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Sign Up</a>
+                                </li>
+                                @endif
+
                                 <li>
                                     <form action="{{ route('logout') }}" method="POST" style="display: inline;">
                                         @csrf
@@ -41,7 +103,6 @@
                                             Logout
                                         </button>
                                     </form>
-
                                 </li>
                             </ul>
                         </div>
@@ -56,129 +117,27 @@
         </div>
     </nav>
 
-    <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 bg-white border-r dark:bg-gray-800 dark:border-gray-700 text-gray-900 dark:text-white transition-transform duration-300 transform -translate-x-full sm:translate-x-0">
-        <div class="h-full px-3 pb-4 overflow-y-auto">
-            <ul class="space-y-2 font-medium">
-                <!-- Common Links -->
-                <li>
-                    <a href="{{ route('home') }}" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span class="ms-3 hidden sm:block">Dashboard</span>
-                    </a>
-                </li>
 
-                <!-- Links for Admin -->
-                @if ($role === 'Admin')
-                    <li>
-                        <a href="/admin/dashboard" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <i class="fas fa-cogs"></i>
-                            <span class="ms-3 hidden sm:block">Admin Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/admin/categories" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <i class="fas fa-list-alt"></i>
-                            <span class="ms-3 hidden sm:block">Manage Categories</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/admin/courses" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <i class="fas fa-book"></i>
-                            <span class="ms-3 hidden sm:block">Manage Courses</span>
-                        </a>
-                    </li>
-                    <li>
-                        @if (isset($courseId))
-                            <a href="/admin/courses/{{ $courseId }}/lessons" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <i class="fas fa-bookmark"></i>
-                                <span class="ms-3 hidden sm:block">Manage Lessons</span>
-                            </a>
-                        @else
-                            <a href="/admin/courses" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <i class="fas fa-bookmark"></i>
-                                <span class="ms-3 hidden sm:block">Select a Course to Manage Lessons</span>
-                            </a>
-                        @endif
-                    </li>
-                    <li>
-                        <a href="/admin/users" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <i class="fas fa-users"></i>
-                            <span class="ms-3 hidden sm:block">Manage users</span>
-                        </a>
-                    </li>
-                @endif
+    <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-[10rem] h-screen pt-20 bg-white border-r dark:bg-gray-800 dark:border-gray-700 text-gray-900 dark:text-white transition-transform duration-300 transform -translate-x-full sm:translate-x-0">
+        <ul class="space-y-2 font-medium">
+            @foreach ($sidebarLinks as $link)
+            <x-sidebar-item :href="$link['href']" :icon="$link['icon']" :text="$link['text']" />
+            @endforeach
 
-                <!-- Links for Instructor -->
-                @if ($role === 'Instructor')
-                    <li>
-                        <a href="/instructor/dashboard" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                            <span class="ms-3 hidden sm:block">Instructor Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/instructor/courses" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <i class="fas fa-edit"></i>
-                            <span class="ms-3 hidden sm:block">Manage Courses</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/instructor/students" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <i class="fas fa-users"></i>
-                            <span class="ms-3 hidden sm:block">Manage Students</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/instructor/categories" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <i class="fas fa-tags"></i>
-                            <span class="ms-3 hidden sm:block">Manage Categories</span>
-                        </a>
-                    </li>
-                    <li>
-                        @if (isset($courseId))
-                            <a href="/instructor/courses/{{ $courseId }}/lessons" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <i class="fas fa-bookmark"></i>
-                                <span class="ms-3 hidden sm:block">Manage Lessons</span>
-                            </a>
-                        @else
-                            <a href="/instructor/courses" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <i class="fas fa-bookmark"></i>
-                                <span class="ms-3 hidden sm:block">Select a Course to Manage Lessons</span>
-                            </a>
-                        @endif
-                    </li>
-                @endif
+            <!-- Logout Link for Authenticated Users -->
+            @if ($role)
+            <li>
+                <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                    @csrf
+                    <button type="submit" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="ms-3 hidden sm:block">Logout</span>
+                    </button>
+                </form>
+            </li>
+            @endif
+        </ul>
 
-                <!-- Links for Guest -->
-                @if (!$role)
-                    <li>
-                        <a href="/login" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <i class="fas fa-sign-in-alt"></i>
-                            <span class="ms-3 hidden sm:block">Login</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/signup" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <i class="fas fa-user-plus"></i>
-                            <span class="ms-3 hidden sm:block">Sign Up</span>
-                        </a>
-                    </li>
-                @endif
-               <!-- Logout Form for Authenticated Users -->
-                @if ($role)
-                <li>
-                    <form action="{{ route('logout') }}" method="POST" style="display: inline;">
-                        @csrf
-                        <button type="submit" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span class="ms-3 hidden sm:block">Logout</span>
-                        </button>
-                    </form>
-                </li>
-                @endif
-            </ul>
-        </div>
-    </aside>
 </header>
 
 <script>

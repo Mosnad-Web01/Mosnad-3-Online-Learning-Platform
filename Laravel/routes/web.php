@@ -133,7 +133,7 @@ Route::middleware('web')->group(function () {
 
     // مسارات إضافية متعلقة بالدورات التدريبية
     Route::get('/', [CourseController::class, 'home'])->name('home');
-    Route::get('courses/{course}', [CourseController::class, 'showDetails'])->name('courses.show.details');
+    Route::get('courses/{course}', [CourseController::class, 'showDetails'])->name('courses.show');
 
     // مسارات تصنيف المدرب
     Route::prefix('instructor')->middleware('auth')->name('instructor.')->group(function () {

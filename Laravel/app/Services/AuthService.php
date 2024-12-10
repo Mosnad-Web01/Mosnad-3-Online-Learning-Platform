@@ -33,8 +33,8 @@ class AuthService
         ]);
 
         // تعيين الدور الافتراضي
-        $role = Role::where('name', 'student')->first();
-        $user->roles()->attach($role);
+        $role = 'student';//Role::where('name', 'student')->first();
+        //$user->roles()->attach($role);
 
         return $user;
     }

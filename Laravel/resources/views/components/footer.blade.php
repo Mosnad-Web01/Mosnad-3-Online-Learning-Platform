@@ -1,8 +1,11 @@
-<footer class="p-4 bg-white sm:p-6 dark:bg-gray-800 lg:ml-64">
+<footer class=" z-50  p-4 bg-white sm:p-6 dark:bg-gray-800 w-full">
     <div class="container mx-auto">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">
-                © 2022 <a href="https://flowbite.com" class="hover:underline">Flowbite™</a>. All Rights Reserved.
+                © {{ now()->year }} 
+                <a href="/" class="hover:underline">
+                    {{ config('app.name', 'TutorNet') }}
+                </a>. All Rights Reserved.
             </span>
             <div class="flex mt-4 space-x-6 sm:mt-0 sm:justify-center">
                 <a href="#" class="text-gray-500 hover:text-gray-900 dark:hover:text-white">
