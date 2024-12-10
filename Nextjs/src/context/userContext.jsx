@@ -1,19 +1,14 @@
-// src/context/userContext.js
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
-import {loginUser} from "@/services/api";
+import { createContext, useContext, useState } from "react";
 // إنشاء سياق المستخدم
 const UserContext = createContext(null);
 
 // مكون المزود (Provider) لإدارة الحالة
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null); // حالة المستخدم
- 
 
   return (
-    
-
     <UserContext.Provider value={{ user, setUser }}>
       {children}
     </UserContext.Provider>

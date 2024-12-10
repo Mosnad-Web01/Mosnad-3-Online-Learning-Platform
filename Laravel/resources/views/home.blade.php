@@ -24,7 +24,7 @@
                                     <div class="p-6">
                                         <h3 class="text-xl font-semibold text-gray-800 dark:text-white">{{ $course->course_name }}</h3>
                                         <p class="text-gray-600 dark:text-white mt-4">{{ Str::limit($course->description, 100) }}</p>
-                                        <a href="{{ route('courses.show.details', $course->id) }}" class="text-blue-500 dark:text-white mt-4 inline-block">Learn More</a>
+                                        <a href="{{ route('courses.show', $course->id) }}" class="text-blue-500 dark:text-white mt-4 inline-block">Learn More</a>
                                     </div>
                                 </div>
                             @empty
