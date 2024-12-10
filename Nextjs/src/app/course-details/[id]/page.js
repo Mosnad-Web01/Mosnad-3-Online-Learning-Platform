@@ -10,6 +10,7 @@ import { motion } from 'framer-motion';
 import api from '@/services/api';
 import { useUser } from '@/context/UserContext';
 import Cookies from "js-cookie"; 
+import { ImPrevious } from 'react-icons/im';
 
 
 const CourseDetails = () => {
