@@ -84,12 +84,11 @@
     </div>
     </section>
 
-    <!-- إضافة كود JavaScript لتنفيذ SweetAlert2 عند الحذف -->
+    <!-- SweetAlert2 for Delete Confirmation -->
     <script>
         document.querySelectorAll('.delete-form').forEach(form => {
             form.addEventListener('submit', function (e) {
-                e.preventDefault(); // منع تنفيذ الفورم مباشرةً
-
+                e.preventDefault();
                 Swal.fire({
                     title: 'Are you sure?',
                     text: 'Do you really want to delete this course?',
@@ -100,7 +99,7 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        form.submit(); // تنفيذ الحذف إذا تم التأكيد
+                        form.submit();
                     }
                 });
             });
@@ -117,7 +116,7 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = url; // الانتقال إلى صفحة التعديل إذا تم التأكيد
+                    window.location.href = url;
                 }
             });
         }

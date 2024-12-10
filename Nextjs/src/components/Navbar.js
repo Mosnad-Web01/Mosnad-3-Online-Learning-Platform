@@ -8,7 +8,7 @@ import NavbarDropdown from "../components/NavbarDropdown";
 import Image from "next/image";
 import { logout, fetchCurrentUser } from "@/services/api"; // Import API functions
 import { toast } from "react-toastify";
-import { useUser } from "@/context/UserContext"; // استدعاء سياق المستخدم
+import { useUser } from "@/context/userContext"; // استدعاء سياق المستخدم
 
 // Dynamically load the ScrollLink to avoid SSR issues
 const ScrollLink = dynamic(() => import("react-scroll").then((mod) => mod.Link), { ssr: false });

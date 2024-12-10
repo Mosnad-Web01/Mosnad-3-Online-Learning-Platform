@@ -1,7 +1,12 @@
 "use client";
 import React, { useState } from "react";
+<<<<<<< HEAD
 import { useRouter } from "next/navigation"; // استخدم هذه المكتبة للتنقل بين الصفحات
 import { regester } from "@/services/api";
+=======
+import { useRouter } from "next/navigation"; 
+import { registerStudent } from "../../services/api";
+>>>>>>> f448f73f59ff2e3c4d7ab6bae5af4ae015e94bf2
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -11,13 +16,24 @@ export default function Register() {
 
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const router = useRouter(); // استخدم الـ router
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+<<<<<<< HEAD
       const role ="student";
       console.log({ name, email, password, password_confirmation, role }); // تحقق من القيم
+=======
+      // إضافة CSRF token هنا إن لزم الأمر
+      const csrfToken = await getCsrfToken(); // استرجاع التوكن من الـ API إذا لزم الأمر
+
+      const response = await registerStudent({ name, email, password, csrfToken });
+
+      localStorage.setItem("studentId", response.data.user.id); // تخزين studentId
+      setSuccessMessage(response.data.message); // عرض رسالة النجاح
+      setErrorMessage(""); // إخفاء رسالة الخطأ
+>>>>>>> f448f73f59ff2e3c4d7ab6bae5af4ae015e94bf2
 
       const response = await regester({ name, email, password,password_confirmation,role }); // إرسال البيانات إلى API
       setSuccessMessage("User registered successfully. Please log in.");
@@ -100,12 +116,12 @@ export default function Register() {
           Register
         </button>
         <p className="mt-4 text-sm text-center">
-          لديك حساب بالفعل؟{" "}
+          Already have an account?{" "}
           <a
             href="/login"
             className="text-blue-500 hover:underline"
           >
-            سجل الدخول
+            Login here
           </a>
         </p>
       </form>

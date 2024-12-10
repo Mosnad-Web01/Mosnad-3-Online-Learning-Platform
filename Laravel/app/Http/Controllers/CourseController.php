@@ -18,42 +18,40 @@ class CourseController extends Controller
             'course_name' => 'required|string|max:255',
             'description' => 'required|string',
             'level' => 'required|in:Beginner,Intermediate,Advanced',
-            'category_id' => 'required|exists:course_categories,id',
+            'category_id' => 'required|exists:categories,id', // التحقق الصحيح
             'price' => 'required|numeric',
             'start_date' => 'required|date',
-            'end_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date', // تحقق إضافي
             'instructor_id' => 'required|exists:users,id',
-            'language' => 'nullable|string', // التحقق من حقل اللغة
-            'requirements' => 'nullable|string', // التحقق من حقل المتطلبات
-            'learning_outcomes' => 'nullable|string', // التحقق من حقل نتائج التعلم
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // التحقق من الصورة
+            'language' => 'nullable|string',
+            'requirements' => 'nullable|string',
+            'learning_outcomes' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        // Handle image upload if provided
         $imagePath = null;
         if ($request->hasFile('image')) {
             $imageName = uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
-            $imagePath = $request->file('image')->storeAs('public/courses/' . $request->course_name, $imageName); // Store image with a unique name inside the course folder
+            $imagePath = $request->file('image')->storeAs('public/courses', $imageName);
         }
 
-        // Create the course record
-        $course = Course::create([
-            'course_name' => $request->course_name,
-            'description' => $request->description,
-            'level' => $request->level,
-            'category_id' => $request->category_id,
-            'price' => $request->price,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'instructor_id' => $request->instructor_id,
-            'language' => $request->language, // إضافة اللغة
-            'requirements' => $request->requirements, // إضافة المتطلبات
-            'learning_outcomes' => $request->learning_outcomes, // إضافة نتائج التعلم
-            'image' => $imagePath, // حفظ مسار الصورة
-        ]);
+        $course = Course::create($request->only([
+            'course_name',
+            'description',
+            'level',
+            'category_id',
+            'price',
+            'start_date',
+            'end_date',
+            'instructor_id',
+            'language',
+            'requirements',
+            'learning_outcomes',
+        ]) + ['image' => $imagePath]);
 
         return response()->json($course, Response::HTTP_CREATED);
     }
+
 
     /**
      * Update the specified course.
