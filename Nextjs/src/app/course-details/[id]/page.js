@@ -75,7 +75,7 @@ const CourseDetails = () => {
     fetchCourseDetails();
 
   }, [id]);
-  //  // Fetch user data on component mount
+  
   
   useEffect(() => {
     // استرجاع بيانات المستخدم من الكوكيز
@@ -91,23 +91,22 @@ const CourseDetails = () => {
   }, []);
   console.log('user',user);
   const handleEnrollment = async () => {
-  
-    if (isProcessing) return; // منع النقرات المتكررة
+    if (isProcessing || isEnrolled) return; // Prevent repeated or unnecessary calls
     setIsProcessing(true);
     try {
-      // const studentId = user.id;
       if (course.price == 0) {
-        await createEnrollment({ courseId: course.id });
-        setIsEnrolled(true);
-      } else if (!isEnrolled) {
-        router.push(`/payment/${course.id}?studentId`);
+        const response = await createEnrollment({ courseId: course.id });
+        if (response.status === 200) setIsEnrolled(true);
+      } else {
+        router.push(`/payment/${course.id}`);
       }
     } catch (error) {
-      console.error('Error during enrollment:', error);
+      console.error('Error during enrollment:', error.response?.data || error.message);
     } finally {
       setIsProcessing(false);
     }
   };
+  
   
 
   if (!course || !instructor) return <p>Course or instructor not found</p>;
@@ -157,10 +156,10 @@ const CourseDetails = () => {
               </div>
               {/* زر الالتحاق بالدورة */}
               <button
-                 onClick={handleEnrollment}
+                onClick={isEnrolled ? () => router.push(`/course-details/${course.id}/lessons`) : handleEnrollment}
                 className="mt-4 py-2 px-6 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
               >
-                {course.price === 0 || isEnrolled ? 'Go to Lessons' : 'Enroll Now'}
+                {isEnrolled ? 'Go to Lessons' : 'Enroll Now'}
               </button>
 
             </div>
@@ -222,39 +221,35 @@ const CourseDetails = () => {
         <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />
 
        {/* Lessons Section with Go to button and Animation */}
-          {isEnrolled && course.lessons && course.lessons.length > 0 ? (
-            <motion.section
-              className="my-6 p-4 bg-white dark:bg-gray-800 text-black dark:text-white"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.7 }}
-            >
-              <h2 className="text-2xl font-semibold">Lessons</h2>
-              <div className="mt-4">
-                <Link href={`/course-details/${course.id}/lessons`} passHref>
-                  <button className="flex items-center text-blue-500 hover:text-blue-700">
-                    <span>Go to Lessons</span>
-                    <FaArrowRight className="ml-2" />
-                  </button>
-                </Link>
-              </div>
-            </motion.section>
-          ) : (
-            <motion.section
-              className="my-6 p-4 bg-white dark:bg-gray-800 text-black dark:text-white"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.7 }}
-            >
-              <h2 className="text-2xl font-semibold">Lessons</h2>
-              {isEnrolled ? (
-                <p>You are already enrolled in this course. Start learning now!</p>
-              ) : (
-                <p>You need to enroll in this course to access its content.</p>
-              )}
+       {isEnrolled ? (
+  <motion.section
+    className="my-6 p-4 bg-white dark:bg-gray-800 text-black dark:text-white"
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.7 }}
+  >
+    <h2 className="text-2xl font-semibold">Lessons</h2>
+    <div className="mt-4">
+      <Link href={`/course-details/${course.id}/lessons`} passHref>
+        <button className="flex items-center text-blue-500 hover:text-blue-700">
+          <span>Go to Lessons</span>
+          <FaArrowRight className="ml-2" />
+        </button>
+      </Link>
+    </div>
+  </motion.section>
+) : (
+  <motion.section
+    className="my-6 p-4 bg-white dark:bg-gray-800 text-black dark:text-white"
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.7 }}
+  >
+    <h2 className="text-2xl font-semibold">Lessons</h2>
+    <p>You need to enroll in this course to access its content.</p>
+  </motion.section>
+)}
 
-            </motion.section>
-          )}
 
 
         <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />

@@ -66,10 +66,14 @@ api.interceptors.request.use(async (config) => {
 });
 
 export const loginUser = ({ email, password }) => {
-  console.log("Email:", email);
-console.log("Password:", password);
-
   return api.post('/login', { email, password }).then((response) => {
+    return response;
+  });
+};
+
+export const regester = ({ name, email, password, password_confirmation, role }) => {
+  return api.post('/register', { name, email, password, password_confirmation, role }) // إرسال البيانات مباشرة
+  .then((response) => {
     return response;
   });
 };
@@ -119,14 +123,29 @@ export const updateLesson = (courseId, lessonId, data) =>
 export const deleteLesson = (courseId, lessonId) =>
   api.delete(`/courses/${courseId}/lessons/${lessonId}`);
 
+// التعامل مع التسجيلات (Enrollments)
+
+export const createEnrollment = (data) =>
+  api.post(`/enrollments/courses/${data.courseId}/enroll`, data);
+
+export const updateProgress = (data) =>
+  api.patch(`/enrollments/courses/${data.courseId}/progress`, data);
+
+export const fetchStudentEnrollments = () =>
+  api.get('/enrollments/courses');
+
+export const fetchEnrollmentByCourseId = (courseId) =>
+  api.get(`/enrollments/courses/${courseId}`);
+
+
 // التسجيلات (Enrollments)
 // export const fetchEnrollments = () => api.get('/enrollments');
 // export const fetchEnrollmentById = (id) => api.get(`/enrollments/${id}`);
 // export const createEnrollment = (data) => api.post('/enrollments', data);
 // export const updateEnrollment = (id, data) => api.put(`/enrollments/${id}`, data);
 // export const deleteEnrollment = (id) => api.delete(`/enrollments/${id}`);
-export const createEnrollment = (data) => api.post(`/enrollments/courses/${data.courseId}/enroll`, data);
-export const updateProgress = (data) => api.patch(`/enrollments/courses/${data.courseId}/progress`, data);
+// export const createEnrollment = (data) => api.post(`/enrollments/courses/${data.courseId}/enroll`, data);
+// export const updateProgress = (data) => api.patch(`/enrollments/courses/${data.courseId}/progress`, data);
 
 // إكمالات الدروس (Lesson Completions)
 export const fetchLessonCompletions = () => api.get('/lesson-completions');
@@ -135,6 +154,7 @@ export const deleteLessonCompletion = (id) => api.delete(`/lesson-completions/${
 
 // المدفوعات (Payments)
 export const createPayment = (paymentData) => api.post('/payments', paymentData);
+
 
 export default api;
 

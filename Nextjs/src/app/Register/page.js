@@ -1,12 +1,14 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation"; // استخدم هذه المكتبة للتنقل بين الصفحات
-import { registerStudent } from "../../services/api";
+import { regester } from "@/services/api";
 
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [password_confirmation, setPasswordCom] = useState("");
+
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter(); // استخدم الـ router
@@ -14,12 +16,13 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await registerStudent({ name, email, password }); // إرسال البيانات إلى API
-      localStorage.setItem("studentId", response.data.student.id); // تخزين studentId
-      setSuccessMessage(response.data.message); // عرض رسالة النجاح
-      setErrorMessage(""); // إخفاء رسالة الخطأ
+      const role ="student";
+      console.log({ name, email, password, password_confirmation, role }); // تحقق من القيم
 
-      // الانتقال إلى صفحة تسجيل الدخول بعد ثانية واحدة
+      const response = await regester({ name, email, password,password_confirmation,role }); // إرسال البيانات إلى API
+      setSuccessMessage("User registered successfully. Please log in.");
+      setErrorMessage(""); // إخفاء رسالة الخطأ
+        // الانتقال إلى صفحة تسجيل الدخول بعد ثانية واحدة
       setTimeout(() => {
         router.push("/login"); // تغيير المسار إلى صفحة تسجيل الدخول
       }, 1000);
@@ -76,6 +79,17 @@ export default function Register() {
             className="w-full p-2 border border-gray-300 rounded mt-1"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+           <label htmlFor="password" className="block text-gray-700">
+            Password confirm
+          </label>
+          <input
+            type="password"
+            id="password_confirmation"
+            className="w-full p-2 border border-gray-300 rounded mt-1"
+            value={password_confirmation}
+            onChange={(e) => setPasswordCom(e.target.value)}
             required
           />
         </div>
