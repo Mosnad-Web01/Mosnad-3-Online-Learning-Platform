@@ -64,9 +64,6 @@ api.interceptors.request.use(async (config) => {
 
 // دوال التعامل مع المستخدمين
 export const loginUser = ({ email, password }) => {
-  console.log("Email:", email);
-  console.log("Password:", password);
-
   return api.post('/login', { email, password }).then((response) => {
     return response;
   });
@@ -81,7 +78,15 @@ export const registerStudent = async ({ name, email, password, csrfToken }) => {
   });
 };
 
-export const fetchUserProfile = () => api.get(`/user-profiles`);
+export const regester = ({ name, email, password, password_confirmation, role }) => {
+  return api.post('/register', { name, email, password, password_confirmation, role }) // إرسال البيانات مباشرة
+  .then((response) => {
+    return response;
+  });
+};
+
+export const fetchUserprofile = () => api.get(`/user-profiles`);
+
 export const fetchCurrentUser = () => api.get('/users');
 
 export const logout = async () => {
@@ -142,5 +147,6 @@ export const deleteLessonCompletion = (id) => api.delete(`/lesson-completions/${
 
 // التعامل مع المدفوعات (Payments)
 export const createPayment = (paymentData) => api.post('/payments', paymentData);
+
 
 export default api;

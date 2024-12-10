@@ -1,12 +1,19 @@
 "use client";
 import React, { useState } from "react";
+<<<<<<< HEAD
+import { useRouter } from "next/navigation"; // استخدم هذه المكتبة للتنقل بين الصفحات
+import { regester } from "@/services/api";
+=======
 import { useRouter } from "next/navigation"; 
 import { registerStudent } from "../../services/api";
+>>>>>>> f448f73f59ff2e3c4d7ab6bae5af4ae015e94bf2
 
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [password_confirmation, setPasswordCom] = useState("");
+
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
@@ -14,6 +21,10 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+<<<<<<< HEAD
+      const role ="student";
+      console.log({ name, email, password, password_confirmation, role }); // تحقق من القيم
+=======
       // إضافة CSRF token هنا إن لزم الأمر
       const csrfToken = await getCsrfToken(); // استرجاع التوكن من الـ API إذا لزم الأمر
 
@@ -22,8 +33,12 @@ export default function Register() {
       localStorage.setItem("studentId", response.data.user.id); // تخزين studentId
       setSuccessMessage(response.data.message); // عرض رسالة النجاح
       setErrorMessage(""); // إخفاء رسالة الخطأ
+>>>>>>> f448f73f59ff2e3c4d7ab6bae5af4ae015e94bf2
 
-      // الانتقال إلى صفحة تسجيل الدخول بعد ثانية واحدة
+      const response = await regester({ name, email, password,password_confirmation,role }); // إرسال البيانات إلى API
+      setSuccessMessage("User registered successfully. Please log in.");
+      setErrorMessage(""); // إخفاء رسالة الخطأ
+        // الانتقال إلى صفحة تسجيل الدخول بعد ثانية واحدة
       setTimeout(() => {
         router.push("/login"); // تغيير المسار إلى صفحة تسجيل الدخول
       }, 1000);
@@ -80,6 +95,17 @@ export default function Register() {
             className="w-full p-2 border border-gray-300 rounded mt-1"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+           <label htmlFor="password" className="block text-gray-700">
+            Password confirm
+          </label>
+          <input
+            type="password"
+            id="password_confirmation"
+            className="w-full p-2 border border-gray-300 rounded mt-1"
+            value={password_confirmation}
+            onChange={(e) => setPasswordCom(e.target.value)}
             required
           />
         </div>

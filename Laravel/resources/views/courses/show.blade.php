@@ -1,6 +1,11 @@
 <x-layout>
-    <div class="flex">
-        <!-- المحتوى الرئيسي -->
+<div class="flex lg:ml-[4rem] mt-16 lg:mt-0 flex-grow w-full bg-gray-100 dark:bg-gray-900">
+<section class="bg-gray-50 dark:bg-gray-900 py-10 mt-10 ml-[6rem] flex items-center justify-start rtl:justify-end">
+    <div class="flex items-center justify-start rtl:justify-end">
+    <div class="min-h-screen flex flex-col">
+
+        <div class="container flex-grow mx-auto px-4">
+     <!-- المحتوى الرئيسي -->
         <main class="flex-1 mt-8"> <!-- إضافة هامش يسار -->
             <div class="bg-white dark:bg-gray-800 text-black dark:text-white min-h-screen py-8 px-4">
                 <div class="w-full px-0 py-0">

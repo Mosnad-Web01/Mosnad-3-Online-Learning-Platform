@@ -91,23 +91,22 @@ const CourseDetails = () => {
   }, []);
   console.log('user',user);
   const handleEnrollment = async () => {
-  
-    if (isProcessing) return; // منع النقرات المتكررة
+    if (isProcessing || isEnrolled) return; // Prevent repeated or unnecessary calls
     setIsProcessing(true);
     try {
-      // const studentId = user.id;
       if (course.price == 0) {
-        await createEnrollment({ courseId: course.id });
-        setIsEnrolled(true);
-      } else if (!isEnrolled) {
-        router.push(`/payment/${course.id}?studentId`);
+        const response = await createEnrollment({ courseId: course.id });
+        if (response.status === 200) setIsEnrolled(true);
+      } else {
+        router.push(`/payment/${course.id}`);
       }
     } catch (error) {
-      console.error('Error during enrollment:', error);
+      console.error('Error during enrollment:', error.response?.data || error.message);
     } finally {
       setIsProcessing(false);
     }
   };
+  
   
 
   if (!course || !instructor) return <p>Course or instructor not found</p>;
