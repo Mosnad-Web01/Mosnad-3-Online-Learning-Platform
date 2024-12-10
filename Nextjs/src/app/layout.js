@@ -1,8 +1,8 @@
 import localFont from "next/font/local";
-import "./globals.css";
-import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { UserProvider } from "@/context/userContext";
+import Navbar from "../components/Navbar";
+import { UserProvider } from "../context/userContext";
+import "./globals.css";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -21,17 +21,18 @@ export const metadata = {
 };
 
 // تعديل RootLayout للحصول على بيانات المستخدم بشكل غير متزامن
-export default  function RootLayout({ children }) {
-
+export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-      <UserProvider>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <UserProvider>
           {/* تمرير بيانات المستخدم إلى Navbar و UserProvider */}
-          <Navbar  />
+          <Navbar />
           <main className="flex-grow p-0">{children}</main>
           <Footer />
-      </UserProvider>
+        </UserProvider>
       </body>
     </html>
   );

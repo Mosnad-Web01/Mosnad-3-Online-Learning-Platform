@@ -1,12 +1,7 @@
 "use client";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
-<<<<<<< HEAD
-import { useRouter } from "next/navigation"; // استخدم هذه المكتبة للتنقل بين الصفحات
-import { regester } from "@/services/api";
-=======
-import { useRouter } from "next/navigation"; 
 import { registerStudent } from "../../services/api";
->>>>>>> f448f73f59ff2e3c4d7ab6bae5af4ae015e94bf2
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -21,30 +16,32 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-<<<<<<< HEAD
-      const role ="student";
-      console.log({ name, email, password, password_confirmation, role }); // تحقق من القيم
-=======
+      const role = "student";
       // إضافة CSRF token هنا إن لزم الأمر
       const csrfToken = await getCsrfToken(); // استرجاع التوكن من الـ API إذا لزم الأمر
 
-      const response = await registerStudent({ name, email, password, csrfToken });
+      const response = await registerStudent({
+        name,
+        email,
+        password,
+        csrfToken,
+      });
 
       localStorage.setItem("studentId", response.data.user.id); // تخزين studentId
       setSuccessMessage(response.data.message); // عرض رسالة النجاح
       setErrorMessage(""); // إخفاء رسالة الخطأ
->>>>>>> f448f73f59ff2e3c4d7ab6bae5af4ae015e94bf2
 
-      const response = await regester({ name, email, password,password_confirmation,role }); // إرسال البيانات إلى API
+      // const response = await regester({ name, email, password,password_confirmation,role }); // إرسال البيانات إلى API
       setSuccessMessage("User registered successfully. Please log in.");
       setErrorMessage(""); // إخفاء رسالة الخطأ
-        // الانتقال إلى صفحة تسجيل الدخول بعد ثانية واحدة
+      // الانتقال إلى صفحة تسجيل الدخول بعد ثانية واحدة
       setTimeout(() => {
         router.push("/login"); // تغيير المسار إلى صفحة تسجيل الدخول
       }, 1000);
     } catch (error) {
       setErrorMessage(
-        error.response?.data?.message || "Registration failed. Please try again."
+        error.response?.data?.message ||
+          "Registration failed. Please try again."
       );
       setSuccessMessage(""); // إخفاء رسالة النجاح
     }
@@ -57,7 +54,9 @@ export default function Register() {
         className="bg-gray-100 dark:bg-gray-900 text-black dark:text-gray-200 p-6 rounded shadow-md max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg w-full"
       >
         <h2 className="text-2xl font-bold mb-4">Create an Account</h2>
-        {successMessage && <p className="text-green-500 mb-4">{successMessage}</p>}
+        {successMessage && (
+          <p className="text-green-500 mb-4">{successMessage}</p>
+        )}
         {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
         <div className="mb-4">
           <label htmlFor="name" className="block text-gray-700">
@@ -97,7 +96,7 @@ export default function Register() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-           <label htmlFor="password" className="block text-gray-700">
+          <label htmlFor="password" className="block text-gray-700">
             Password confirm
           </label>
           <input
@@ -117,10 +116,7 @@ export default function Register() {
         </button>
         <p className="mt-4 text-sm text-center">
           Already have an account?{" "}
-          <a
-            href="/login"
-            className="text-blue-500 hover:underline"
-          >
+          <a href="/login" className="text-blue-500 hover:underline">
             Login here
           </a>
         </p>
