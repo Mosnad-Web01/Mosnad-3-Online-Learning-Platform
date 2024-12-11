@@ -23,7 +23,7 @@ Route::middleware('web')->get('/sanctum/csrf-cookie', function (Request $request
 });
 
 // مجموعة المسارات الخاصة بـ API
-Route::middleware('api')->group(function () {
+Route::middleware('web')->group(function () {
     // مسارات عامة لا تتطلب مصادقة
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);

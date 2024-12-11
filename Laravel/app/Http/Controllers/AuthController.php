@@ -27,6 +27,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $data = $this->authService->login($request->only('email', 'password'));
+        
 
         return response()->json(['message' => 'Login successful.', 'user' => $data['user']])
         ->cookie('XSRF-TOKEN', csrf_token(), 60 * 24, '/', null, false, false);

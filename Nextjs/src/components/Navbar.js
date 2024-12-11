@@ -13,7 +13,7 @@ import {
   FaUser,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { useUser } from "../context/userContext";
+import { useUser } from "../context/UserContext";
 import { fetchCurrentUser, logout } from "../services/api"; // Import API functions
 
 // Dynamically load the ScrollLink to avoid SSR issues
