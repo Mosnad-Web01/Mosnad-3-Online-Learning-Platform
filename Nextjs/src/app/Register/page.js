@@ -1,7 +1,7 @@
 "use client";
+import { registerStudent } from "@/services/api";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { registerStudent } from "../../services/api";
+import { useState } from "react";
 
 export default function Register() {
   const [name, setName] = useState("");

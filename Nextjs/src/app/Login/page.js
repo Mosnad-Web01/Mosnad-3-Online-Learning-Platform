@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import { useUser } from "@/context/UserContext"; // استدعاء سياق المستخدم
+import { loginUser } from "@/services/api";
+import Cookies from "js-cookie";
 import { useRouter } from "next/navigation"; // للتنقل بين الصفحات
-import { loginUser } from "../../services/api";
-import { useUser } from '@/context/UserContext'; // استدعاء سياق المستخدم
-import Cookies from "js-cookie"; 
+import { useState } from "react";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,19 +11,18 @@ export default function Login() {
   const router = useRouter();
   const { setUser } = useUser(); // تحديث حالة المستخدم من السياق
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await loginUser({ email, password }); // استدعاء API لتسجيل الدخول
-       // حفظ المستخدم في الكوكي
-       Cookies.set("user", JSON.stringify(response.data.user), {
+      // حفظ المستخدم في الكوكي
+      Cookies.set("user", JSON.stringify(response.data.user), {
         expires: 7, // مدة الحفظ (7 أيام)
         path: "/", // متاح لكل المسارات
         // secure: true, // استخدم هذا في حالة HTTPS
         // sameSite: "", // لتجنب مشاكل CSRF
       });
-            setUser(response.data.user); // تحديث حالة المستخدم في السياق
+      setUser(response.data.user); // تحديث حالة المستخدم في السياق
 
       setError(""); // إزالة رسالة الخطأ
       router.push("/"); // التوجيه إلى الصفحة الرئيسية

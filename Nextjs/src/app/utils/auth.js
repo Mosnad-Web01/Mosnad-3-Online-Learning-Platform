@@ -1,4 +1,4 @@
-import { loginStudent } from "../services/api"; // استيراد وظيفة تسجيل الدخول من API
+import { loginStudent } from "@/services/api"; // استيراد وظيفة تسجيل الدخول من API
 
 let loggedInUser = null; // تتبع حالة تسجيل الدخول في الذاكرة
 

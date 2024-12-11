@@ -1,7 +1,7 @@
 "use client";
+import CategoryCard from "@components/CategoryCard";
+import { fetchCategories } from "@services/api";
 import { useEffect, useState } from "react";
-import CategoryCard from "../../components/CategoryCard";
-import { fetchCategories } from "../../services/api";
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState([]);
