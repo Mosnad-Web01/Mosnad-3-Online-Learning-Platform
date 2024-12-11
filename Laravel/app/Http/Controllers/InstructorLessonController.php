@@ -76,9 +76,18 @@ class InstructorLessonController extends Controller
     $course = Course::where('instructor_id', Auth::id())->findOrFail($courseId);
     $lesson = $course->lessons()->findOrFail($lessonId);
 
-    // تأكد من تحويل البيانات المخزنة كـ JSON إلى مصفوفة
-    $lesson->images = json_decode($lesson->images, true) ?? [];
-    $lesson->files = json_decode($lesson->files, true) ?? [];
+    // التأكد من أن البيانات من النوع string قبل استخدام json_decode
+    if (is_string($lesson->images)) {
+        $lesson->images = json_decode($lesson->images, true) ?? [];
+    } else {
+        $lesson->images = $lesson->images ?? [];
+    }
+
+    if (is_string($lesson->files)) {
+        $lesson->files = json_decode($lesson->files, true) ?? [];
+    } else {
+        $lesson->files = $lesson->files ?? [];
+    }
 
     return view('instructor.lessons.edit', compact('course', 'lesson'));
 }
