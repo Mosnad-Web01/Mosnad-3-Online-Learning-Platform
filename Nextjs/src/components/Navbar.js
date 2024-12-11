@@ -1,7 +1,5 @@
 "use client";
 
-import { useUser } from "@/context/userContext";
-import { fetchCurrentUser, logout } from "@/services/api"; // Import API functions
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,6 +13,8 @@ import {
   FaUser,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { useUser } from "../context/UserContext";
+import { fetchCurrentUser, logout } from "../services/api"; // Import API functions
 
 // Dynamically load the ScrollLink to avoid SSR issues
 const ScrollLink = dynamic(

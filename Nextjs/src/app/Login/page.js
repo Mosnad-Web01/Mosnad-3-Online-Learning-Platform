@@ -1,9 +1,10 @@
 "use client";
-import { useUser } from "@/context/UserContext"; // استدعاء سياق المستخدم
-import { loginUser } from "@/services/api";
-import Cookies from "js-cookie";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation"; // للتنقل بين الصفحات
-import { useState } from "react";
+import { loginUser } from "@/services/api";
+import { useUser } from "@/context/UserContext";
+
+import Cookies from "js-cookie";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
