@@ -10,9 +10,9 @@ use Illuminate\Support\Facades\Storage;
 class InstructorCourseController extends Controller
 {
 
-
 public function index()
 {
+    
     // استخدام Auth::user() بدلاً من auth()->user()
     $courses = Course::where('instructor_id', Auth::user()->id)->get();
 

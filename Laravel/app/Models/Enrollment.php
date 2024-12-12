@@ -33,3 +33,4 @@ class Enrollment extends Model
         return $this->hasMany(LessonCompletion::class);
     }
 }
+

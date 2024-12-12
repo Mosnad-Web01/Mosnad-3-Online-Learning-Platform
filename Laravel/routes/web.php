@@ -85,8 +85,12 @@ Route::middleware('web')->group(function () {
             Route::delete('/courses/{courseId}/lessons/{lessonId}', [InstructorLessonController::class, 'destroy'])->name('instructor.lessons.destroy');
             Route::delete('/instructor/lessons/{courseId}/{lessonId}/images/{imageIndex}', [InstructorLessonController::class, 'deleteImage'])
              ->name('instructor.lessons.deleteImage');
+            //Instructor students
+            Route::get('/students', [InstructorController::class, 'index'])->name('instructor.students.index');
 
-            // مسارات إدارة الطلاب
+
+
+             // مسارات إدارة الطلاب
             Route::get('/courses/{courseId}/students', [CourseUserController::class, 'index'])->name('instructor.students.index');
             Route::get('/courses/{courseId}/students/{studentId}/edit', [CourseUserController::class, 'edit'])->name('instructor.students.edit');
             Route::put('/courses/{courseId}/students/{studentId}', [CourseUserController::class, 'update'])->name('instructor.students.update');

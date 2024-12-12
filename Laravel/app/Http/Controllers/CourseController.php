@@ -112,48 +112,7 @@ class CourseController extends Controller
         return response()->json(['message' => 'Course deleted successfully'], Response::HTTP_OK);
     }
 
-    /**
-     * Get all courses with category, instructor, and lessons.
-     */
-    // public function index(Request $request)
-    // {
-    //     $user = $request->user();
-
-    //     if (!$user) {
-    //         return response()->json(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
-    //     }
-
-    //     if ($user->role === 'student') {
-    //         $courses = $user->courses()->with(['category', 'instructor', 'lessons'])->get();
-    //     } elseif ($user->role === 'instructor') {
-    //         $courses = $user->createdCourses()->with(['category', 'instructor', 'lessons'])->get();
-    //     } else {
-    //         $courses = Course::with(['category', 'instructor', 'lessons'])->get();
-    //     }
-
-    //     // إضافة رابط الصورة
-    //     foreach ($courses as $course) {
-    //         if ($course->image) {
-    //             $course->image_url = asset('storage/' . $course->image);
-    //         }
-    //     }
-
-    //     return response()->json($courses, Response::HTTP_OK);
-    // }
-    // ------Code for test Token-----
-    // $xsrfTokenFromHeader = $request->header('X-XSRF-TOKEN');
-    // $xsrfTokenFromCookie = $request->cookie('XSRF-TOKEN');
-
-    // if ($xsrfTokenFromHeader == $xsrfTokenFromCookie) {
-    //     // إذا لم يتطابق التوكن، يمكن إرجاع رد خطأ
-    //     return response()->json(['message' => 'Invalid CSRF token',
-    //     'xsrfTokenFromHeader'=>$xsrfTokenFromHeader,
-    //     'xsrfTokenFromCookie'=>$xsrfTokenFromCookie,
-    //     'Auth::check():'=>Auth::check(),
-    //     'Auth::user():'=>Auth::user(),
-
-    //      ], 403);
-    // }
+    
     public function index(Request $request)
  {
 
