@@ -11,10 +11,6 @@ use App\Http\Controllers\{
     InstructorCourseController,
     InstructorLessonController,
     CourseUserController,
-    ReviewController,
-    EnrollmentController,
-    LessonCompletionController,
-    CourseCategoryController,
     CourseController,
     InstructorCategoryController,
     AdminLessonController,
@@ -22,7 +18,7 @@ use App\Http\Controllers\{
     AdminCategoryController,
     AdminController,
     InstructorController,
-    UserController,
+    StudentController,
     AdminUserController
 };
 
@@ -85,9 +81,9 @@ Route::middleware('web')->group(function () {
             Route::delete('/courses/{courseId}/lessons/{lessonId}', [InstructorLessonController::class, 'destroy'])->name('instructor.lessons.destroy');
             Route::delete('/instructor/lessons/{courseId}/{lessonId}/images/{imageIndex}', [InstructorLessonController::class, 'deleteImage'])
              ->name('instructor.lessons.deleteImage');
-            //Instructor students
-            Route::get('/students', [InstructorController::class, 'index'])->name('instructor.students.index');
-
+           
+             //Instructor students
+             Route::get('/students', [StudentController::class, 'index'])->name('instructor.students.index');
 
 
              // مسارات إدارة الطلاب

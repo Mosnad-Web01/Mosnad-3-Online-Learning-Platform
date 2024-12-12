@@ -10,14 +10,16 @@ class Enrollment extends Model
     use HasFactory;
 
     protected $fillable = [
+        'id',
         'course_id',
         'student_id',
         'enrollment_date',
         'completion_date',
         'progress',
     ];
-
-    // العلاقات
+    
+    // العلاقة مع الطالب
+    
     public function course()
     {
         return $this->belongsTo(Course::class);
@@ -30,7 +32,12 @@ class Enrollment extends Model
 
     public function completions()
     {
-        return $this->hasMany(LessonCompletion::class);
+        return $this->hasMany(LessonProgress::class);
     }
+    public function lessons()
+{
+    return $this->belongsToMany(Lesson::class, 'lesson_progress');
+}
+
 }
 

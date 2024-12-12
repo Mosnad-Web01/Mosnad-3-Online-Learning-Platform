@@ -125,11 +125,12 @@ class User extends Authenticatable
       }
   
       //* Relationship with the Course model as student
-
+     
+      
       public function enrolledCourses()
       {
           return $this->belongsToMany(Course::class, 'enrollments', 'student_id', 'course_id')
-                      ->withPivot('enrollment_date', 'completion_date', 'progress')
+                      ->withPivot('id','enrollment_date', 'completion_date', 'progress')
                       ->withTimestamps();
       }
 
