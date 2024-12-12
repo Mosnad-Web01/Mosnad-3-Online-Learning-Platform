@@ -86,7 +86,7 @@ Route::middleware('web')->group(function () {
             Route::delete('/instructor/lessons/{courseId}/{lessonId}/images/{imageIndex}', [InstructorLessonController::class, 'deleteImage'])
              ->name('instructor.lessons.deleteImage');
             //Instructor students
-            Route::get('/{instructorId}/students', [InstructorController::class, 'index'])->name('instructor.students.index');
+            Route::get('/students', [InstructorController::class, 'index'])->name('instructor.students.index');
 
 
 

@@ -22,16 +22,27 @@ class InstructorController extends Controller
         // إرجاع الدورات كـ JSON
         return response()->json($courses);
     }
-    public function index($instructorId)
+    public function index()
     {
-        // الحصول على المعلم مع دوراته وطلابه
-        $instructor = User::with(['courses.students'])->where('id', $instructorId)->where('role', 'instructor')->first();
-
+        // الحصول على المستخدم المصادق عليه
+        $user = Auth::user();
+    
+        // التحقق من أن المستخدم لديه دور المعلم
+        if (!$user || $user->role !== 'Instructor') {
+            return redirect()->back()->with('error', 'Access denied.');
+        }
+    
+        // استخراج بيانات المعلم مع دوراته وطلابه
+        $instructor = User::with(['courses.students'])->find($user->id);
+    
         if (!$instructor) {
             return redirect()->back()->with('error', 'Instructor not found.');
-        }                        
+        }
+    
+        // عرض الصفحة مع البيانات
         return view('instructor.students.index', compact('instructor'));
     }
+    
      // دالة لتسجيل الخروج
      public function logout(Request $request)
      {
