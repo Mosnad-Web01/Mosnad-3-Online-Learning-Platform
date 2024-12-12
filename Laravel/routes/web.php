@@ -80,20 +80,17 @@ Route::middleware('web')->group(function () {
             Route::get('/instructor/courses/{courseId}/lessons', [InstructorLessonController::class, 'index'])->name('instructor.lessons.index');
             Route::get('/courses/{courseId}/lessons/create', [InstructorLessonController::class, 'create'])->name('instructor.lessons.create');
             Route::post('/courses/{courseId}/lessons', [InstructorLessonController::class, 'store'])->name('instructor.lessons.store');
-            Route::get('/instructor/lessons/{lessonId}/view-video', [InstructorLessonController::class, 'viewVideo'])
-            ->name('instructor.lessons.view_video');
-            Route::get('/instructor/lessons/{lessonId}/view-image', [InstructorLessonController::class, 'viewImage'])
-            ->name('instructor.lessons.view_image');
-            Route::get('/instructor/lessons/{lessonId}/view-file', [InstructorLessonController::class, 'viewFile'])
-            ->name('instructor.lessons.view_file');
-                        
             Route::get('/courses/{courseId}/lessons/{lessonId}/edit', [InstructorLessonController::class, 'edit'])->name('instructor.lessons.edit');
             Route::put('/courses/{courseId}/lessons/{lessonId}', [InstructorLessonController::class, 'update'])->name('instructor.lessons.update');
             Route::delete('/courses/{courseId}/lessons/{lessonId}', [InstructorLessonController::class, 'destroy'])->name('instructor.lessons.destroy');
             Route::delete('/instructor/lessons/{courseId}/{lessonId}/images/{imageIndex}', [InstructorLessonController::class, 'deleteImage'])
              ->name('instructor.lessons.deleteImage');
+            //Instructor students
+            Route::get('/{instructorId}/students', [InstructorController::class, 'index'])->name('instructor.students.index');
 
-            // مسارات إدارة الطلاب
+
+
+             // مسارات إدارة الطلاب
             Route::get('/courses/{courseId}/students', [CourseUserController::class, 'index'])->name('instructor.students.index');
             Route::get('/courses/{courseId}/students/{studentId}/edit', [CourseUserController::class, 'edit'])->name('instructor.students.edit');
             Route::put('/courses/{courseId}/students/{studentId}', [CourseUserController::class, 'update'])->name('instructor.students.update');

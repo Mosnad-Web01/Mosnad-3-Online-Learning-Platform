@@ -15,18 +15,15 @@ document.addEventListener('DOMContentLoaded', function() {
             remember: remember
         };
 
-        // إرسال الطلب باستخدام Axios
         axios.post('/api/login', data)
             .then(response => {
 
-                // بعد نجاح تسجيل الدخول، استرجاع الدور من الاستجابة
-                const userRole = response.data.user.role; // تأكد من أن الدور يتم إرجاعه في الاستجابة
+                const userRole = response.data.user.role; 
         
-                // التوجيه بناءً على الدور
                 if (userRole === 'Admin') {
-                    window.location.href = '/admin/dashboard';  // تحويل إلى لوحة تحكم المدير
+                    window.location.href = '/admin/dashboard';  
                 } else if (userRole === 'Instructor') {
-                    window.location.href = '/instructor/dashboard';  // تحويل إلى لوحة تحكم المدرب
+                    window.location.href = '/instructor/dashboard'; 
                 } 
                 // else {
                 //      window.location.href = '/login';  // تحويل إلى لوحة تحكم أخرى للمستخدمين العاديين

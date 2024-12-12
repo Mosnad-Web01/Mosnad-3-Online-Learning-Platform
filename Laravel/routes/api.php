@@ -22,11 +22,14 @@ Route::middleware('web')->get('/sanctum/csrf-cookie', function (Request $request
     return response()->json(['message' => 'CSRF token set', 'cookie' => $request]);
 });
 
+
 // مجموعة المسارات الخاصة بـ API
 Route::middleware('web')->group(function () {
+ 
     // مسارات عامة لا تتطلب مصادقة
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/logout', [AuthController::class, 'logout']);
 
     // مسارات الدورات
     Route::prefix('courses')->group(function () {
@@ -46,7 +49,6 @@ Route::middleware('web')->group(function () {
         Route::delete('{id}', [CourseCategoryController::class, 'destroy']);
     });
 
-    Route::post('/logout', [AuthController::class, 'logout']);
 
     // المسارات التي تتطلب مصادقة باستخدام Sanctum
     Route::middleware('auth:sanctum')->group(function () {

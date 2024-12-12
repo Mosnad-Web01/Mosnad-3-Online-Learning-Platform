@@ -113,21 +113,25 @@ class User extends Authenticatable
         return $this->hasMany(Payment::class);
     }
 
-    /**
-     * Relationship with the CourseUser model.
-     */
-    public function courseUsers()
-    {
-        return $this->hasMany(CourseUser::class);
-    }
+   
 
     /**
-     * Relationship with the Course model.
+     * Relationship with the Course model as an instructer
      */
-    public function courses()
-    {
-        return $this->belongsToMany(Course::class);
-    }
+   
+      public function courses()
+      {
+          return $this->hasMany(Course::class, 'instructor_id');
+      }
+  
+      //* Relationship with the Course model as student
+
+      public function enrolledCourses()
+      {
+          return $this->belongsToMany(Course::class, 'enrollments', 'student_id', 'course_id')
+                      ->withPivot('enrollment_date', 'completion_date', 'progress')
+                      ->withTimestamps();
+      }
 
     /**
      * Relationship with the suspending user.

@@ -30,16 +30,27 @@ class Course extends Model
         return $this->belongsTo(CourseCategory::class);
     }
 
+    
+    public function lessons()
+    {
+        return $this->hasMany(Lesson::class);
+    }
+    
+    // علاقة الدورة بالمعلم
     public function instructor()
     {
         return $this->belongsTo(User::class, 'instructor_id');
     }
 
-    public function lessons()
+    // علاقة الدورة بالطلاب
+    public function students()
     {
-        return $this->hasMany(Lesson::class);
+        return $this->belongsToMany(User::class, 'enrollments', 'course_id', 'student_id')
+                    ->withPivot('enrollment_date', 'completion_date', 'progress')
+                    ->withTimestamps();
     }
-
+    
+  
     // علاقة مع المدفوعات
     public function payments()
     {
