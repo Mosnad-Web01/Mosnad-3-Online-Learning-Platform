@@ -1,5 +1,38 @@
 <?php
 
+namespace App\Http\Controllers;
+
+use App\Models\Lesson;
+use App\Models\LessonProgress;
+
+class ProgressController extends Controller
+{
+    /**
+     * حساب نسبة التقدم لطالب معين بناءً على معرف التسجيل (enrollment_id)
+     *
+     * @param int $enrollmentId
+     * @return float
+     */
+    public function calculateProgress($enrollmentId)
+    {
+        // تأكد من حساب التقدم بشكل صحيح
+        // هذه مجرد مثال، يمكنك تعديلها حسب الطريقة التي تحسب بها التقدم
+        $completedLessons = LessonProgress::where('enrollment_id', $enrollmentId)
+            ->whereNotNull('completed_at')
+            ->count();
+    
+        $totalLessons = Lesson::whereHas('course', function ($query) use ($enrollmentId) {
+            $query->whereHas('enrollments', function ($query) use ($enrollmentId) {
+                $query->where('id', $enrollmentId);
+            });
+        })->count();
+    
+        // حساب التقدم
+        return $totalLessons > 0 ? ($completedLessons / $totalLessons) * 100 : 0;
+    }
+    
+}
+
 // namespace App\Http\Controllers;
 
 // use Illuminate\Http\Request;

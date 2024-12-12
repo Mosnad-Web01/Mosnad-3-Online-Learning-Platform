@@ -46,10 +46,11 @@ class Course extends Model
     public function students()
     {
         return $this->belongsToMany(User::class, 'enrollments', 'course_id', 'student_id')
-                    ->withPivot('enrollment_date', 'completion_date', 'progress')
+                    ->withPivot('id','enrollment_date', 'completion_date', 'progress')
                     ->withTimestamps();
     }
-    
+ 
+
   
     // علاقة مع المدفوعات
     public function payments()
@@ -62,4 +63,8 @@ class Course extends Model
     {
         return $this->hasMany(CourseUser::class);
     }
+    public function enrollments()
+{
+    return $this->hasMany(Enrollment::class);
+}
 }

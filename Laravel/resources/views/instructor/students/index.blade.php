@@ -24,7 +24,7 @@
                                         <th class="px-4 py-3 font-medium text-gray-900 dark:text-white">Email</th>
                                         <th class="px-4 py-3 font-medium text-gray-900 dark:text-white">Enrollment Date</th>
                                         <th class="px-4 py-3 font-medium text-gray-900 dark:text-white">Progress</th>
-                                        <th class="px-4 py-3 font-medium text-gray-900 dark:text-white text-center">Actions</th>
+                                        <!-- <th class="px-4 py-3 font-medium text-gray-900 dark:text-white text-center">Actions</th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -34,8 +34,16 @@
                                             <td class="px-4 py-3">{{ $student->email }}</td>
                                             <td class="px-4 py-3">{{ $student->pivot->enrollment_date }}</td>
                                             <td class="px-4 py-3">{{ $student->pivot->progress }}%</td>
-                                            <td class="px-4 py-3 flex items-center justify-start space-x-4">
+                                            <!-- <td class="px-4 py-3">
+    <div class="w-full bg-gray-300 rounded-full">
+        <div class="bg-blue-500 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style="width: {{ $student->pivot->progress }}%">
+            {{ $student->pivot->progress }}%
+        </div>
+    </div>
+</td> -->
                                                 <!-- زر تحديث التقدم -->
+
+                                            <!-- <td class="px-4 py-3 flex items-center justify-start space-x-4">
                                                 <form action="{{ route('instructor.students.edit', [$course->id, $student->id]) }}" method="POST">
                                                     @csrf
                                                     @method('PATCH')
@@ -46,7 +54,7 @@
                                                 </form>
 
                                               
-                                            </td>
+                                            </td> -->
                                         </tr>
                                     @empty
                                         <tr>
