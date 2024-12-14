@@ -84,8 +84,7 @@ Route::middleware('web')->group(function () {
              ->name('instructor.lessons.deleteImage');
            
              //Instructor students
-             Route::get('/students', [StudentController::class, 'index'])->name('instructor.students.index');
-            //  Route::get('/course/{courseId}/progress', [StudentController::class, 'show'])->name('progress.');
+             Route::get('/students', [StudentController::class, 'index'])->name('students.index');
              Route::get('/course/{courseId}/StudentChart', [StudentController::class, 'showChart'])->name('progress.chart');
              Route::get('/course/{courseId}/student/{studentId}/progress', [StudentController::class, 'show'])->name('progress.course');
 
@@ -121,6 +120,10 @@ Route::middleware('web')->group(function () {
             Route::get('/courses/{id}/edit', [AdminCourseController::class, 'edit'])->name('courses.edit');
             Route::put('/courses/{id}', [AdminCourseController::class, 'update'])->name('courses.update');
             Route::delete('/courses/{id}', [AdminCourseController::class, 'destroy'])->name('courses.destroy');
+        
+            // مسارات إدارة الدروس
+
+            Route::get('/students', [StudentController::class, 'index'])->name('students.index');
 
             // مسارات إدارة الدروس
             Route::get('/courses/{courseId}/lessons', [AdminLessonController::class, 'index'])->name('lessons.index');

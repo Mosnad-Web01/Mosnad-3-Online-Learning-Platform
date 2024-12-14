@@ -19,47 +19,104 @@ class StudentController extends Controller
     }
 
     // دالة لحساب تقدم الطالب
+    // public function index()
+    // {
+    //     // الحصول على المستخدم المصادق عليه
+    //     $user = Auth::user();
+
+    //     // التحقق من أن المستخدم لديه دور المعلم
+    //     if (!$user || $user->role !== 'Instructor') {
+    //         return redirect()->back()->with('error', 'Access denied.');
+    //     }
+
+    //     // استخراج بيانات المعلم مع دوراته وطلابه
+    //     $instructor = User::with(['courses.students'])->find($user->id);
+
+    //     if (!$instructor) {
+    //         return redirect()->back()->with('error', 'Instructor not found.');
+    //     }
+
+    //     // استخدام ProgressController لحساب التقدم
+    //     foreach ($instructor->courses as $course) {
+    //         $course->students = $course->students->unique('id'); // إزالة التكرار
+
+    //         foreach ($course->students as $student) {
+    //             $enrollmentId = $student->pivot->id;
+    //             // حساب التقدم باستخدام ProgressController
+    //             $progress = $this->progressController->calculateProgress($enrollmentId);
+
+    //             // تأكد من أن التقدم ليس NULL قبل التحديث
+    //             if ($progress !== null) {
+    //                 // تحديث التقدم في الجدول الوسيط (pivot)
+    //                 $student->pivot->update(['progress' => $progress]);
+    //             } else {
+    //                 // إذا كان التقدم NULL، يمكنك تعيين قيمة افتراضية مثل 0
+    //                 $student->pivot->update(['progress' => 0]);
+    //             }
+    //         }
+    //     }
+
+    //     // عرض الصفحة مع البيانات
+    //     return view('students.index', compact('instructor'));
+    // }
+
     public function index()
-    {
-        // الحصول على المستخدم المصادق عليه
-        $user = Auth::user();
+{
+    // الحصول على المستخدم المصادق عليه
+    $user = Auth::user();
 
-        // التحقق من أن المستخدم لديه دور المعلم
-        if (!$user || $user->role !== 'Instructor') {
-            return redirect()->back()->with('error', 'Access denied.');
-        }
+    // التحقق من أن المستخدم لديه دور "أدمن" أو "معلم"
+    if (!$user || ($user->role !== 'Admin' && $user->role !== 'Instructor')) {
+        return redirect()->back()->with('error', 'Access denied.');
+    }
 
-        // استخراج بيانات المعلم مع دوراته وطلابه
-        $instructor = User::with(['courses.students'])->find($user->id);
+    // توحيد المتغير للاستخدام في كلا الحالتين
+    $instructors = [];  // متغير لتخزين جميع المعلمين في حالة "أدمن" أو معلم واحد في حالة "معلم"
 
-        if (!$instructor) {
-            return redirect()->back()->with('error', 'Instructor not found.');
-        }
+    // استرجاع جميع المعلمين مع دوراتهم وطلابهم إذا كان المستخدم "أدمن"
+    if ($user->role === 'Admin') {
+        $instructors = User::with(['courses.students'])->where('role', 'Instructor')->get();
+    }
 
-        // استخدام ProgressController لحساب التقدم
+    // إذا كان المستخدم "معلم"
+    if ($user->role === 'Instructor') {
+        $instructors = User::with(['courses.students'])->where('id', $user->id)->get();
+    }
+
+    // حساب التقدم لجميع الطلاب إذا كان المستخدم "معلم"
+    foreach ($instructors as $instructor) {
         foreach ($instructor->courses as $course) {
             $course->students = $course->students->unique('id'); // إزالة التكرار
 
             foreach ($course->students as $student) {
-                $enrollmentId = $student->pivot->id;
-                // حساب التقدم باستخدام ProgressController
-                $progress = $this->progressController->calculateProgress($enrollmentId);
-
-                // تأكد من أن التقدم ليس NULL قبل التحديث
-                if ($progress !== null) {
-                    // تحديث التقدم في الجدول الوسيط (pivot)
-                    $student->pivot->update(['progress' => $progress]);
-                } else {
-                    // إذا كان التقدم NULL، يمكنك تعيين قيمة افتراضية مثل 0
-                    $student->pivot->update(['progress' => 0]);
-                }
+                $this->updateProgress($student);
             }
         }
-
-        // عرض الصفحة مع البيانات
-        return view('instructor.students.index', compact('instructor'));
     }
 
+    // إرسال البيانات إلى الـ View
+    return view('students.index', compact('instructors'));
+}
+
+// دالة لحساب التقدم وتحديثه
+private function updateProgress($student)
+{
+    // تأكد من أن الطالب لديه بيانات التقدم في جدول pivot
+    if ($student->pivot) {
+        $enrollmentId = $student->pivot->id;
+        // حساب التقدم باستخدام ProgressController
+        $progress = $this->progressController->calculateProgress($enrollmentId);
+
+        // تأكد من أن التقدم ليس NULL قبل التحديث
+        if ($progress !== null) {
+            // تحديث التقدم في الجدول الوسيط (pivot)
+            $student->pivot->update(['progress' => $progress]);
+        } else {
+            // إذا كان التقدم NULL، يمكنك تعيين قيمة افتراضية مثل 0
+            $student->pivot->update(['progress' => 0]);
+        }
+    }
+}
    
     
     public function show($courseId, $studentId, Request $request)
