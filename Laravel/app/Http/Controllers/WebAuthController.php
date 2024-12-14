@@ -29,19 +29,17 @@ class WebAuthController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::user(); // جلب المستخدم الحالي
 
-            // تأكد من أن المستخدم يحتوي على علاقة الأدوار
-            if ($user->roles->isNotEmpty()) {
-                $role = $user->roles->first()->name;  // استخراج أول دور للمستخدم
-            } else {
-                // في حال لم يكن للمستخدم أي دور
-                $role = 'guest'; // أو يمكنك تخصيص هذا حسب احتياجك
-            }
+            // // تأكد من أن المستخدم يحتوي على علاقة الأدوار
+            // if ($user->roles->isNotEmpty()) {
+            //     $role = $user->roles->first()->name;  // استخراج أول دور للمستخدم
+            // } else {
+            //     // في حال لم يكن للمستخدم أي دور
+            //     $role = 'guest'; // أو يمكنك تخصيص هذا حسب احتياجك
+            // }
 
             // إرسال الاستجابة مع الدور
             return response()->json([
-                'message' => 'Login successful',
-                'role' => $role,  // إضافة الدور
-                'user' => $user   // إضافة معلومات المستخدم (اختياري)
+                'message' => 'Login successful'
             ]);
         } else {
             // في حال فشل تسجيل الدخول

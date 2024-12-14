@@ -24,6 +24,8 @@
                                         <th class="px-4 py-3 font-medium text-gray-900 dark:text-white">Email</th>
                                         <th class="px-4 py-3 font-medium text-gray-900 dark:text-white">Enrollment Date</th>
                                         <th class="px-4 py-3 font-medium text-gray-900 dark:text-white">Progress</th>
+                                        <th class="px-4 py-3 font-medium text-gray-900 dark:text-white">Action</th> <!-- إضافة عمود لـ Action -->
+
                                         <!-- <th class="px-4 py-3 font-medium text-gray-900 dark:text-white text-center">Actions</th> -->
                                     </tr>
                                 </thead>
@@ -34,6 +36,11 @@
                                             <td class="px-4 py-3">{{ $student->email }}</td>
                                             <td class="px-4 py-3">{{ $student->pivot->enrollment_date }}</td>
                                             <td class="px-4 py-3">{{ $student->pivot->progress }}%</td>
+                                            <td class="px-4 py-3">
+                                                <!-- زر للانتقال إلى صفحة تفاصيل الدورة -->
+                                                <a href="{{ route('progress.course', ['courseId' => $course->id, 'studentId' => $student->id]) }}" 
+                                                class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">View Details</a>
+                                            </td>
                                             <!-- <td class="px-4 py-3">
     <div class="w-full bg-gray-300 rounded-full">
         <div class="bg-blue-500 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style="width: {{ $student->pivot->progress }}%">

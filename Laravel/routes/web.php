@@ -19,7 +19,8 @@ use App\Http\Controllers\{
     AdminController,
     InstructorController,
     StudentController,
-    AdminUserController
+    AdminUserController,
+    ProgressController
 };
 
 // مجموعة مسارات الويب
@@ -84,9 +85,13 @@ Route::middleware('web')->group(function () {
            
              //Instructor students
              Route::get('/students', [StudentController::class, 'index'])->name('instructor.students.index');
-
+            //  Route::get('/course/{courseId}/progress', [StudentController::class, 'show'])->name('progress.');
+             Route::get('/course/{courseId}/StudentChart', [StudentController::class, 'showChart'])->name('progress.chart');
+             Route::get('/course/{courseId}/student/{studentId}/progress', [StudentController::class, 'show'])->name('progress.course');
 
              // مسارات إدارة الطلاب
+             // ملف routes/web.php
+
             Route::get('/courses/{courseId}/students', [CourseUserController::class, 'index'])->name('instructor.students.index');
             Route::get('/courses/{courseId}/students/{studentId}/edit', [CourseUserController::class, 'edit'])->name('instructor.students.edit');
             Route::put('/courses/{courseId}/students/{studentId}', [CourseUserController::class, 'update'])->name('instructor.students.update');

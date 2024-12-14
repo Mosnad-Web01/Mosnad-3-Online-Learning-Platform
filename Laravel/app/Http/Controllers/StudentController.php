@@ -2,11 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\ProgressController; // استدعاء الكنترولر الآخر
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
+    // تعريف الخاصية العامة
+    protected $progressController;
+
+    // تهيئة المتغير في الباني
+    public function __construct()
+    {
+        $this->progressController = new ProgressController();
+    }
+
     // دالة لحساب تقدم الطالب
     public function index()
     {
@@ -26,15 +37,14 @@ class StudentController extends Controller
         }
 
         // استخدام ProgressController لحساب التقدم
-        $progressController = new ProgressController();
         foreach ($instructor->courses as $course) {
             $course->students = $course->students->unique('id'); // إزالة التكرار
-        
+
             foreach ($course->students as $student) {
                 $enrollmentId = $student->pivot->id;
                 // حساب التقدم باستخدام ProgressController
-                $progress = $progressController->calculateProgress($enrollmentId);
-        
+                $progress = $this->progressController->calculateProgress($enrollmentId);
+
                 // تأكد من أن التقدم ليس NULL قبل التحديث
                 if ($progress !== null) {
                     // تحديث التقدم في الجدول الوسيط (pivot)
@@ -46,8 +56,31 @@ class StudentController extends Controller
             }
         }
 
-
         // عرض الصفحة مع البيانات
         return view('instructor.students.index', compact('instructor'));
     }
+
+   
+    
+    public function show($courseId, $studentId, Request $request)
+{
+    // استدعاء الدالة من ProgressController
+    $data = $this->progressController->getStudentProgressData($request, $courseId, $studentId);
+
+    // عرض الفيو وتمرير البيانات له
+    return view('progress.course', $data);
 }
+
+    public function showChart($courseId, Request $request)
+    {
+        $data = $this->progressController->getCourseProgressData($request, $courseId);
+
+        // إرسال المتغير إلى الـ view
+        return view('progress.chart', [
+            'lessonProgress' => $data['lessonProgress'],
+            'lessonCounts' => $data['lessonCounts'],  // تمرير lessonCounts إلى الـ view
+        ]);
+
+    }
+}
+
