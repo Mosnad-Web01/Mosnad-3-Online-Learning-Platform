@@ -55,4 +55,5 @@ class Review extends Model
         'course_rating' => 1,
         'instructor_rating' => 1,
     ];
+    
 }
