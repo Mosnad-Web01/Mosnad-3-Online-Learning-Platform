@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AuthLogingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\InstructorController;
@@ -27,9 +27,9 @@ Route::middleware('web')->get('/sanctum/csrf-cookie', function (Request $request
 Route::middleware('web')->group(function () {
  
     // مسارات عامة لا تتطلب مصادقة
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/login', [AuthLogingController::class, 'login']);
+    Route::post('/register', [AuthLogingController::class, 'register']);
+    Route::post('/logout', [AuthLogingController::class, 'logout']);
 
     // مسارات الدورات
     Route::prefix('courses')->group(function () {

@@ -11,7 +11,7 @@ $sidebarLinks = [
 ['href' => '/admin/dashboard', 'icon' => 'cogs', 'text' => 'Admin Dashboard'],
 ['href' => '/admin/categories', 'icon' => 'list-alt', 'text' => 'Manage Categories'],
 ['href' => '/admin/courses', 'icon' => 'book', 'text' => 'Manage Courses'],
-['href' => isset($courseId) ? "/admin/courses/$courseId/lessons" : '/admin/courses', 'icon' => 'bookmark', 'text' => isset($courseId) ? 'Manage Lessons' : 'Select a Course to Manage Lessons'],
+['href' => '/admin/students', 'icon' => 'users', 'text' =>  'Manage Students'],
 ['href' => '/admin/users', 'icon' => 'users', 'text' => 'Manage Users'],
 ];
 } elseif ($role === 'Instructor') {

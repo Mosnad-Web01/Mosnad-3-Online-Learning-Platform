@@ -14,7 +14,16 @@ class LessonProgress extends Model
         'lesson_id',
         'completed_at',
     ];
+    protected $casts = [
+        'completed_at' => 'datetime',  // تأكد من أن `completed_at` يتم تحويله إلى كائن Carbon
+    ];
+    
     protected $table = 'lesson_progress';  // تحديد اسم الجدول هنا
+// في نموذج LessonProgress
+public function user()
+{
+    return $this->hasOneThrough(User::class, Enrollment::class, 'id', 'id', 'enrollment_id', 'student_id');
+}
 
     // العلاقة مع نموذج Enrollment
     public function enrollment()
