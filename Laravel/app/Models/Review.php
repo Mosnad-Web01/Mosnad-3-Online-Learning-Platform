@@ -55,5 +55,11 @@ class Review extends Model
         'course_rating' => 1,
         'instructor_rating' => 1,
     ];
+    public function replies()
+{
+    return $this->hasMany(ReviewReply::class);
+}
+
+
     
 }

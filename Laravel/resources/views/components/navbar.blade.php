@@ -21,6 +21,12 @@ $sidebarLinks = [
 ['href' => '/instructor/students', 'icon' => 'users', 'text' => 'Manage Students'],
 ['href' => '/instructor/categories', 'icon' => 'tags', 'text' => 'Manage Categories'],
 ['href' => isset($courseId) ? "/instructor/courses/$courseId/lessons" : '/instructor/courses', 'icon' => 'bookmark', 'text' => isset($courseId) ? 'Manage Lessons' : 'Select a Course to Manage Lessons'],
+[
+    'href' => '/instructor/reviews',
+    'icon' => 'star', // أيقونة مناسبة للمراجعات
+    'text' => 'Manage Reviews'
+]
+
 ];
 } elseif (!$role) {
 $sidebarLinks = [

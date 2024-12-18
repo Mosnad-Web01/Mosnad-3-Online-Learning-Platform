@@ -48,5 +48,4 @@ href="/"
 
     <!-- ربط ملف JavaScript -->
     @vite('resources/js/login.js')
-    <p>Login</p>
 </x-base>
