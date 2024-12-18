@@ -41,7 +41,7 @@ Route::middleware('web')->group(function () {
     Route::post('/login', [WebAuthController::class, 'login'])->name('login.submit');
     Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
     Route::get('/signup', [WebAuthController::class, 'showRegister'])->name('signup');
-Route::post('/signup', [WebAuthController::class, 'register'])->name('signup.submit');
+    Route::post('/signup', [WebAuthController::class, 'register'])->name('signup.submit');
 
 
     Route::post('/admin/logout', [AdminController::class, 'logout']);
