@@ -55,28 +55,31 @@ class WebReviewController extends Controller
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function index(Request $request)
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user();
     
-        if ($user->role === 'Instructor') {
-            $courses = Course::where('instructor_id', $user->id)
-                ->withCount('reviews') // جلب عدد المراجعات
-                ->with(['reviews' => function ($query) {
-                    $query->select('course_id', 'course_rating'); // جلب التقييمات فقط
-                }])
-                ->get();
-        } elseif ($user->role === 'Admin') {
-            $courses = Course::withCount('reviews') // جلب عدد المراجعات
-                ->with(['reviews' => function ($query) {
-                    $query->select('course_id', 'course_rating'); // جلب التقييمات فقط
-                }])
-                ->get();
-        } else {
-            return redirect()->back()->with('error', 'Unauthorized access.');
-        }
-    
-        return view('reviews.index', compact('courses'));
+    if ($user->role === 'Instructor') {
+        // إذا كان المستخدم هو مدرس، قم بإظهار الكورسات الخاصة به
+        $courses = Course::where('instructor_id', $user->id)
+            ->withCount('reviews') // جلب عدد المراجعات
+            ->with(['reviews' => function ($query) {
+                $query->select('course_id', 'course_rating'); // جلب التقييمات فقط
+            }])
+            ->paginate(10); // تقسيم النتائج إلى 10 كورسات في كل صفحة
+    } elseif ($user->role === 'Admin') {
+        // إذا كان المستخدم هو Admin، قم بإظهار جميع الكورسات
+        $courses = Course::withCount('reviews') // جلب عدد المراجعات
+            ->with(['reviews' => function ($query) {
+                $query->select('course_id', 'course_rating'); // جلب التقييمات فقط
+            }])
+            ->paginate(10); // تقسيم النتائج إلى 10 كورسات في كل صفحة
+    } else {
+        return redirect()->back()->with('error', 'Unauthorized access.');
     }
+
+    return view('reviews.index', compact('courses'));
+}
+
     
     
 
