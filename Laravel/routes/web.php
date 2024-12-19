@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\{
     HomeController,
-    SignupController,
+    WebProfileController,
     WebAuthController,
     AdminDashboardController,
     InstructorDashboardController,
@@ -43,7 +43,7 @@ Route::middleware('web')->group(function () {
     Route::get('/signup', [WebAuthController::class, 'showRegister'])->name('signup');
     Route::post('/signup', [WebAuthController::class, 'register'])->name('signup.submit');
 
-
+    
     Route::post('/admin/logout', [AdminController::class, 'logout']);
     Route::post('/instructor/logout', [InstructorController::class, 'logout']);
 
@@ -68,15 +68,20 @@ Route::middleware('web')->group(function () {
             }
             return view('dashboard');
         });
+        Route::get('/profile/form', [WebProfileController::class, 'showForm'])->name('profile.form');
+        Route::post('/profile', [WebProfileController::class, 'store'])->name('profile.store');
+        Route::put('/profile/{id}', [WebProfileController::class, 'update'])->name('profile.update');
+        
 
-
-
+        Route::resource('/reviews', WebReviewController::class);
         // مسارات لوحة التحكم للمدرب
         Route::prefix('instructor')
          ->middleware(['role:Admin,Instructor'])
         ->group(function () {
             // لوحة تحكم المدرب
             Route::get('/dashboard', [InstructorDashboardController::class, 'index'])->name('instructor.dashboard');
+
+            Route::resource('profile', WebProfileController::class);
 
             // مسارات إدارة الدورات التدريبية
             Route::get('/courses', [InstructorCourseController::class, 'index'])->name('instructor.courses.index');
@@ -102,7 +107,7 @@ Route::middleware('web')->group(function () {
              Route::get('/course/{courseId}/student/{studentId}/progress', [StudentController::class, 'show'])->name('progress.course');
 
              //reviews
-             Route::resource('/reviews', WebReviewController::class);
+             
 
 
              // مسارات إدارة الطلاب
