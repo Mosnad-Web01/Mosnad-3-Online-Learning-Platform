@@ -47,7 +47,7 @@ const CheckoutForm = ({amount,studentID,corseId}) => {
             clientSecret,
             elements,
             confirmParams: {
-              return_url: "/",
+              return_url: "http://localhost:3000/",
             },
           });
       
