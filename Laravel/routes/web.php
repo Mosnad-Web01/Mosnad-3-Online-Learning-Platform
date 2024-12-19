@@ -73,7 +73,7 @@ Route::middleware('web')->group(function () {
         Route::put('/profile/{id}', [WebProfileController::class, 'update'])->name('profile.update');
         
 
-
+        Route::resource('/reviews', WebReviewController::class);
         // مسارات لوحة التحكم للمدرب
         Route::prefix('instructor')
          ->middleware(['role:Admin,Instructor'])
@@ -107,7 +107,7 @@ Route::middleware('web')->group(function () {
              Route::get('/course/{courseId}/student/{studentId}/progress', [StudentController::class, 'show'])->name('progress.course');
 
              //reviews
-             Route::resource('/reviews', WebReviewController::class);
+             
 
 
              // مسارات إدارة الطلاب
