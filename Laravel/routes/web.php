@@ -20,7 +20,9 @@ use App\Http\Controllers\{
     InstructorController,
     StudentController,
     AdminUserController,
-    ProgressController
+    ProgressController,
+    WebReviewController,
+
 };
 
 // مجموعة مسارات الويب
@@ -38,12 +40,23 @@ Route::middleware('web')->group(function () {
     Route::get('/login', [WebAuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [WebAuthController::class, 'login'])->name('login.submit');
     Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
+    Route::get('/signup', [WebAuthController::class, 'showRegister'])->name('signup');
+    Route::post('/signup', [WebAuthController::class, 'register'])->name('signup.submit');
+
+
     Route::post('/admin/logout', [AdminController::class, 'logout']);
     Route::post('/instructor/logout', [InstructorController::class, 'logout']);
 
-    // مسارات تسجيل المستخدم الجديد
-    Route::get('/signup', [SignupController::class, 'create'])->name('signup');
-    Route::post('/signup', [SignupController::class, 'store'])->name('signup.submit');
+    // // مسارات تسجيل المستخدم الجديد
+    // Route::get('/signup', [SignupController::class, 'create'])->name('signup');
+    // Route::post('/signup', [SignupController::class, 'store'])->name('signup.submit');
+
+
+    // مسار الرد على المراجعة
+    Route::post('/reviews/{review}/reply', [WebReviewController::class, 'storeReply'])->name('reviews.reply');
+    
+    // مسار الرد على الرد
+    Route::post('/replies/{reply}/reply', [WebReviewController::class, 'storeReplyToReply'])->name('replies.replyToReply');
 
     // مجموعة مسارات مصادقة المستخدم باستخدام Sanctum
     Route::middleware(['auth:sanctum'])->group(function () {
@@ -87,6 +100,10 @@ Route::middleware('web')->group(function () {
              Route::get('/students', [StudentController::class, 'index'])->name('students.index');
              Route::get('/course/{courseId}/StudentChart', [StudentController::class, 'showChart'])->name('progress.chart');
              Route::get('/course/{courseId}/student/{studentId}/progress', [StudentController::class, 'show'])->name('progress.course');
+
+             //reviews
+             Route::resource('/reviews', WebReviewController::class);
+
 
              // مسارات إدارة الطلاب
              // ملف routes/web.php

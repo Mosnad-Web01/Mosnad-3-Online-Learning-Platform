@@ -13,25 +13,37 @@
                     <a href="#courses" class="bg-white text-blue-500 px-6 py-2 rounded-full text-xl font-semibold hover:bg-gray-200 transition">Browse Courses</a>
                 </section>
 
-                <!-- Courses Section -->
-                <section id="courses" class="py-20 lg:col-start-2 col-end-3 overflow-y-auto p-4">
-                    <div class="container mx-auto px-4">
-                        <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white">Popular Courses</h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                            @forelse($courses as $course)
-                                <div class="bg-gray-200 dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                                    <img src="{{ $course->image ? asset('storage/' . $course->image) : 'https://via.placeholder.com/400x250' }}" alt="{{ $course->course_name }}" class="w-full h-56 object-cover">
-                                    <div class="p-6">
-                                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">{{ $course->course_name }}</h3>
-                                        <p class="text-gray-600 dark:text-white mt-4">{{ Str::limit($course->description, 100) }}</p>
-                                        <a href="{{ route('courses.show', $course->id) }}" class="text-blue-500 dark:text-white mt-4 inline-block">Learn More</a>
-                                    </div>
-                                </div>
-                            @empty
-                                <p class="text-center text-gray-500 col-span-3">No courses available at the moment.</p>
-                            @endforelse
-                        </div>
+             <!-- Courses Section -->
+<section id="courses" class="py-20 lg:col-start-2 col-end-3 overflow-y-auto p-4">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-8">Popular Courses</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            @forelse($courses as $course)
+                <div class="bg-gray-200 dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                    <img 
+                        src="{{ $course->image ? asset('storage/' . $course->image) : 'https://via.placeholder.com/300x200' }}" 
+                        alt="{{ $course->course_name }}" 
+                        class="w-full h-40 object-cover"
+                    >
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white truncate">
+                            {{ $course->course_name }}
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm mt-2">
+                            {{ Str::limit($course->description, 80) }}
+                        </p>
+                        <a href="{{ route('courses.show', $course->id) }}" class="text-blue-500 dark:text-blue-300 text-sm mt-4 inline-block">
+                            Learn More
+                        </a>
                     </div>
+                </div>
+            @empty
+                <p class="text-center text-gray-500 col-span-full">No courses available at the moment.</p>
+            @endforelse
+        </div>
+    </div>
+</section>
+
                 </section>
             </div>
         </main>

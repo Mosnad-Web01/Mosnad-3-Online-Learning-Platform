@@ -23,13 +23,7 @@ class SignupController extends Controller
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'role' => ['required', Rule::in(['student', 'instructor', 'admin'])],
-            'full_name' => 'nullable|string|max:255',
-            'date_of_birth' => 'nullable|date',
-            'address' => 'nullable|string|max:255',
-            'phone_number' => 'nullable|string|max:20',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'bio' => 'nullable|string',
+            'role' => ['required', Rule::in(['student', 'instructor', 'admin'])]
         ]);
 
         // إنشاء المستخدم

@@ -67,4 +67,10 @@ class Course extends Model
 {
     return $this->hasMany(Enrollment::class);
 }
+  // العلاقات مع المراجعات
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
 }
