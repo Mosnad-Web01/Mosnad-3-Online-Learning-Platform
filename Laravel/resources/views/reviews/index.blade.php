@@ -10,34 +10,38 @@
                     <div class="overflow-hidden bg-white dark:bg-gray-800 shadow rounded-lg w-full">
                         <div class="overflow-x-auto">
                             <table class="min-w-full text-sm text-left text-gray-500 dark:text-gray-300">
-                            <thead class="bg-gray-100 dark:bg-gray-700">
-    <tr>
-        <th class="px-4 py-3 font-medium text-gray-900 dark:text-white">Course Name</th>
-        <th class="px-4 py-3 font-medium text-gray-900 dark:text-white">Total Reviews</th>
-        <th class="px-4 py-3 font-medium text-gray-900 dark:text-white">Average Rating</th>
-        <th class="px-4 py-3 font-medium text-gray-900 dark:text-white">Actions</th>
-    </tr>
-</thead>
-<tbody>
-    @foreach ($courses as $course)
-    <tr class="border-b dark:border-gray-700">
-        <td class="px-4 py-3">{{ $course->course_name }}</td>
-        <td class="px-4 py-3">{{ $course->reviews_count }}</td> <!-- عدد المراجعات -->
-        <td class="px-4 py-3">
-            {{ $course->reviews->avg('course_rating') ?? 'No Ratings Yet' }} <!-- متوسط التقييم -->
-        </td>
-        <td class="px-4 py-3 flex items-center justify-start space-x-4">
-            <button onclick="toggleReviews({{ $course->id }})" class="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600">
-                View Reviews
-            </button>
-        </td>
-    </tr>
-    <x-reviews :course="$course" />
-    @endforeach
-</tbody>
-
+                                <thead class="bg-gray-100 dark:bg-gray-700">
+                                    <tr>
+                                        <th class="px-4 py-3 font-medium text-gray-900 dark:text-white">Course Name</th>
+                                        <th class="px-4 py-3 font-medium text-gray-900 dark:text-white">Total Reviews</th>
+                                        <th class="px-4 py-3 font-medium text-gray-900 dark:text-white">Average Rating</th>
+                                        <th class="px-4 py-3 font-medium text-gray-900 dark:text-white">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($courses as $course)
+                                    <tr class="border-b dark:border-gray-700">
+                                        <td class="px-4 py-3">{{ $course->course_name }}</td>
+                                        <td class="px-4 py-3">{{ $course->reviews_count }}</td> <!-- عدد المراجعات -->
+                                        <td class="px-4 py-3">
+                                            {{ $course->reviews->avg('course_rating') ?? 'No Ratings Yet' }} <!-- متوسط التقييم -->
+                                        </td>
+                                        <td class="px-4 py-3 flex items-center justify-start space-x-4">
+                                            <button onclick="toggleReviews({{ $course->id }})" class="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600">
+                                                View Reviews
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <x-reviews :course="$course" />
+                                    @endforeach
+                                </tbody>
                             </table>
                         </div>
+                    </div>
+
+                    <!-- روابط التنقل بين الصفحات -->
+                    <div class="mt-8">
+                        {{ $courses->links() }}
                     </div>
                 </div>
             </div>
