@@ -1,10 +1,20 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  typescript: true,
-  apiVersion: "2023-08-16",
+
+
+const stripeSecretKey = 'sk_test_51Q9qNKIvLrUosj0m8oLnBQbGhiILi5njBBO4NrK0JNILQ06UDne5jOzXBR7JdreVPPxNryqHb6s2gzUoMfm8764i00TLKsJEss';
+
+const stripe = new Stripe(stripeSecretKey, {
+    typescript: true,
+    apiVersion: "2023-08-16"
 });
+
+
+// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+//   typescript: true,
+//   apiVersion: "2023-08-16",
+// });
 
 export async function POST(request) {
   const date = await request.json();
