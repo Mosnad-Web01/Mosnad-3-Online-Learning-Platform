@@ -1,5 +1,5 @@
-<x-layout>
-    <div class="ml-40 flex flex-col min-h-screen">
+<x-homelayout>
+    <div class=" flex flex-col min-h-screen">
         <!-- المحتوى الرئيسي -->
         <main class="flex-grow bg-white dark:bg-gray-900 text-gray-900 dark:text-white w-full overflow-x-hidden">
             <div class="bg-white dark:bg-gray-900 min-h-screen">
@@ -44,4 +44,4 @@
             </div>
         </main>
     </div>
-</x-layout>
+</x-homelayout>
