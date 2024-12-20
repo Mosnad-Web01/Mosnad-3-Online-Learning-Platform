@@ -38,25 +38,27 @@ class Lesson extends Model
         return $this->video_path ? url('storage/' . $this->video_path) : null;
     }
 
+    
     public function getImagesUrlsAttribute()
-    {
-        if (!$this->images) {
-            return [];
-        }
-
-        return array_map(function ($image) {
-            return url('storage/' . $image);
-        }, $this->images);
+{
+    if (!$this->images || !is_array($this->images)) {
+        return [];
     }
 
-    public function getFilesUrlsAttribute()
-    {
-        if (!$this->files) {
-            return [];
-        }
+    return array_map(function ($image) {
+        // يمكنك تعديل المنطق إذا كنت بحاجة إلى معالجة إضافية
+        return url('storage/' . $image);
+    }, $this->images);
+}
 
-        return array_map(function ($file) {
-            return url('storage/' . $file);
-        }, $this->files);
+public function getFilesUrlsAttribute()
+{
+    if (!$this->files || !is_array($this->files)) {
+        return [];
     }
+
+    return array_map(function ($file) {
+        return url('storage/' . $file);
+    }, $this->files);
+}
 }
