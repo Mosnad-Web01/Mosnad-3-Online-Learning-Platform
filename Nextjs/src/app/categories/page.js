@@ -4,13 +4,13 @@ import { fetchCategories } from "@/services/api";
 import { useEffect, useState } from "react";
 
 const CategoriesPage = () => {
-  const [categories, setCategories] = useState();
+  const [categories, setCategories] = useState([]); // تهيئة categories كمصفوفة فارغة
 
   useEffect(() => {
     const fetchCategoryData = async () => {
       try {
         const response = await fetchCategories();
-        setCategories(response.data);
+        setCategories(response.data); // تعيين البيانات
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
