@@ -74,6 +74,8 @@ Route::middleware('web')->group(function () {
         
 
         Route::resource('/reviews', WebReviewController::class);
+
+        
         // مسارات لوحة التحكم للمدرب
         Route::prefix('instructor')
          ->middleware(['role:Admin,Instructor'])
@@ -92,15 +94,20 @@ Route::middleware('web')->group(function () {
             Route::delete('/courses/{id}', [InstructorCourseController::class, 'destroy'])->name('instructor.courses.destroy');
 
             // مسارات إدارة الدروس
-            Route::get('/instructor/courses/{courseId}/lessons', [InstructorLessonController::class, 'index'])->name('instructor.lessons.index');
+            Route::get('/courses/{courseId}/lessons', [InstructorLessonController::class, 'index'])->name('instructor.lessons.index');
             Route::get('/courses/{courseId}/lessons/create', [InstructorLessonController::class, 'create'])->name('instructor.lessons.create');
             Route::post('/courses/{courseId}/lessons', [InstructorLessonController::class, 'store'])->name('instructor.lessons.store');
             Route::get('/courses/{courseId}/lessons/{lessonId}/edit', [InstructorLessonController::class, 'edit'])->name('instructor.lessons.edit');
             Route::put('/courses/{courseId}/lessons/{lessonId}', [InstructorLessonController::class, 'update'])->name('instructor.lessons.update');
             Route::delete('/courses/{courseId}/lessons/{lessonId}', [InstructorLessonController::class, 'destroy'])->name('instructor.lessons.destroy');
-            Route::delete('/instructor/lessons/{courseId}/{lessonId}/images/{imageIndex}', [InstructorLessonController::class, 'deleteImage'])
+            Route::delete('/lessons/{courseId}/{lessonId}/images/{imageIndex}', [InstructorLessonController::class, 'deleteImage'])
              ->name('instructor.lessons.deleteImage');
-           
+             Route::get('/lessons/{lesson}/video', [InstructorLessonController::class, 'addVideo'])->name('lessons.addVideo');
+             Route::post('/lessons/{lesson}/video', [InstructorLessonController::class, 'storeVideo'])->name('lessons.storeVideo');
+
+             Route::get('/lessons/{lessonId}/video', [InstructorLessonController::class, 'viewVideo'])->name('instructor.lessons.view_video');
+
+                
              //Instructor students
              Route::get('/students', [StudentController::class, 'index'])->name('students.index');
              Route::get('/course/{courseId}/StudentChart', [StudentController::class, 'showChart'])->name('progress.chart');
