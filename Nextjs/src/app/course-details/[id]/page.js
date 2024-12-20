@@ -1,4 +1,5 @@
 "use client";
+"use client";
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { FaStar, FaArrowRight } from 'react-icons/fa';
@@ -12,7 +13,6 @@ import { useUser } from '@/context/UserContext';
 import Cookies from "js-cookie"; 
 import { ImPrevious } from 'react-icons/im';
 
-
 const CourseDetails = () => {
   const { id } = useParams();
   const router = useRouter();
@@ -20,9 +20,9 @@ const CourseDetails = () => {
   const [instructor, setInstructor] = useState(null);
   const [relatedCourses, setRelatedCourses] = useState([]);
   const [averageCourseRating, setAverageCourseRating] = useState(0);
-  const [isEnrolled, setIsEnrolled] = useState(false);  // حالة التسجيل
-  const [isProcessing, setIsProcessing] = useState(false); // للتأكد من عدم تكرار النقرات
-  const { user } = useUser(); // جلب بيانات المستخدم من الـ context
+  const [isEnrolled, setIsEnrolled] = useState(false);  // Enrollment state
+  const [isProcessing, setIsProcessing] = useState(false); // Prevent duplicate clicks
+  const [user, setUser] = useState(null); // Declare user state
 
   useEffect(() => {
     const checkEnrollment = async (courseId) => {
@@ -77,20 +77,21 @@ const CourseDetails = () => {
 
   }, [id]);
   
-  
   useEffect(() => {
-    // استرجاع بيانات المستخدم من الكوكيز
-    const userCookie = Cookies.get('user'); // استرجاع الكوكيز المحفوظة
+    // Retrieve user data from cookies
+    const userCookie = Cookies.get('user'); // Get the saved cookie
     if (userCookie) {
       try {
-        const user = JSON.parse(userCookie); // تحليل بيانات المستخدم
-        setUser(user);
+        const user = JSON.parse(userCookie); // Parse the user data
+        setUser(user); // Update state with the parsed user data
       } catch (error) {
         console.error('Error parsing user cookie:', error);
       }
     }
-  }, []);
-  console.log('user',user);
+  }, []); 
+
+  console.log('user', user); // Log the user data for debugging
+  
   const handleEnrollment = async () => {
     if (isProcessing || isEnrolled) return; // Prevent repeated or unnecessary calls
     setIsProcessing(true);
@@ -107,14 +108,14 @@ const CourseDetails = () => {
       setIsProcessing(false);
     }
   };
-  
-  
 
   if (!course || !instructor) return <p>Course or instructor not found</p>;
 
   const ratingStars = Array.from({ length: 5 }, (_, index) => (
     <FaStar key={index} className={`${index < averageCourseRating ? 'text-yellow-500' : 'text-gray-400'}`} />
   ));
+
+ 
 
   return (
     <motion.div
