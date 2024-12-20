@@ -1,5 +1,5 @@
 <x-layout>
-    <section class="bg-gray-50 dark:bg-gray-900 py-10 px-4 sm:px-6 lg:px-8 mt-8">
+<section class="bg-gray-50 dark:bg-gray-900 py-10 mt-10 lg:ml-[10rem] md:ml-44 sm:ml-10 flex items-center justify-start rtl:justify-end">
         <div class="max-w-4xl mx-auto">
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">
                 Edit Lesson "{{ $lesson->title }}" for Course "{{ $course->name }}"

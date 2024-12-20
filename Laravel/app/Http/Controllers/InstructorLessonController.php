@@ -16,7 +16,8 @@ class InstructorLessonController extends Controller
         $lessons = $course->lessons; // جلب الدروس المرتبطة بالدورة
         return view('instructor.lessons.index', compact('course', 'lessons'));
     }
-
+   
+    
     public function create($courseId)
     {
         $course = Course::where('instructor_id', Auth::id())->findOrFail($courseId);
@@ -66,8 +67,9 @@ class InstructorLessonController extends Controller
             'order' => $request->order ?? 0,
         ]);
 
-        return redirect()->route('instructor.lessons.index', $courseId)
-                         ->with('success', 'Lesson created successfully.');
+        return redirect()->route('instructor.lessons.index', ['courseId' => $courseId])
+        ->with('success', 'Lesson created successfully.');
+
     }
 
 
@@ -200,4 +202,42 @@ public function update(Request $request, $courseId, $lessonId)
         return redirect()->route('instructor.lessons.index', $courseId)->with('success', 'Lesson deleted successfully.');
     }
 
+    public function addVideo($lessonId)
+{
+    $lesson = Lesson::findOrFail($lessonId);
+    return view('instructor.lessons.add_video', compact('lesson'));
 }
+
+public function storeVideo(Request $request, $lessonId)
+{
+    $lesson = Lesson::findOrFail($lessonId);
+
+    $request->validate([
+        'video' => 'required|mimes:mp4,mkv,avi|max:51200', // الحد الأقصى 50 ميجابايت
+    ]);
+
+    // حفظ الفيديو في التخزين
+    $videoPath = $request->file('video')->store('public/videos');
+
+    // تحديث مسار الفيديو في قاعدة البيانات
+    $lesson->update([
+        'video_path' => $videoPath,
+    ]);
+
+    return redirect()->route('instructor.lessons.index')->with('success', 'Video uploaded successfully.');
+}
+
+
+
+
+
+    public function viewVideo($lessonId)
+    {
+        $lesson = Lesson::where('id', $lessonId)
+                        ->where('instructor_id', Auth::id()) // التأكد من أن المعلم هو مالك الدرس
+                        ->firstOrFail();
+
+        return view('instructor.lessons.video', compact('lesson'));
+    }
+}
+

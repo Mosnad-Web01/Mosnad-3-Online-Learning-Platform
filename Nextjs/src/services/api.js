@@ -109,6 +109,9 @@ export const updateCategory = (id, data) => api.put(`/categories/${id}`, data);
 export const deleteCategory = (id) => api.delete(`/categories/${id}`);
 
 // التعامل مع الكورسات (Courses)
+
+export const fetchCourseUser = () => api.get('/courses');
+
 export const fetchCourses = () => api.get('/courses');
 export const fetchCourseById = (id) => api.get(`/courses/${id}`);
 export const createCourse = (data) => api.post('/courses', data);
