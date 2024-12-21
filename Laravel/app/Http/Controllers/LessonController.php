@@ -4,6 +4,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lesson;
+use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
@@ -141,19 +142,22 @@ class LessonController extends Controller
      * Display a listing of the lessons.
      */
     public function index($courseId)
-{
-    $lessons = Lesson::where('course_id', $courseId)->get();
+    {
+        $lessons = Lesson::where('course_id', $courseId)->get();
+        $course = Course::findOrFail($courseId);
 
-    foreach ($lessons as $lesson) {
-        if ($lesson->video_url) {
-            $lesson->video_url = asset('storage/' . $lesson->video_url);
+
+        foreach ($lessons as $lesson) {
+            if ($lesson->video_url) {
+                $lesson->video_url = asset('storage/' . str_replace('public/', '', $lesson->video_url));
+            }
+            $lesson->images = $lesson->images ? array_map(fn($path) => asset('storage/' . str_replace('public/', '', $path)), json_decode($lesson->images)) : [];
+            $lesson->files = $lesson->files ? array_map(fn($path) => asset('storage/' . str_replace('public/', '', $path)), json_decode($lesson->files)) : [];
         }
-        $lesson->images = $lesson->images ? array_map(fn($path) => asset('storage/' . $path), json_decode($lesson->images)) : [];
-        $lesson->files = $lesson->files ? array_map(fn($path) => asset('storage/' . $path), json_decode($lesson->files)) : [];
+
+        return view('lessons.index', compact('lessons', 'courseId', 'course'));
     }
 
-    return response()->json($lessons, Response::HTTP_OK);
-}
 
 public function show($courseId, $lessonId)
 {
@@ -167,5 +171,6 @@ public function show($courseId, $lessonId)
 
     return response()->json($lesson, Response::HTTP_OK);
 }
+
 
 }

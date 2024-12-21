@@ -112,7 +112,7 @@ class CourseController extends Controller
         return response()->json(['message' => 'Course deleted successfully'], Response::HTTP_OK);
     }
 
-    
+
     public function index(Request $request)
  {
 
@@ -149,9 +149,17 @@ class CourseController extends Controller
     }
     public function home()
     {
-        $courses = Course::latest()->take(6)->get(); // جلب آخر 6 كورسات
+        $courses = Course::latest()->take(6)->get();
+
+        foreach ($courses as $course) {
+            $course->image_url = $course->image
+                ? asset('storage/courses/' . $course->image)
+                : asset('images/cover.jpg');
+        }
+
         return view('home', compact('courses'));
     }
+
     public function showDetails($id)
 {
     // جلب الدورة مع الفئة، المدرب، والدروس

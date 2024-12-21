@@ -1,5 +1,5 @@
 <x-layout>
-    <div class="lg:ml-[4rem] mt-16 lg:mt-0 flex-grow w-full bg-gray-100 dark:bg-gray-900">
+    <main class="bg-white dark:bg-gray-900 text-black dark:text-white min-h-screen w-full">
         <section class="bg-gray-50 dark:bg-gray-900 py-10 mt-10 ml-[6rem] flex items-center justify-start rtl:justify-end">
             <div class="flex items-center justify-start rtl:justify-end">
                 <div class="min-h-screen flex flex-col">
@@ -28,7 +28,7 @@
                                                 @if($progress->user && $progress->lesson) <!-- تحقق من وجود user و lesson -->
                                                     <td class="px-4 py-3">{{ $progress->user->name }}</td> <!-- اسم الطالب -->
                                                     <td class="px-4 py-3">{{ $progress->lesson->title }}</td> <!-- عنوان الدرس -->
-                                                    <td class="px-4 py-3"> 
+                                                    <td class="px-4 py-3">
                                                         {{ secondsToHumanReadable($progress->total_duration_seconds ?? 0) }}</td> <!-- الوقت المستغرق -->
                                                 @else
                                                     <td class="px-4 py-3" colspan="3">No data available for {{ $progress->user->name }}</td> <!-- عرض اسم الطالب في حالة عدم وجود بيانات -->
@@ -50,5 +50,5 @@
                 </div>
             </div>
         </section>
-    </div>
+    </main>
 </x-layout>
