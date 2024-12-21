@@ -41,6 +41,10 @@ public function user()
         
         return view('lesson.show', compact('course', 'lesson'));
     }
-
+    public function lesson()
+    {
+        return $this->belongsTo(Lesson::class);
+    }
+    
 }
 

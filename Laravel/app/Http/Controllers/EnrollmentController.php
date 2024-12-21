@@ -140,32 +140,37 @@ class EnrollmentController extends Controller
         // إذا كانت الدورة مدفوعة
         return redirect()->route('payment.page', ['courseId' => $courseId]);
     }
-
     public function completeLesson(Request $request, $courseId, $lessonId)
     {
         $userId = Auth::id();
-
+    
         // تسجيل العملية في السجل
         Log::info('Updating progress for lesson ID: ' . $lessonId);
-
+    
         // التحقق من تسجيل الطالب في الدورة
         $enrollment = Enrollment::where('student_id', $userId)
             ->where('course_id', $courseId)
             ->firstOrFail();
-
+    
         // التحقق إذا كان الطالب قد أكمل الدرس بالفعل
         $existingCompletion = LessonProgress::where('enrollment_id', $enrollment->id)
             ->where('lesson_id', $lessonId)
             ->first();
-
+    
         if (!$existingCompletion) {
             // إذا لم يكن قد أكمل الدرس من قبل، نقوم بإضافته إلى الجدول
             LessonProgress::create([
                 'enrollment_id' => $enrollment->id,
                 'lesson_id' => $lessonId,
+                'completed_at' => now(),
             ]);
         }
-
+    
+        return response()->json([
+            'message' => 'Lesson marked as completed successfully.',
+        ]);
+    
+    
         // تحديث تقدم الطالب
         $completedLessonsCount = LessonProgress::where('enrollment_id', $enrollment->id)->count();
         $totalLessonsCount = Lesson::where('course_id', $courseId)->count();

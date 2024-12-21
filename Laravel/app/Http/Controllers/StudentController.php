@@ -97,7 +97,6 @@ class StudentController extends Controller
     // إرسال البيانات إلى الـ View
     return view('students.index', compact('instructors'));
 }
-
 // دالة لحساب التقدم وتحديثه
 private function updateProgress($student)
 {
@@ -123,7 +122,6 @@ private function updateProgress($student)
 {
     // استدعاء الدالة من ProgressController
     $data = $this->progressController->getStudentProgressData($request, $courseId, $studentId);
-
     // عرض الفيو وتمرير البيانات له
     return view('progress.course', $data);
 }
