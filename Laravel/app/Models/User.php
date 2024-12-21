@@ -155,4 +155,20 @@ class User extends Authenticatable
 
         return !$this->suspension_end_date || $this->suspension_end_date->greaterThan($now);
     }
+    public function studentReviews()
+    {
+        return $this->hasMany(Review::class, 'student_id');
+    }
+
+    // المراجعات كمدرس
+    public function instructorReviews()
+    {
+        return $this->hasMany(Review::class, 'instructor_id');
+    }
+    public function updateAverageRating()
+{
+    $this->average_rating = $this->instructorReviews()->avg('instructor_rating') ?? 0;
+    $this->save();
+}
+
 }

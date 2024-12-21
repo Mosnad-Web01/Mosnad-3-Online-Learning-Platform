@@ -35,7 +35,7 @@ Route::middleware('web')->group(function () {
     });
 
     // المسار الرئيسي للصفحة الرئيسية
-    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/', [HomeController::class, 'home'])->name('home');
 
     // مسارات تسجيل الدخول والخروج
     Route::get('/login', [WebAuthController::class, 'showLoginForm'])->name('login');
@@ -178,8 +178,8 @@ Route::middleware('web')->group(function () {
     });
 
     // مسارات إضافية متعلقة بالدورات التدريبية
-    Route::get('/', [CourseController::class, 'home'])->name('home');
     Route::get('courses/{course}', [CourseController::class, 'showDetails'])->name('courses.show');
+    Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
 
     // مسارات تصنيف المدرب
     Route::prefix('instructor')->middleware('auth')->name('instructor.')->group(function () {

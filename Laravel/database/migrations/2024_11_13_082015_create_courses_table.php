@@ -29,7 +29,8 @@ return new class extends Migration
             $table->string('image')->nullable(); // إضافة عمود الصورة
         });
     }
-
+   
+    
     /**
      * Reverse the migrations.
      */

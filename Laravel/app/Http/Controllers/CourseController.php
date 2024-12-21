@@ -7,6 +7,7 @@ use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
+
 class CourseController extends Controller
 {
     /**
@@ -147,11 +148,9 @@ class CourseController extends Controller
         }
         return response()->json(['message' => 'Course not found'], Response::HTTP_NOT_FOUND);
     }
-    public function home()
-    {
-        $courses = Course::latest()->take(6)->get(); // جلب آخر 6 كورسات
-        return view('home', compact('courses'));
-    }
+   
+    
+    
     public function showDetails($id)
 {
     // جلب الدورة مع الفئة، المدرب، والدروس
