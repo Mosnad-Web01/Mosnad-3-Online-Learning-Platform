@@ -22,6 +22,12 @@ use App\Http\Controllers\{
     AdminUserController,
     ProgressController,
     WebReviewController,
+
+    ImageController,
+    EnrollmentController,
+    PaymentController,
+    LessonController,
+
     ContactController
 
 };
@@ -33,9 +39,16 @@ Route::middleware('web')->group(function () {
     Route::get('/sanctum/csrf-cookie', function () {
         return response()->json(['message' => 'CSRF cookie set']);
     });
+    Route::get('/main', [ImageController::class, 'randomImage']);
+    Route::get('/courses/{courseId}/payment', [PaymentController::class, 'showPaymentPage'])->name('payment.page');
+    Route::get('/courses/{courseId}/enroll', [EnrollmentController::class, 'handleEnrollment'])->name('enroll.course');
+    Route::get('courses/{courseId}/lessons', [LessonController::class, 'index'])->name('course.lessons');
+    Route::post('/courses/{courseId}/lessons/{lessonId}/complete', [EnrollmentController::class, 'completeLesson'])->name('lessons.complete');
+
 
     // المسار الرئيسي للصفحة الرئيسية
     Route::get('/', [HomeController::class, 'home'])->name('home');
+    //  Route::get('/', [CourseController::class, 'home'])->name('home');
 
     // مسارات تسجيل الدخول والخروج
     Route::get('/login', [WebAuthController::class, 'showLoginForm'])->name('login');
@@ -58,7 +71,7 @@ Route::middleware('web')->group(function () {
 
     // مسار الرد على المراجعة
     Route::post('/reviews/{review}/reply', [WebReviewController::class, 'storeReply'])->name('reviews.reply');
-    
+
     // مسار الرد على الرد
     Route::post('/replies/{reply}/reply', [WebReviewController::class, 'storeReplyToReply'])->name('replies.replyToReply');
 
@@ -111,6 +124,7 @@ Route::middleware('web')->group(function () {
             Route::delete('/courses/{courseId}/lessons/{lessonId}', [InstructorLessonController::class, 'destroy'])->name('instructor.lessons.destroy');
             Route::delete('/lessons/{courseId}/{lessonId}/images/{imageIndex}', [InstructorLessonController::class, 'deleteImage'])
              ->name('instructor.lessons.deleteImage');
+
              Route::get('/lessons/{lesson}/video', [InstructorLessonController::class, 'addVideo'])->name('lessons.addVideo');
              Route::post('/lessons/{lesson}/video', [InstructorLessonController::class, 'storeVideo'])->name('lessons.storeVideo');
 
@@ -158,7 +172,7 @@ Route::middleware('web')->group(function () {
             Route::get('/courses/{id}/edit', [AdminCourseController::class, 'edit'])->name('courses.edit');
             Route::put('/courses/{id}', [AdminCourseController::class, 'update'])->name('courses.update');
             Route::delete('/courses/{id}', [AdminCourseController::class, 'destroy'])->name('courses.destroy');
-        
+
             // مسارات إدارة الدروس
 
             Route::get('/students', [StudentController::class, 'index'])->name('students.index');
@@ -184,6 +198,9 @@ Route::middleware('web')->group(function () {
     // مسارات تصنيف المدرب
     Route::prefix('instructor')->middleware('auth')->name('instructor.')->group(function () {
         Route::resource('categories', InstructorCategoryController::class);
+    });
+
+    Route::middleware(['auth', 'role:student'])->group(function () {
     });
 
 });

@@ -62,7 +62,6 @@ const CourseDetails = () => {
     fetchCourseDetails();
   }, [id]);
 
-  // Retrieve user data from cookies
   useEffect(() => {
     const userCookie = Cookies.get('user');
     if (userCookie) {

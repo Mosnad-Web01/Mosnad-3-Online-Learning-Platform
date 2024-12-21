@@ -6,6 +6,9 @@ use App\Models\Payment;
 use App\Models\User;
 use App\Models\CourseUser;
 use Illuminate\Http\Request;
+use App\Models\Course;
+use Illuminate\Support\Facades\Auth;
+
 
 class PaymentController extends Controller
 {
@@ -36,11 +39,23 @@ class PaymentController extends Controller
     }
 
     // عرض دفعة معينة
-    public function show($id)
-    {
-        $payment = Payment::with('user', 'courseUser')->findOrFail($id);
-        return response()->json($payment);
+    public function showPaymentPage($courseId)
+{
+    // تحقق مما إذا كان المستخدم مسجلاً دخوله
+    if (!Auth::check()) {
+        return redirect()->route('login')->with('error', 'You must be logged in to access this page.');
     }
+
+    $course = Course::findOrFail($courseId);
+
+    // استرجاع course_user المرتبط بالـ course و الـ user
+    $courseUser = CourseUser::where('course_id', $courseId)
+                            ->where('user_id', Auth::user()->id)  // assuming the user is logged in
+                            ->firstOrFail();
+
+    return view('courses.payment', compact('course', 'courseUser'));
+}
+
 
     // تحديث دفعة معينة
     public function update(Request $request, $id)
