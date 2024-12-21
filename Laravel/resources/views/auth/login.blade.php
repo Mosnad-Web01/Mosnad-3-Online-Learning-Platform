@@ -52,7 +52,6 @@ href="/"
 
 <script>
     // Theme Toggle Logic
-    const themeToggle = document.getElementById('theme-toggle');
 
     // Check localStorage for saved theme
     if (localStorage.getItem('theme') === 'dark') {
@@ -61,22 +60,7 @@ href="/"
         document.documentElement.classList.remove('dark');
     }
 
-    themeToggle.addEventListener('click', () => {
-        // Toggle theme
-        document.documentElement.classList.toggle('dark');
+    
 
-        // Save the theme in localStorage
-        if (document.documentElement.classList.contains('dark')) {
-            localStorage.setItem('theme', 'dark');
-        } else {
-            localStorage.setItem('theme', 'light');
-        }
-    });
-
-    // Sidebar Toggle Logic
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const logoSidebar = document.getElementById('logo-sidebar');
-    sidebarToggle.addEventListener('click', () => {
-        logoSidebar.classList.toggle('-translate-x-full');
-    });
+   
 </script>

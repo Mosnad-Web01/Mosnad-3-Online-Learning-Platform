@@ -49,7 +49,13 @@
                             <label for="password_confirmation" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Confirm password</label>
                             <input type="password" name="password_confirmation" id="password_confirmation" placeholder="••••••••" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" required>
                         </div>
-
+                        <div>
+        <label for="role" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Role</label>
+        <select name="role" id="role" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+            <option value="instructor">Instructor</option>
+            <option value="student">Student</option>
+        </select>
+    </div>
                  
                         <button type="submit" class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700">Create an account</button>
                     </form>
@@ -60,9 +66,7 @@
 </x-base>
 
 <script>
-    // Theme Toggle Logic
-    const themeToggle = document.getElementById('theme-toggle');
-
+    
     // Check localStorage for saved theme
     if (localStorage.getItem('theme') === 'dark') {
         document.documentElement.classList.add('dark');
@@ -70,22 +74,7 @@
         document.documentElement.classList.remove('dark');
     }
 
-    themeToggle.addEventListener('click', () => {
-        // Toggle theme
-        document.documentElement.classList.toggle('dark');
+    
 
-        // Save the theme in localStorage
-        if (document.documentElement.classList.contains('dark')) {
-            localStorage.setItem('theme', 'dark');
-        } else {
-            localStorage.setItem('theme', 'light');
-        }
-    });
-
-    // Sidebar Toggle Logic
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const logoSidebar = document.getElementById('logo-sidebar');
-    sidebarToggle.addEventListener('click', () => {
-        logoSidebar.classList.toggle('-translate-x-full');
-    });
+   
 </script>
