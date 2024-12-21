@@ -22,15 +22,19 @@ class ContactController extends Controller   {
                 'email' => 'required|email',
                 'message' => 'required|string|min:10',
             ]);
-    
             // Send the email using a mailable
             try {
-                Mail::to('admin@example.com')->send(new ContactFormMail($request));
+                Mail::to('tutornet0@gmail.com')->send(new ContactFormMail($request));
     
                 return redirect()->route('contact.index')->with('success', 'Your message has been sent successfully!');
             } catch (\Exception $e) {
-                return redirect()->route('contact.index')->with('error', 'There was an issue sending your message.');
+                return redirect()->route('contact.home')->with('error', 'There was an issue sending your message.');
             }
         }
         
 }
+Mail::to('tutornet0@gmail.com')->send(new \App\Mail\ContactFormMail((object)[
+    'name' => 'Test Name',
+    'email' => 'hana.saif.1978@gmail.com',
+    'message' => 'This is a test message.'
+]));

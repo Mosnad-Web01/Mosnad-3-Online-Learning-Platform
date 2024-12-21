@@ -60,9 +60,6 @@
     });
 
     // Sidebar Toggle Logic
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const logoSidebar = document.getElementById('logo-sidebar');
-    sidebarToggle.addEventListener('click', () => {
-        logoSidebar.classList.toggle('-translate-x-full');
-    });
+  
+    
 </script>

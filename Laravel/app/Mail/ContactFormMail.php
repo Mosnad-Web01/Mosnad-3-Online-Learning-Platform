@@ -3,41 +3,31 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Http\Request;
 
 class ContactFormMail extends Mailable
 {
-    public $name;
-    public $email;
-    public $message;
-
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct(Request $request)
+    public $data;
+
+    public function __construct($data)
     {
-        // Pass the validated data to the mailable
-        $this->name = $request->name;
-        $this->email = $request->email;
-        $this->message = $request->message;
+        // تأكد من تحويل البيانات إلى مصفوفة أو كائن
+        $this->data = is_array($data) ? (object) $data : $data;
     }
-    
-    /**
-     * Build the message.
-     */
+
     public function build()
     {
-        return $this->subject('New Contact Message')
+    
+        return $this->subject('New Contact Form Message')
                     ->view('emails.contact')
                     ->with([
-                        'name' => $this->name,
-                        'email' => $this->email,
-                        'message' => $this->message,
+                        'name' => $this->data->name ?? '',
+                        'email' => $this->data->email ?? '',
+                        'message' => $this->data->message ?? '',
                     ]);
     }
-}
+    }
+
