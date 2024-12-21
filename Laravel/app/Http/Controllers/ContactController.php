@@ -33,8 +33,3 @@ class ContactController extends Controller   {
         }
         
 }
-Mail::to('tutornet0@gmail.com')->send(new \App\Mail\ContactFormMail((object)[
-    'name' => 'Test Name',
-    'email' => 'hana.saif.1978@gmail.com',
-    'message' => 'This is a test message.'
-]));
