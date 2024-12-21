@@ -22,6 +22,7 @@ use App\Http\Controllers\{
     AdminUserController,
     ProgressController,
     WebReviewController,
+    ContactController
 
 };
 
@@ -47,6 +48,9 @@ Route::middleware('web')->group(function () {
     Route::post('/admin/logout', [AdminController::class, 'logout']);
     Route::post('/instructor/logout', [InstructorController::class, 'logout']);
 
+    Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
+    Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+    
     // // مسارات تسجيل المستخدم الجديد
     // Route::get('/signup', [SignupController::class, 'create'])->name('signup');
     // Route::post('/signup', [SignupController::class, 'store'])->name('signup.submit');
