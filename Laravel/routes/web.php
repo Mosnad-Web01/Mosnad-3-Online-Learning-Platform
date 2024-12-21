@@ -79,6 +79,11 @@ Route::middleware('web')->group(function () {
 
         Route::resource('/reviews', WebReviewController::class);
 
+        Route::get('/reviews/student/{studentId}', [WebReviewController::class, 'getReviewsByStudent']);
+        Route::get('/reviews/top', [WebReviewController::class, 'getTopReviews']);
+        Route::get('/reviews/date-range', [WebReviewController::class, 'getReviewsByDateRange']);
+        Route::get('/reviews/brief', [WebReviewController::class, 'getBriefReviews']);
+        
         
         // مسارات لوحة التحكم للمدرب
         Route::prefix('instructor')

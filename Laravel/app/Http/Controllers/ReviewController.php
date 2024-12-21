@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ReviewController extends Controller
 {
+    
     /**
      * عرض جميع التقييمات.
      */
@@ -128,4 +129,79 @@ public function getReviewsByInstructor($instructorId)
     return response()->json($reviews, 200);
 }
 
+    /**
+     * عرض جميع التقييمات المرتبطة بطالب معين.
+     */
+    public function getReviewsByStudent($studentId)
+    {
+        $reviews = Review::with(['course', 'instructor'])
+            ->where('student_id', $studentId)
+            ->get();
+
+        if ($reviews->isEmpty()) {
+            return response()->json(['message' => 'No reviews found for this student'], 404);
+        }
+
+        return response()->json($reviews, 200);
+    }
+
+    /**
+     * عرض أفضل التقييمات.
+     */
+    public function getTopReviews(Request $request)
+    {
+        $limit = $request->query('limit', 10); // تحديد عدد التقييمات (افتراضي: 10)
+        $reviews = Review::with(['course', 'instructor', 'student'])
+            ->orderBy('course_rating', 'desc') // ترتيب بناءً على تقييم الكورس
+            ->orderBy('instructor_rating', 'desc') // ترتيب ثانوي بناءً على تقييم الأستاذ
+            ->limit($limit)
+            ->get();
+
+        if ($reviews->isEmpty()) {
+            return response()->json(['message' => 'No top reviews found'], 404);
+        }
+
+        return response()->json($reviews, 200);
+    }
+
+    /**
+     * عرض التقييمات ضمن نطاق زمني.
+     */
+    public function getReviewsByDateRange(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $reviews = Review::with(['course', 'instructor', 'student'])
+            ->whereBetween('created_at', [$request->start_date, $request->end_date])
+            ->get();
+
+        if ($reviews->isEmpty()) {
+            return response()->json(['message' => 'No reviews found in the specified date range'], 404);
+        }
+
+        return response()->json($reviews, 200);
+    }
+
+    /**
+     * عرض التقييمات بتفاصيل مختصرة.
+     */
+    public function getBriefReviews()
+    {
+        $reviews = Review::select('id', 'course_id', 'instructor_id', 'student_id', 'course_rating', 'instructor_rating', 'created_at')
+            ->with(['course:id,name', 'instructor:id,name', 'student:id,name'])
+            ->get();
+
+        if ($reviews->isEmpty()) {
+            return response()->json(['message' => 'No reviews found'], 404);
+        }
+
+        return response()->json($reviews, 200);
+    }
 }

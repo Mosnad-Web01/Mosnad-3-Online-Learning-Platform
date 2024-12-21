@@ -1,4 +1,4 @@
-<x-base>
+<x-homelayout>
 
     <section class="text-gray-600 dark:text-gray-300 body-font bg-gray-100 dark:bg-gray-900 relative">
         <div class="container px-5 py-4 mx-auto flex sm:flex-nowrap flex-wrap">
@@ -56,7 +56,7 @@
         </div>
     </section>
 
-</x-base>
+</x-homelayout>
 
 <script>
     
