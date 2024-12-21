@@ -16,9 +16,9 @@
     ];
 @endphp
 <x-layout>
-    <div class="lg:ml-[4rem] mt-16 lg:mt-0 flex-grow w-full bg-gray-100 dark:bg-gray-900">
+<div class="lg:ml-[4rem] :ml-10 mt-16 flex-grow w-full bg-gray-100 dark:bg-gray-900">
 
-        <section class="bg-gray-50 dark:bg-gray-900 py-10 mt-10 ml-[6rem] flex items-center justify-start rtl:justify-end">
+        <section class="bg-gray-50 dark:bg-gray-900 py-10 mt-10 lg:ml-[6rem] md:ml-44 sm:ml-10 flex items-center justify-start rtl:justify-end">
             <div class="flex items-center justify-start rtl:justify-end">
                 <div class="min-h-screen flex flex-col">
 
@@ -35,6 +35,7 @@
                         @endif
 
 <div class="overflow-x-auto bg-white dark:bg-gray-800 shadow rounded-lg">
+
     <table class="min-w-full text-sm text-left text-gray-500 dark:text-gray-300">
         <thead class="bg-gray-100 dark:bg-gray-700">
             <tr>
@@ -91,6 +92,9 @@
             @endforelse
         </tbody>
     </table>
+    <div class="mt-4">
+        {{ $courses->links('pagination::tailwind') }}
+    </div>
 </div>
 </div>
                     </div>
@@ -137,4 +141,6 @@
         </script>
 
     </div>
+   
+
 </x-layout>

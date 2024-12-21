@@ -1,3 +1,4 @@
+
 <x-layout>
     <main class="bg-white dark:bg-gray-900 text-black dark:text-white min-h-screen w-full">
 
@@ -7,12 +8,14 @@
             <div class="bg-white dark:bg-gray-900 min-h-[calc(100vh-theme(space.4)*2)] sm:min-h-[calc(100vh-theme(space.6)*2)]">
 
 
+
                 <!-- Hero Section -->
                 <section class="text-center py-20 bg-blue-500 dark:bg-gray-900 text-white">
                     <h1 class="text-4xl font-bold mb-4">Welcome to Our Online Course Dashboard</h1>
                     <p class="text-lg mb-6">Start learning and growing today. Access thousands of courses designed for all levels.</p>
                     <a href="#courses" class="bg-white text-blue-500 px-6 py-2 rounded-full text-xl font-semibold hover:bg-gray-200 transition">Browse Courses</a>
                 </section>
+
 
              <!-- Courses Section -->
              <section id="courses" class="py-20 lg:col-start-2 col-end-3 overflow-y-auto p-4">

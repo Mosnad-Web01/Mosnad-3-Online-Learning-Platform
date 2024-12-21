@@ -13,6 +13,11 @@ $sidebarLinks = [
 ['href' => '/admin/courses', 'icon' => 'book', 'text' => 'Manage Courses'],
 ['href' => '/admin/students', 'icon' => 'users', 'text' =>  'Manage Students'],
 ['href' => '/admin/users', 'icon' => 'users', 'text' => 'Manage Users'],
+[
+    'href' => '/reviews',
+    'icon' => 'star', // أيقونة مناسبة للمراجعات
+    'text' => 'Manage Reviews'
+]
 ];
 } elseif ($role === 'Instructor') {
 $sidebarLinks = [
@@ -22,7 +27,7 @@ $sidebarLinks = [
 ['href' => '/instructor/categories', 'icon' => 'tags', 'text' => 'Manage Categories'],
 ['href' => isset($courseId) ? "/instructor/courses/$courseId/lessons" : '/instructor/courses', 'icon' => 'bookmark', 'text' => isset($courseId) ? 'Manage Lessons' : 'Select a Course to Manage Lessons'],
 [
-    'href' => '/instructor/reviews',
+    'href' => '/reviews',
     'icon' => 'star', // أيقونة مناسبة للمراجعات
     'text' => 'Manage Reviews'
 ]

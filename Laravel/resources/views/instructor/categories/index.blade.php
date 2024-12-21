@@ -1,5 +1,5 @@
 <x-layout>
-    <section class="bg-gray-50 dark:bg-gray-900 py-10  mt-10">
+    <section class="ml-40 bg-gray-50 dark:bg-gray-900 py-10  mt-10">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">My Categories</h1>

@@ -18,8 +18,9 @@
 
 <x-layout>
     <div class="lg:ml-[4rem] mt-16 lg:mt-0 flex-grow w-full bg-gray-100 dark:bg-gray-900">
-        <section class="bg-gray-50 dark:bg-gray-900 py-10 mt-10 ml-[6rem] flex items-center justify-start rtl:justify-end">
-            <div class="flex items-center justify-start rtl:justify-end">
+        
+    <section class="bg-gray-50 dark:bg-gray-900 py-10 mt-10 lg:ml-[6rem] md:ml-44 sm:ml-10 flex items-center justify-start rtl:justify-end">
+    <div class="flex items-center justify-start rtl:justify-end">
                 <div class="min-h-screen flex flex-col">
                     <div class="container flex-grow mx-auto px-4">
                         <div class="flex justify-between items-center mb-6">
@@ -56,41 +57,14 @@
                                             @foreach ($table->columns as $column)
                                                 <td class="px-4 py-3">
                                                     @if ($column['key'] === 'video_path' && $lesson->video_path)
-                                                        <a href="{{ route('instructor.lessons.view_video', ['lessonId' => $lesson->id]) }}" 
-                                                           class="text-blue-500 hover:underline" target="_blank">
-                                                            View Video
-                                                        </a>
-                                                    @elseif ($column['key'] === 'images')
-                                                        @php
-                                                            $images = is_string($lesson->images) ? json_decode($lesson->images, true) : $lesson->images;
-                                                        @endphp
-                                                        @if ($images && is_array($images))
-                                                            @foreach ($images as $image)
-                                                                <a href="{{ route('instructor.lessons.view_image', ['lessonId' => $lesson->id, 'imagePath' => $image['path'] ?? '']) }}" 
-                                                                   class="block mt-1 text-blue-500 hover:underline" target="_blank">
-                                                                    View Image
-                                                                </a>
-                                                            @endforeach
-                                                        @else
-                                                            <p class="text-sm text-gray-500 dark:text-gray-400">No images uploaded</p>
+                                                      
+                          
+                          @if ($lesson->video_path)
+                              <a href="{{ Storage::url($lesson->video_path) }}" target="_blank" class="text-blue-500">Watch Video</a>
+                          @else
+                              <a href="{{ route('lessons.addVideo', $lesson->id) }}" class="text-blue-500">Add Video</a>
+                          @endif
                                                         @endif
-                                                    @elseif ($column['key'] === 'files')
-                                                        @php
-                                                            $files = is_string($lesson->files) ? json_decode($lesson->files, true) : $lesson->files;
-                                                        @endphp
-                                                        @if ($files && is_array($files))
-                                                            @foreach ($files as $file)
-                                                                <a href="{{ route('instructor.lessons.view_file', ['lessonId' => $lesson->id, 'filePath' => $file['path'] ?? '']) }}" 
-                                                                   class="block mt-1 text-blue-500 hover:underline" target="_blank">
-                                                                    Download File
-                                                                </a>
-                                                            @endforeach
-                                                        @else
-                                                            <p class="text-sm text-gray-500 dark:text-gray-400">No files uploaded</p>
-                                                        @endif
-                                                    @else
-                                                        {{ $lesson->{$column['key']} ?? '' }}
-                                                    @endif
                                                 </td>
                                             @endforeach
                                             <td class="px-4 py-3 flex items-center justify-start space-x-4">

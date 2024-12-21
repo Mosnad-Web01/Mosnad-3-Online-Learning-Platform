@@ -19,15 +19,14 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => {
 
                 const userRole = response.data.user.role; 
-        
                 if (userRole === 'Admin') {
                     window.location.href = '/admin/dashboard';  
                 } else if (userRole === 'Instructor') {
                     window.location.href = '/instructor/dashboard'; 
                 } 
-                // else {
-                //      window.location.href = '/login';  // تحويل إلى لوحة تحكم أخرى للمستخدمين العاديين
-                // }
+                 else if (userRole === 'Student'){
+                      window.location.href = '/';  // تحويل إلى لوحة تحكم أخرى للمستخدمين العاديين
+                 }
             })
             .catch(error => {
                 console.log(error);

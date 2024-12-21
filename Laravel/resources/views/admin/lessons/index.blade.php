@@ -1,6 +1,6 @@
 <x-layout>
-    <section class="bg-gray-50 dark:bg-gray-900 py-10 mt-10">
-        <div class="container mx-auto px-4">
+<section class="bg-gray-50 dark:bg-gray-900 py-10 mt-10 lg:ml-[10rem] md:ml-44 sm:ml-10 flex items-center justify-start rtl:justify-end">
+<div class="container mx-auto px-4">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Lessons for {{ $course->course_name }}</h1>
                 <a href="{{ route('admin.lessons.create', $course->id) }}"
@@ -23,13 +23,13 @@
                             <p class="text-sm text-gray-700 dark:text-gray-300">{{ Str::limit($lesson->content, 100) }}</p>
 
                             {{-- عرض الفيديو --}}
-                            @if ($lesson->video_path)
-                                <p class="mt-2">
-                                    <button class="text-blue-500 view-video" data-video-url="{{ asset('storage/' . $lesson->video_path) }}">View Video</button>
-                                </p>
-                            @else
-                                <p class="text-sm text-gray-500 dark:text-gray-400">No video uploaded</p>
-                            @endif
+                          
+    @if ($lesson->video_path)
+        <a href="{{ Storage::url($lesson->video_path) }}" target="_blank" class="text-blue-500">Watch Video</a>
+    @else
+        <a href="{{ route('lessons.addVideo', $lesson->id) }}" class="text-blue-500">Add Video</a>
+    @endif
+</td>
 
                             {{-- عرض الصور --}}
                             @if ($lesson->images && is_string($lesson->images) && is_array(json_decode($lesson->images, true)))

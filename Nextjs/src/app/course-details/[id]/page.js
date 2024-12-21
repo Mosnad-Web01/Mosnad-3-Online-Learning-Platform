@@ -1,17 +1,15 @@
 "use client";
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { FaStar, FaArrowRight } from 'react-icons/fa';
 import { fetchCourseById, fetchCourses, createEnrollment } from '@/services/api';
 import ScrollableCourseList from '@/components/ScrollableCourseList';
 import Link from 'next/link';
-import Image from 'next/image'; 
-import { motion } from 'framer-motion'; 
-import api from '@/services/api';
-import { useUser } from '@/context/UserContext';
-import Cookies from "js-cookie"; 
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+import Cookies from 'js-cookie';
 import { ImPrevious } from 'react-icons/im';
-
 
 const CourseDetails = () => {
   const { id } = useParams();
@@ -20,98 +18,89 @@ const CourseDetails = () => {
   const [instructor, setInstructor] = useState(null);
   const [relatedCourses, setRelatedCourses] = useState([]);
   const [averageCourseRating, setAverageCourseRating] = useState(0);
-  const [isEnrolled, setIsEnrolled] = useState(false);  // حالة التسجيل
-  const [isProcessing, setIsProcessing] = useState(false); // للتأكد من عدم تكرار النقرات
-  const { user } = useUser(); // جلب بيانات المستخدم من الـ context
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [user, setUser] = useState(null);
 
+  // Fetch course details
   useEffect(() => {
-    const checkEnrollment = async (courseId) => {
-      try {
-        const response = await api.get('/payments', { params: { courseId } });
-        if (response.data && response.data.isEnrolled) {
-          return { isEnrolled: response.data.isEnrolled };
-        } else {
-          return { isEnrolled: false };
-        }
-      } catch (error) {
-        console.error('Error checking enrollment:', error);
-        return { isEnrolled: false };
-      }
-    };
-  
     const fetchCourseDetails = async () => {
       try {
         const response = await fetchCourseById(id);
-        if (response && response.data) {
+        if (response?.data) {
           const courseData = response.data;
-  
+
           setCourse(courseData);
           setInstructor(courseData.instructor);
-  
-          const courseRatings = courseData.ratings || [];
+
+          const ratings = courseData.ratings || [];
           const avgRating =
-            courseRatings.length === 0
-              ? 0
-              : courseRatings.reduce((total, rating) => total + rating.courseRating, 0) / courseRatings.length;
+            ratings.length > 0
+              ? ratings.reduce((total, r) => total + r.courseRating, 0) / ratings.length
+              : 0;
           setAverageCourseRating(avgRating);
-  
+
           const relatedResponse = await fetchCourses();
-          if (relatedResponse && relatedResponse.data) {
-            const allCourses = relatedResponse.data;
-            const related = allCourses.filter(c => c.category_id === courseData.category_id && c.id !== courseData.id);
-            setRelatedCourses(related);
-          }
-  
+          const allCourses = relatedResponse?.data || [];
+          const related = allCourses.filter(
+            (c) => c.category_id === courseData.category_id && c.id !== courseData.id
+          );
+          setRelatedCourses(related);
+
           // Check enrollment status
-          const enrollmentResponse = await checkEnrollment(courseData.id);
-          setIsEnrolled(enrollmentResponse.isEnrolled);
+          const enrollmentResponse = await api.get('/payments', { params: { courseId: courseData.id } });
+          setIsEnrolled(enrollmentResponse?.data?.isEnrolled || false);
         } else {
-          console.error('Error: No data in the response');
+          console.error('Error: Course data is missing.');
         }
       } catch (error) {
-        console.error("Error fetching course details:", error);
+        console.error('Error fetching course details:', error);
       }
     };
-  
-    fetchCourseDetails();
 
+    fetchCourseDetails();
   }, [id]);
+
   useEffect(() => {
-    // استرجاع بيانات المستخدم من الكوكيز
-    const userCookie = Cookies.get('user'); // استرجاع الكوكيز المحفوظة
+    const userCookie = Cookies.get('user');
     if (userCookie) {
       try {
-        const user = JSON.parse(userCookie); // تحليل بيانات المستخدم
-        setUser(user);
+        setUser(JSON.parse(userCookie));
       } catch (error) {
         console.error('Error parsing user cookie:', error);
       }
     }
   }, []);
-  console.log('user',user);
+
   const handleEnrollment = async () => {
-    if (isProcessing || isEnrolled) return; // Prevent repeated or unnecessary calls
+    if (isProcessing || isEnrolled) return;
     setIsProcessing(true);
+    setErrorMessage(null);
+
     try {
-      if (course.price == 0) {
+      if (course.price === 0) {
         const response = await createEnrollment({ courseId: course.id });
-        if (response.status === 200) setIsEnrolled(true);
+        if (response.status === 200) {
+          setIsEnrolled(true);
+        } else {
+          throw new Error('Failed to enroll in the course.');
+        }
       } else {
         router.push(`/payment/${course.id}`);
       }
     } catch (error) {
-      console.error('Error during enrollment:', error.response?.data || error.message);
+      setErrorMessage(error.response?.data?.message || 'An error occurred during enrollment.');
+      console.error('Error during enrollment:', error);
     } finally {
       setIsProcessing(false);
     }
   };
-  
-  
 
-  if (!course || !instructor) return <p>Course or instructor not found</p>;
+  if (!course || !instructor) return <p>Course or instructor not found.</p>;
 
   const ratingStars = Array.from({ length: 5 }, (_, index) => (
-    <FaStar key={index} className={`${index < averageCourseRating ? 'text-yellow-500' : 'text-gray-400'}`} />
+    <FaStar key={index} className={index < averageCourseRating ? 'text-yellow-500' : 'text-gray-400'} />
   ));
 
   return (
@@ -119,10 +108,9 @@ const CourseDetails = () => {
       className="bg-white dark:bg-gray-800 text-black dark:text-white min-h-screen py-8 px-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 1 }} 
+      transition={{ duration: 1 }}
     >
       <div className="w-full px-0 py-0">
-        {/* Course Details Section with Animation */}
         <motion.section
           className="bg-gray-100 dark:bg-gray-900 p-8 mt-0 rounded-lg shadow-lg"
           initial={{ opacity: 0, x: -100 }}
@@ -144,7 +132,6 @@ const CourseDetails = () => {
               <h1 className="text-3xl md:text-4xl font-bold mb-2">{course.course_name}</h1>
               <p className="text-md md:text-lg mb-4">Instructor: {instructor.name}</p>
               <p className="text-md md:text-lg mb-4">Start Date: {course.start_date}</p>
-              <p className="text-md md:text-lg mb-4">End Date: {course.end_date}</p>
               <p className="text-md md:text-lg mb-4">Language: {course.language}</p>
               <p className="text-md md:text-lg mb-4">Price: ${course.price}</p>
               <div className="flex items-center mt-4">
@@ -153,122 +140,39 @@ const CourseDetails = () => {
                   ({averageCourseRating ? averageCourseRating.toFixed(1) : '0.0'})
                 </span>
               </div>
-              {/* زر الالتحاق بالدورة */}
+
               <button
-                onClick={isEnrolled ? () => router.push(`/course-details/${course.id}/lessons`) : handleEnrollment}
-                className="mt-4 py-2 px-6 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                onClick={handleEnrollment}
+                disabled={isProcessing}
+                className={`mt-4 py-2 px-6 rounded-lg ${
+                  isEnrolled
+                    ? 'bg-green-500 text-white'
+                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                }`}
               >
-                {isEnrolled ? 'Go to Lessons' : 'Enroll Now'}
+                {isProcessing
+                  ? 'Processing...'
+                  : isEnrolled
+                  ? 'Go to Lessons'
+                  : 'Enroll Now'}
               </button>
 
+              {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
             </div>
           </div>
         </motion.section>
 
-
-        <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />
-
-        {/* Requirements Section with Animation */}
-        <motion.section
-          className="my-6 p-4 bg-white dark:bg-gray-800 text-black dark:text-white"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-        >
-          <h2 className="text-2xl font-semibold">Requirements</h2>
-          <ul className="list-disc ml-6">
-            {typeof course.requirements === 'string' && course.requirements.length > 0 ? (
-              <li className="text-sm mt-2">{course.requirements}</li>
-            ) : (
-              <li className="text-sm mt-2">No data available</li>
-            )}
-          </ul>
-        </motion.section>
-
-        <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />
-
-        {/* Learning Outcomes Section with Animation */}
-        <motion.section
-          className="my-6 p-4 bg-white dark:bg-gray-800 text-black dark:text-white"
-          initial={{ opacity: 0, x: 100 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.7 }}
-        >
-          <h2 className="text-2xl font-semibold">Learning Outcomes</h2>
-          <ul className="list-disc ml-6">
-            {typeof course.learning_outcomes === 'string' && course.learning_outcomes.length > 0 ? (
-              <li className="text-sm mt-2">{course.learning_outcomes}</li>
-            ) : (
-              <li className="text-sm mt-2">No data available</li>
-            )}
-          </ul>
-        </motion.section>
-
-        <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />
-
-        {/* Course Content Section with Animation */}
-        <motion.section
-          className="my-6 p-4 bg-white dark:bg-gray-800 text-black dark:text-white"
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-        >
-          <h2 className="text-2xl font-semibold">Course Content</h2>
-          <p className="text-sm mt-2">{course.description}</p>
-        </motion.section>
-
-        <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />
-
-       {/* Lessons Section with Go to button and Animation */}
-       {isEnrolled ? (
-  <motion.section
-    className="my-6 p-4 bg-white dark:bg-gray-800 text-black dark:text-white"
-    initial={{ opacity: 0, scale: 0.9 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ duration: 0.7 }}
-  >
-    <h2 className="text-2xl font-semibold">Lessons</h2>
-    <div className="mt-4">
-      <Link href={`/course-details/${course.id}/lessons`} passHref>
-        <button className="flex items-center text-blue-500 hover:text-blue-700">
-          <span>Go to Lessons</span>
-          <FaArrowRight className="ml-2" />
-        </button>
-      </Link>
-    </div>
-  </motion.section>
-) : (
-  <motion.section
-    className="my-6 p-4 bg-white dark:bg-gray-800 text-black dark:text-white"
-    initial={{ opacity: 0, scale: 0.9 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ duration: 0.7 }}
-  >
-    <h2 className="text-2xl font-semibold">Lessons</h2>
-    <p>You need to enroll in this course to access its content.</p>
-  </motion.section>
-)}
-
-
-
-        <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />
-
-        {/* Related Courses Section with Animation */}
-        <motion.section
-          className="my-6 p-4 bg-white dark:bg-gray-800 text-black dark:text-white"
-          initial={{ opacity: 0, x: -100 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.7 }}
-        >
+        <motion.section className="mt-6">
           <h2 className="text-2xl font-semibold">Related Courses</h2>
           {relatedCourses.length > 0 ? (
             <ScrollableCourseList courses={relatedCourses} />
           ) : (
-            <p>No related courses available</p>
+            <p>No related courses available.</p>
           )}
         </motion.section>
       </div>
     </motion.div>
   );
 };
+
 export default CourseDetails;

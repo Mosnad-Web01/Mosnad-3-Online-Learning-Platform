@@ -14,7 +14,7 @@ public function index()
 {
     
     // استخدام Auth::user() بدلاً من auth()->user()
-    $courses = Course::where('instructor_id', Auth::user()->id)->get();
+    $courses = Course::where('instructor_id', Auth::user()->id)->paginate(10);
 
     return view('instructor.courses.index', compact('courses'));
 }

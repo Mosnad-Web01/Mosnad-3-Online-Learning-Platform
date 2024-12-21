@@ -49,3 +49,18 @@ href="/"
     <!-- ربط ملف JavaScript -->
     @vite('resources/js/login.js')
 </x-base>
+
+<script>
+    // Theme Toggle Logic
+
+    // Check localStorage for saved theme
+    if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+
+    
+
+   
+</script>
