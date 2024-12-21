@@ -76,8 +76,6 @@ const CourseDetails = () => {
     fetchCourseDetails();
 
   }, [id]);
-  
-  
   useEffect(() => {
     // استرجاع بيانات المستخدم من الكوكيز
     const userCookie = Cookies.get('user'); // استرجاع الكوكيز المحفوظة

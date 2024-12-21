@@ -1,6 +1,6 @@
 <x-layout>
-    <div class="lg:ml-[4rem] mt-16 lg:mt-0 flex-grow w-full bg-gray-100 dark:bg-gray-900">
-        <section class="bg-gray-50 dark:bg-gray-900 py-10 mt-10 ml-[6rem] flex items-center justify-start rtl:justify-end">
+    <main class="bg-white dark:bg-gray-900 text-black dark:text-white min-h-screen w-full">
+        <div class="bg-gray-50 dark:bg-gray-900 py-10 mt-10  flex items-center justify-start rtl:justify-end">
             <div class="container flex-grow mx-auto px-4">
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-8">Manage All Instructors and Their Students</h1>
 
@@ -45,7 +45,7 @@
                                                 <td class="px-4 py-2">{{ $student->pivot->progress }}%</td>
                                                 <td class="px-4 py-3">
                                                 <!-- زر للانتقال إلى صفحة تفاصيل الدورة -->
-                                                <a href="{{ route('progress.course', ['courseId' => $course->id, 'studentId' => $student->id]) }}" 
+                                                <a href="{{ route('progress.course', ['courseId' => $course->id, 'studentId' => $student->id]) }}"
                                                 class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">View Details</a>
                                             </td>
                                             </tr>
@@ -57,6 +57,6 @@
                     </div>
                 @endforeach
             </div>
-        </section>
-    </div>
+        </div>
+    </main>
 </x-layout>

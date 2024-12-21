@@ -6,7 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\Enrollment;
 use App\Models\CourseUser;
 use App\Models\Course;
+use App\Models\Lesson;
+use App\Models\LessonCompletion;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
 
 class EnrollmentController extends Controller
 {
@@ -46,8 +50,6 @@ class EnrollmentController extends Controller
                 return response()->json(['message' => 'Payment required for this course'], 403);
             }
         }
-
-
         // تسجيل الطالب
         $enrollment = Enrollment::create([
             'student_id' => $userId,
@@ -113,4 +115,78 @@ class EnrollmentController extends Controller
 
         return response()->json(['enrollment' => $enrollment], 200);
     }
+    public function handleEnrollment($courseId)
+    {
+        $userId = 7; // تعيين معرف الطالب إلى 7 للتجربة
+
+        // التحقق من وجود الدورة
+        $course = Course::findOrFail($courseId);
+
+        // التحقق إذا كان الطالب مسجلاً بالفعل
+        if ($this->isStudentEnrolled($userId, $courseId)) {
+            return redirect()->route('course.lessons', ['courseId' => $courseId]);
+        }
+
+        // إذا لم يكن مسجلاً، تحقق من سعر الدورة
+        if ($course->price == 0) {
+            // تسجيل الطالب تلقائياً إذا كانت الدورة مجانية
+            Enrollment::create([
+                'student_id' => $userId,
+                'course_id' => $courseId,
+            ]);
+
+            return redirect()->route('course.lessons', ['courseId' => $courseId]);
+        }
+
+        // إذا كانت الدورة مدفوعة
+        return redirect()->route('payment.page', ['courseId' => $courseId]);
+    }
+
+    public function completeLesson(Request $request, $courseId, $lessonId)
+    {
+        $userId = Auth::id();
+
+        // تسجيل العملية في السجل
+        Log::info('Updating progress for lesson ID: ' . $lessonId);
+
+        // التحقق من تسجيل الطالب في الدورة
+        $enrollment = Enrollment::where('student_id', $userId)
+            ->where('course_id', $courseId)
+            ->firstOrFail();
+
+        // التحقق إذا كان الطالب قد أكمل الدرس بالفعل
+        $existingCompletion = LessonCompletion::where('enrollment_id', $enrollment->id)
+            ->where('lesson_id', $lessonId)
+            ->first();
+
+        if (!$existingCompletion) {
+            // إذا لم يكن قد أكمل الدرس من قبل، نقوم بإضافته إلى الجدول
+            LessonCompletion::create([
+                'enrollment_id' => $enrollment->id,
+                'lesson_id' => $lessonId,
+            ]);
+        }
+
+        // تحديث تقدم الطالب
+        $completedLessonsCount = LessonCompletion::where('enrollment_id', $enrollment->id)->count();
+        $totalLessonsCount = Lesson::where('course_id', $courseId)->count();
+
+        $progress = ($completedLessonsCount / $totalLessonsCount) * 100;
+        $enrollment->progress = $progress;
+
+        // إذا اكتملت الدورة، تسجيل تاريخ الإتمام
+        if ($progress == 100 && !$enrollment->completion_date) {
+            $enrollment->completion_date = now();
+        }
+
+        $enrollment->save();
+
+        // إرجاع التقدم الحالي
+        return response()->json(['message' => 'Lesson completed and progress updated', 'progress' => $progress], 200);
+    }
+
+
+
+
+
 }

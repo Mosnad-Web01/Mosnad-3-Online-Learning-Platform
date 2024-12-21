@@ -9,7 +9,7 @@ class LessonCompletionController extends Controller
 {
     public function index()
     {
-        return LessonCompletion::with(['enrollment', 'lesson'])->get();
+        return LessonCompletionController::with(['enrollment', 'lesson'])->get();
     }
 
     public function store(Request $request)
@@ -19,10 +19,10 @@ class LessonCompletionController extends Controller
             'lesson_id' => 'required|exists:lessons,id',
         ]);
 
-        return LessonCompletion::create($validated);
+        return LessonCompletionController::create($validated);
     }
 
-    public function destroy(LessonCompletion $lessonCompletion)
+    public function destroy(LessonCompletionController $lessonCompletion)
     {
         $lessonCompletion->delete();
         return response()->noContent();
