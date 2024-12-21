@@ -48,7 +48,7 @@ Route::middleware('web')->group(function () {
 
     // المسار الرئيسي للصفحة الرئيسية
     Route::get('/', [HomeController::class, 'home'])->name('home');
-    //  Route::get('/', [CourseController::class, 'home'])->name('home');
+    // Route::get('/', [CourseController::class, 'home'])->name('home');
 
     // مسارات تسجيل الدخول والخروج
     Route::get('/login', [WebAuthController::class, 'showLoginForm'])->name('login');

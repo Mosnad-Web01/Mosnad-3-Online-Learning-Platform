@@ -14,23 +14,28 @@
                 <h2 class="text-xl font-bold mb-4">Lessons List</h2>
                 <ul class="list-none space-y-4" id="lessons-list">
                     @forelse ($lessons as $lesson)
-                    <li class="lesson-item cursor-pointer p-3 bg-white dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg shadow-md transition duration-300"
-                    data-lesson="{{ json_encode($lesson) }}">
-                    <div class="flex items-center">
-                        <i class="fas fa-play-circle text-xl text-purple-600 dark:text-purple-400 mr-3"></i>
-                        <span class="text-lg font-medium">{{ $lesson->title }}</span>
-                        <!-- أيقونة إكمال الدرس -->
-                        <button
-                        class="ml-auto complete-lesson-btn"
-                        data-lesson-id="{{ $lesson->id }}"
-                        data-completed="{{ $lesson->completed }}">
-                        <i class="fas fa-check-circle" style="color: {{ $lesson->completed ? 'green' : 'gray' }};"></i>
-                    </button>
+                        <li class="lesson-item cursor-pointer p-3 bg-white dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg shadow-md transition duration-300"
+                            data-lesson='@json($lesson)'>
+                            <div class="flex items-center">
+                                <i class="fas fa-play-circle text-xl text-purple-600 dark:text-purple-400 mr-3"></i>
+                               <span class="text-lg font-medium">{{ $lesson->title }}</span>
+                                <form action="{{ route('lesson.submit', ['courseId' => $course->id, 'lessonId' => $lesson->id]) }}" method="POST" class="ml-auto">
+                                    @csrf
+                                    <button type="submit" class="text-purple-600 dark:text-purple-400">
+                                        <i class="fas fa-play-circle"></i> Start
+                                    </button>
+                                </form>
 
-
-                    </div>
-                </li>
-
+                                @if ($lesson->completed)
+                                    <form action="{{ route('lesson.complete', ['courseId' => $course->id, 'lessonId' => $lesson->id]) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="text-green-600">
+                                            <i class="fas fa-check-circle"></i> Completed
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </li>
                     @empty
                         <p>No lessons available for this course.</p>
                     @endforelse
@@ -41,17 +46,53 @@
             <section class="col-span-8 bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4" id="lesson-details">
                 <h2 class="text-2xl font-bold mb-4">Select a lesson to view details</h2>
                 <div id="lesson-content" class="hidden">
-                    <!-- يتم عرض محتوى الدرس هنا -->
+                    <h2 class="text-xl font-bold" id="lesson-title"></h2>
+                    <p class="text-gray-700 dark:text-gray-300 mb-4" id="lesson-description"></p>
+
+                    <div id="lesson-video" class="hidden">
+                        <video controls class="w-full mb-4" id="lesson-video-element">
+                            <source src="" type="video/mp4">
+                        </video>
+                    </div>
                 </div>
             </section>
         </div>
     </main>
- </x-homelayout>
+</x-homelayout>
 
-    <!-- إضافة مكتبة SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- إضافة مكتبة SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const lessonsList = document.querySelectorAll('.lesson-item');
+        const lessonContentContainer = document.getElementById('lesson-content');
+        const lessonTitleElement = document.getElementById('lesson-title');
+        const lessonDescriptionElement = document.getElementById('lesson-description');
+        const lessonVideoElement = document.getElementById('lesson-video');
+        const lessonVideoSource = document.getElementById('lesson-video-element');
+
+        lessonsList.forEach(lessonItem => {
+            lessonItem.addEventListener('click', () => {
+                const lesson = JSON.parse(lessonItem.getAttribute('data-lesson'));
+
+                // تحديث محتوى الدرس
+                lessonTitleElement.textContent = lesson.title;
+                lessonDescriptionElement.textContent = lesson.content || 'No content available';
+
+                if (lesson.video_url) {
+                    lessonVideoElement.classList.remove('hidden');
+                    lessonVideoSource.src = lesson.video_url;
+                    lessonVideoElement.classList.remove('hidden');
+                } else {
+                    lessonVideoElement.classList.add('hidden');
+                }
+
+                lessonContentContainer.classList.remove('hidden');
+            });
+        });
+    });
+
         document.addEventListener('DOMContentLoaded', () => {
             const lessonsList = document.querySelectorAll('.lesson-item');
             const lessonContentContainer = document.getElementById('lesson-content');

@@ -7,7 +7,7 @@ use App\Models\Enrollment;
 use App\Models\CourseUser;
 use App\Models\Course;
 use App\Models\Lesson;
-use App\Models\LessonCompletion;
+ use App\Models\LessonProgress;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -154,20 +154,20 @@ class EnrollmentController extends Controller
             ->firstOrFail();
 
         // التحقق إذا كان الطالب قد أكمل الدرس بالفعل
-        $existingCompletion = LessonCompletion::where('enrollment_id', $enrollment->id)
+        $existingCompletion = LessonProgress::where('enrollment_id', $enrollment->id)
             ->where('lesson_id', $lessonId)
             ->first();
 
         if (!$existingCompletion) {
             // إذا لم يكن قد أكمل الدرس من قبل، نقوم بإضافته إلى الجدول
-            LessonCompletion::create([
+            LessonProgress::create([
                 'enrollment_id' => $enrollment->id,
                 'lesson_id' => $lessonId,
             ]);
         }
 
         // تحديث تقدم الطالب
-        $completedLessonsCount = LessonCompletion::where('enrollment_id', $enrollment->id)->count();
+        $completedLessonsCount = LessonProgress::where('enrollment_id', $enrollment->id)->count();
         $totalLessonsCount = Lesson::where('course_id', $courseId)->count();
 
         $progress = ($completedLessonsCount / $totalLessonsCount) * 100;

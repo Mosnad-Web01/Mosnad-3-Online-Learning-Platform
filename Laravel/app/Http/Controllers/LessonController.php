@@ -158,7 +158,7 @@ class LessonController extends Controller
                 ? array_map(fn($path) => asset('storage/' . str_replace('public/', '', $path)), $lesson->files)
                 : [];
         }
-    
+
         return view('lessons.index', compact('lessons', 'courseId', 'course'));
     }
     

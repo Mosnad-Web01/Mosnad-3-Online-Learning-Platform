@@ -69,11 +69,13 @@ $sidebarLinks = [
                     @endphp
 
                     <!-- User Dropdown Menu -->
+                     
                     <div class="relative">
                         <button type="button" class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" aria-expanded="false" data-dropdown-toggle="dropdown-user">
                             <span class="sr-only text-gray-900 dark:text-white">Open user menu</span>
                             <img class="w-8 h-8 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="user photo">
                         </button>
+                        
                         <div id="dropdown-user" class="hidden z-10 w-44 bg-white rounded shadow dark:bg-gray-700">
                             <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdown-button">
                                 <li>
