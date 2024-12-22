@@ -7,7 +7,7 @@ use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\Enrollment;
 use App\Models\CourseCategory;
-use App\Models\LessonCompletion;
+use App\Models\LessonProgress;
 use Illuminate\Support\Facades\Auth;
 
 class StudentCourseController extends Controller
@@ -39,7 +39,7 @@ class StudentCourseController extends Controller
         // الحصول على الدورة والدروس المرتبطة بها
         $course = Course::with('lessons')->findOrFail($courseId);
         $lessons = $course->lessons;
-        $completedLessons = LessonCompletion::where('enrollment_id', $enrollment->id)
+        $completedLessons = LessonProgress::where('enrollment_id', $enrollment->id)
             ->pluck('lesson_id')->toArray();
 
         return view('student.courses.show', compact('course', 'lessons', 'completedLessons'));
@@ -74,20 +74,20 @@ class StudentCourseController extends Controller
             ->firstOrFail();
 
         // التحقق إذا كان الطالب قد أكمل الدرس بالفعل
-        $existingCompletion = LessonCompletion::where('enrollment_id', $enrollment->id)
+        $existingCompletion = LessonProgress::where('enrollment_id', $enrollment->id)
             ->where('lesson_id', $lessonId)
             ->first();
 
         if (!$existingCompletion) {
             // إضافة إتمام الدرس إلى الجدول
-            LessonCompletion::create([
+            LessonProgress::create([
                 'enrollment_id' => $enrollment->id,
                 'lesson_id' => $lessonId,
             ]);
         }
 
         // تحديث التقدم
-        $completedLessonsCount = LessonCompletion::where('enrollment_id', $enrollment->id)->count();
+        $completedLessonsCount = LessonProgress::where('enrollment_id', $enrollment->id)->count();
         $totalLessonsCount = Lesson::where('course_id', $courseId)->count();
 
         $progress = ($completedLessonsCount / $totalLessonsCount) * 100;

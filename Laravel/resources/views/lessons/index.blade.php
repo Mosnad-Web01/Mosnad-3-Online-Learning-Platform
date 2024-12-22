@@ -1,4 +1,4 @@
-<x-layout>
+<x-homelayout>
     <main class="bg-white dark:bg-gray-900 text-black dark:text-white min-h-screen w-full">
         <div class="w-full px-4 py-8 grid grid-cols-12 gap-4 mt-8">
             <!-- عمود القائمة -->
@@ -46,6 +46,7 @@
             </section>
         </div>
     </main>
+ </x-homelayout>
 
     <!-- إضافة مكتبة SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -217,4 +218,3 @@ lessonsList.forEach(lessonItem => {
             }
         });
     </script>
-</x-layout>

@@ -1,4 +1,5 @@
-<x-layout>
+<x-homelayout>
+
     <main class="bg-white dark:bg-gray-900 text-black dark:text-white min-h-screen w-full">
         <div class="flex flex-col min-h-screen mt-4">
             <div class="container mx-auto px-4 flex-grow">
@@ -137,4 +138,5 @@
             </div>
         </div>
     </main>
-</x-layout>
+</x-homelayout>
+

@@ -18,8 +18,11 @@ class Enrollment extends Model
         'progress',
     ];
     
-    // العلاقة مع الطالب
-    
+    public function lessonProgress()
+    {
+        return $this->hasMany(LessonProgress::class);
+    }
+        
     public function course()
     {
         return $this->belongsTo(Course::class);

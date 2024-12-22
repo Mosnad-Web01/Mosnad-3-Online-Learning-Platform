@@ -72,5 +72,10 @@ class Course extends Model
     {
         return $this->hasMany(Review::class);
     }
-
+    public function updateAverageRating()
+    {
+        $this->average_rating = $this->reviews()->avg('course_rating') ?? 0;
+        $this->save();
+    }
+    
 }

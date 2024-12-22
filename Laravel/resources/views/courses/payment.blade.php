@@ -1,4 +1,4 @@
-<x-layout>
+<x-homelayout>
     <main class="bg-white dark:bg-gray-900 text-black dark:text-white min-h-screen w-full flex justify-center items-center">
         <div class="w-full p-6 bg-gray-100 dark:bg-gray-800 rounded-t-lg shadow-lg mt-8">
             <h1 class="text-2xl font-bold text-center mb-4">Payment for {{ $course->course_name }}</h1>
@@ -61,4 +61,4 @@
             </form>
         </div>
     </main>
-</x-layout>
+</x-homelayout>

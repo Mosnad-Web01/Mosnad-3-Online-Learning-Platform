@@ -1,5 +1,5 @@
 <x-layout>
-<div class="lg:ml-[4rem] mt-16 lg:mt-0 flex-grow w-full bg-gray-100 dark:bg-gray-900">
+<div class="lg:ml-0 mt-4 lg:mt-0 flex-grow w-full bg-gray-100 dark:bg-gray-900">
 
     <section class="bg-gray-50 dark:bg-gray-900 py-10 mt-10 ml-[6rem] flex items-center justify-start rtl:justify-end">
     <div class="flex items-center justify-start rtl:justify-end">
@@ -26,10 +26,29 @@
                         Manage Courses
                     </a>
                 </div>
+                 <!-- Actions -->
+                <!-- Course Management -->
+                <div class="bg-gray-100 p-6 rounded-lg shadow-md hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Course Management</h3>
+                    <p class="mt-2 text-gray-600 dark:text-gray-400">
+                        Create, edit, and manage your courses.
+                    </p>
+                    <a href="{{ route('instructor.courses.index') }}" class="mt-4 inline-block text-primary-600 dark:text-primary-500 hover:underline">
+                        Manage Courses
+                    </a>
+                </div>
+                <div class="bg-gray-100 p-6 rounded-lg shadow-md hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Course Management</h3>
+                    <p class="mt-2 text-gray-600 dark:text-gray-400">
+                        Create, edit, and manage your courses.
+                    </p>
+                    <a href="{{ route('instructor.courses.index') }}" class="mt-4 inline-block text-primary-600 dark:text-primary-500 hover:underline">
+                        Manage Courses
+                    </a>
+                </div>
 
 
-
-            </div>
+            
         </div>
     </section>
 </x-layout>

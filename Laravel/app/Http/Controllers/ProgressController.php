@@ -128,10 +128,9 @@ class ProgressController extends Controller
             $query->where('course_id', $courseId)
                   ->where('student_id', $studentId);  // تغيير user_id إلى student_id أو العمود الصحيح
         })
-        ->whereBetween('completed_at', [$startDate, $endDate])
+        ->whereNotNull('completed_at') 
         ->selectRaw('lesson_progress.*, TIMESTAMPDIFF(SECOND, created_at, completed_at) as total_duration_seconds')
         ->paginate(10);
-
     // إرجاع البيانات
     return compact('lessonProgress', 'courseId', 'startDate', 'endDate');
 }

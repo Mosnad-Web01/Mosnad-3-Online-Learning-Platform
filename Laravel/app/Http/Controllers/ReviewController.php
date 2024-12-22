@@ -128,7 +128,6 @@ public function getReviewsByInstructor($instructorId)
 
     return response()->json($reviews, 200);
 }
-
     /**
      * عرض جميع التقييمات المرتبطة بطالب معين.
      */
@@ -145,24 +144,32 @@ public function getReviewsByInstructor($instructorId)
         return response()->json($reviews, 200);
     }
 
-    /**
-     * عرض أفضل التقييمات.
-     */
-    public function getTopReviews(Request $request)
+
+    public function getTopReviews()
     {
-        $limit = $request->query('limit', 10); // تحديد عدد التقييمات (افتراضي: 10)
-        $reviews = Review::with(['course', 'instructor', 'student'])
-            ->orderBy('course_rating', 'desc') // ترتيب بناءً على تقييم الكورس
-            ->orderBy('instructor_rating', 'desc') // ترتيب ثانوي بناءً على تقييم الأستاذ
-            ->limit($limit)
+        $reviews = Review::with('student', 'course')
+            ->orderBy('course_rating', 'desc') 
+            ->limit(3) 
             ->get();
 
-        if ($reviews->isEmpty()) {
-            return response()->json(['message' => 'No top reviews found'], 404);
-        }
-
-        return response()->json($reviews, 200);
+        return view('reviews.index', compact('reviews'));
     }
+
+    // public function getTopReviews(Request $request)
+    // {
+    //     $limit = $request->query('limit', 10); // تحديد عدد التقييمات (افتراضي: 10)
+    //     $reviews = Review::with(['course', 'instructor', 'student'])
+    //         ->orderBy('course_rating', 'desc') // ترتيب بناءً على تقييم الكورس
+    //         ->orderBy('instructor_rating', 'desc') // ترتيب ثانوي بناءً على تقييم الأستاذ
+    //         ->limit($limit)
+    //         ->get();
+
+    //     if ($reviews->isEmpty()) {
+    //         return response()->json(['message' => 'No top reviews found'], 404);
+    //     }
+
+    //     return response()->json($reviews, 200);
+    // }
 
     /**
      * عرض التقييمات ضمن نطاق زمني.
@@ -177,7 +184,6 @@ public function getReviewsByInstructor($instructorId)
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-
         $reviews = Review::with(['course', 'instructor', 'student'])
             ->whereBetween('created_at', [$request->start_date, $request->end_date])
             ->get();

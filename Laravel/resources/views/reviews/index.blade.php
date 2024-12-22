@@ -1,5 +1,5 @@
 <x-layout>
-    <div class="lg:ml-[4rem] mt-16 lg:mt-0 flex-grow w-full bg-gray-100 dark:bg-gray-900">
+    <div class=" lg:mt-0 flex-grow w-full bg-gray-100 dark:bg-gray-900">
         <section class="bg-gray-50 dark:bg-gray-900 py-10 mt-10 ml-[6rem] flex items-center justify-start rtl:justify-end">
             <div class="min-h-screen flex flex-col w-full">
                 <div class="container flex-grow mx-auto px-4">

@@ -61,5 +61,17 @@ class Review extends Model
 }
 
 
+protected static function booted()
+{
+    static::saved(function ($review) {
+        $review->course->updateAverageRating();
+        $review->instructor->updateAverageRating();
+    });
+
+    static::deleted(function ($review) {
+        $review->course->updateAverageRating();
+        $review->instructor->updateAverageRating();
+    });
+}
     
 }

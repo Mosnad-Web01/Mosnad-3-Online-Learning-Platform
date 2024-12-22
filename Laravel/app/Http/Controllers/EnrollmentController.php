@@ -7,7 +7,7 @@ use App\Models\Enrollment;
 use App\Models\CourseUser;
 use App\Models\Course;
 use App\Models\Lesson;
-use App\Models\LessonCompletion;
+ use App\Models\LessonProgress;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -117,11 +117,10 @@ class EnrollmentController extends Controller
     }
     public function handleEnrollment($courseId)
     {
-        $userId = 7; // تعيين معرف الطالب إلى 7 للتجربة
-
+        // $userId = 7; // تعيين معرف الطالب إلى 7 للتجربة
+        $userId = Auth::id();
         // التحقق من وجود الدورة
         $course = Course::findOrFail($courseId);
-
         // التحقق إذا كان الطالب مسجلاً بالفعل
         if ($this->isStudentEnrolled($userId, $courseId)) {
             return redirect()->route('course.lessons', ['courseId' => $courseId]);
@@ -141,34 +140,39 @@ class EnrollmentController extends Controller
         // إذا كانت الدورة مدفوعة
         return redirect()->route('payment.page', ['courseId' => $courseId]);
     }
-
     public function completeLesson(Request $request, $courseId, $lessonId)
     {
         $userId = Auth::id();
-
+    
         // تسجيل العملية في السجل
         Log::info('Updating progress for lesson ID: ' . $lessonId);
-
+    
         // التحقق من تسجيل الطالب في الدورة
         $enrollment = Enrollment::where('student_id', $userId)
             ->where('course_id', $courseId)
             ->firstOrFail();
-
+    
         // التحقق إذا كان الطالب قد أكمل الدرس بالفعل
-        $existingCompletion = LessonCompletion::where('enrollment_id', $enrollment->id)
+        $existingCompletion = LessonProgress::where('enrollment_id', $enrollment->id)
             ->where('lesson_id', $lessonId)
             ->first();
-
+    
         if (!$existingCompletion) {
             // إذا لم يكن قد أكمل الدرس من قبل، نقوم بإضافته إلى الجدول
-            LessonCompletion::create([
+            LessonProgress::create([
                 'enrollment_id' => $enrollment->id,
                 'lesson_id' => $lessonId,
+                'completed_at' => now(),
             ]);
         }
-
+    
+        return response()->json([
+            'message' => 'Lesson marked as completed successfully.',
+        ]);
+    
+    
         // تحديث تقدم الطالب
-        $completedLessonsCount = LessonCompletion::where('enrollment_id', $enrollment->id)->count();
+        $completedLessonsCount = LessonProgress::where('enrollment_id', $enrollment->id)->count();
         $totalLessonsCount = Lesson::where('course_id', $courseId)->count();
 
         $progress = ($completedLessonsCount / $totalLessonsCount) * 100;

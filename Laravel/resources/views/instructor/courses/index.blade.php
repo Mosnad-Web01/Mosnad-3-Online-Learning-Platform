@@ -16,9 +16,9 @@
     ];
 @endphp
 <x-layout>
-<div class="lg:ml-[4rem] :ml-10 mt-16 flex-grow w-full bg-gray-100 dark:bg-gray-900">
+<div class=" flex-grow w-full bg-gray-100 dark:bg-gray-900">
 
-        <section class="bg-gray-50 dark:bg-gray-900 py-10 mt-10 lg:ml-[6rem] md:ml-44 sm:ml-10 flex items-center justify-start rtl:justify-end">
+        <section class="bg-gray-50 dark:bg-gray-900 py-10 mt-10 lg:ml-[2rem] md:ml-44 sm:ml-10 flex items-center justify-start rtl:justify-end">
             <div class="flex items-center justify-start rtl:justify-end">
                 <div class="min-h-screen flex flex-col">
 

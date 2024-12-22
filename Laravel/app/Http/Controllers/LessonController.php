@@ -145,32 +145,40 @@ class LessonController extends Controller
     {
         $lessons = Lesson::where('course_id', $courseId)->get();
         $course = Course::findOrFail($courseId);
-
-
+    
         foreach ($lessons as $lesson) {
             if ($lesson->video_url) {
                 $lesson->video_url = asset('storage/' . str_replace('public/', '', $lesson->video_url));
             }
-            $lesson->images = $lesson->images ? array_map(fn($path) => asset('storage/' . str_replace('public/', '', $path)), json_decode($lesson->images)) : [];
-            $lesson->files = $lesson->files ? array_map(fn($path) => asset('storage/' . str_replace('public/', '', $path)), json_decode($lesson->files)) : [];
+            // Directly map over arrays without decoding
+            $lesson->images = $lesson->images
+                ? array_map(fn($path) => asset('storage/' . str_replace('public/', '', $path)), $lesson->images)
+                : [];
+            $lesson->files = $lesson->files
+                ? array_map(fn($path) => asset('storage/' . str_replace('public/', '', $path)), $lesson->files)
+                : [];
         }
 
         return view('lessons.index', compact('lessons', 'courseId', 'course'));
     }
-
-
-public function show($courseId, $lessonId)
-{
-    $lesson = Lesson::where('course_id', $courseId)->findOrFail($lessonId);
-
-    if ($lesson->video_url) {
-        $lesson->video_url = asset('storage/' . $lesson->video_url);
+    
+    public function show($courseId, $lessonId)
+    {
+        $lesson = Lesson::where('course_id', $courseId)->findOrFail($lessonId);
+    
+        if ($lesson->video_url) {
+            $lesson->video_url = asset('storage/' . str_replace('public/', '', $lesson->video_url));
+        }
+        $lesson->images = $lesson->images
+            ? array_map(fn($path) => asset('storage/' . str_replace('public/', '', $path)), $lesson->images)
+            : [];
+        $lesson->files = $lesson->files
+            ? array_map(fn($path) => asset('storage/' . str_replace('public/', '', $path)), $lesson->files)
+            : [];
+    
+        return response()->json($lesson, Response::HTTP_OK);
     }
-    $lesson->images = $lesson->images ? array_map(fn($path) => asset('storage/' . $path), json_decode($lesson->images)) : [];
-    $lesson->files = $lesson->files ? array_map(fn($path) => asset('storage/' . $path), json_decode($lesson->files)) : [];
-
-    return response()->json($lesson, Response::HTTP_OK);
-}
+    
 
 
 }

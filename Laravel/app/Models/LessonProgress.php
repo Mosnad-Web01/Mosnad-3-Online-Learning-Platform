@@ -32,8 +32,19 @@ public function user()
     }
 
     // العلاقة مع نموذج Lesson
+ 
+    public function showLesson($courseId, $lessonId)
+    {
+        // جلب الدورة والدرس
+        $course = Course::find($courseId);
+        $lesson = Lesson::find($lessonId);
+        
+        return view('lesson.show', compact('course', 'lesson'));
+    }
     public function lesson()
     {
         return $this->belongsTo(Lesson::class);
     }
+    
 }
+
