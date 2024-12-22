@@ -2,7 +2,7 @@
     <div class="container mx-auto">
         <div class="flex flex-col items-center justify-center space-y-4 sm:space-y-0 sm:flex-row sm:justify-between">
             <span class="text-sm text-gray-500 text-center sm:text-base dark:text-gray-400">
-                © {{ now()->year }} 
+                © {{ now()->year }}
                 <a href="/" class="hover:underline">
                     {{ config('app.name', 'TutorNet') }}
                 </a>. All Rights Reserved.

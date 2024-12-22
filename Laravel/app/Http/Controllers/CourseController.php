@@ -115,21 +115,21 @@ class CourseController extends Controller
 
 
     public function index(Request $request)
- {
+    {
+        // جلب جميع الكورسات مع العلاقات المرتبطة
+        $courses = Course::with(['category', 'instructor', 'lessons'])->get();
 
-    // جلب جميع الكورسات مع العلاقات المرتبطة
-    $courses = Course::with(['category', 'instructor', 'lessons'])->get();
-
-    // إضافة رابط للصورة لكل دورة إذا كانت موجودة
-    foreach ($courses as $course) {
-        if ($course->image) {
-            $course->image_url = asset('storage/' . $course->image);
+        // إضافة رابط للصورة لكل دورة إذا كانت موجودة
+        foreach ($courses as $course) {
+            if ($course->image) {
+                $course->image_url = asset('storage/' . $course->image);
+            }
         }
+
+        // إعادة العرض مع البيانات
+        return view('courses.index', compact('courses'));
     }
 
-    // إعادة الكورسات في استجابة JSON
-    return response()->json($courses, Response::HTTP_OK);
-}
 
 
 
@@ -137,17 +137,19 @@ class CourseController extends Controller
      * Display the specified course.
      */
     public function show($id)
-    {
-        $course = Course::with(['category', 'instructor', 'lessons'])->find($id);
-        if ($course) {
-            if ($course->image) {
-                $course->image_url = asset('storage/' . $course->image);
-            }
+{
+    // جلب الدورة مع الفئة، المدرب، والدروس
+    $course = Course::with(['category', 'instructor', 'lessons'])->findOrFail($id);
 
-            return response()->json($course, Response::HTTP_OK);
-        }
-        return response()->json(['message' => 'Course not found'], Response::HTTP_NOT_FOUND);
+    // إضافة رابط الصورة إذا كانت موجودة
+    if ($course->image) {
+        $course->image_url = asset('storage/' . $course->image);
     }
+
+    // إعادة العرض مع البيانات
+    return view('courses.show', compact('course'));
+}
+
     public function home()
     {
         $courses = Course::latest()->take(6)->get();
