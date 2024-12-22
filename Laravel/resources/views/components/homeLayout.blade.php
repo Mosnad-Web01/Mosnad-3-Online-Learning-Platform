@@ -1,6 +1,5 @@
 <x-base>
     <x-bar />
     {{ $slot }}
-    <x-footer />
-    </footer>
+    <x-footer2/>
 </x-base>

@@ -19,9 +19,9 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             @foreach($topCourses as $course)
                                 <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
-                                    <img 
-                                        src="{{ $course->image ? asset('storage/' . $course->image) : 'https://via.placeholder.com/300x200' }}" 
-                                        alt="{{ $course->course_name }}" 
+                                    <img
+                                        src="{{ $course->image ? asset('storage/' . $course->image) : 'https://via.placeholder.com/300x200' }}"
+                                        alt="{{ $course->course_name }}"
                                         class="w-full h-40 object-cover"
                                     >
                                     <div class="p-4">
@@ -53,9 +53,9 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             @foreach($topInstructors as $instructor)
                                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition">
-                                    <img 
-                                        src="{{ $instructor->profile_picture ?? 'https://via.placeholder.com/100' }}" 
-                                        alt="{{ $instructor->name }}" 
+                                    <img
+                                        src="{{ $instructor->profile_picture ?? 'https://via.placeholder.com/100' }}"
+                                        alt="{{ $instructor->name }}"
                                         class="w-20 h-20 mb-4 object-cover object-center rounded-full inline-block border-2 border-gray-200 bg-gray-100"
                                     >
                                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white">{{ $instructor->name }}</h3>
@@ -71,7 +71,7 @@
 <section id="reviews" class="py-20 px-4">
     <div class="container mx-auto">
         <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-8">
-            <div class="text-4xl font-bold text-center"> 
+            <div class="text-4xl font-bold text-center">
                 Testimonials
             </div>
             Discover the full collection of success stories and feedback from our learners, powered by TutorNet. Real experiences from students who excelled with the support of cutting-edge resources and dedicated guidance.
@@ -96,8 +96,59 @@
         </div>
     </div>
 </section>
+<!-- About Section -->
+<section class="py-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800 text-black dark:text-white">
+    <div class="text-center">
+        <h2 class="text-4xl font-extrabold font-serif mb-4">
+            About TutorNet
+        </h2>
+        <div class="w-full border-b border-gray-300 dark:border-gray-700 mb-6"></div>
+        <p class="text-lg max-w-6xl mx-auto">
+            Welcome to TutorNet – the online learning platform that connects students with expert instructors, empowering them to learn and grow across a variety of fields.
 
-               
+            At TutorNet, we’re committed to enhancing the learning experience by providing an innovative, user-friendly environment. Teachers can effortlessly design and manage courses, while students enjoy exploring, enrolling, and completing their educational journeys with ease. Whether you’re interested in programming, design, or business, TutorNet offers a comprehensive range of courses tailored to meet diverse interests and skill levels.
+
+            Our platform provides detailed course catalogs, progress tracking, and personalized recommendations, allowing students to access rich learning resources and interact with experienced instructors. Join TutorNet to be part of a unique educational experience, where you can expand your knowledge or share your expertise in an accessible and effective way.
+        </p>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="py-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800 text-black dark:text-white">
+    <div class="text-center mb-12">
+        <h2 class="text-4xl font-extrabold text-gray-800 dark:text-white">
+            Get in touch with us
+        </h2>
+    </div>
+
+    <div class="max-w-3xl mx-auto text-center">
+        <p class="text-lg text-gray-700 dark:text-gray-300 mb-8">
+            We&#39;re here to help! Whether you have questions, feedback, or just want to say hello, feel free to reach out to us using the details below.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 text-lg text-gray-700 dark:text-gray-300">
+            <div class="flex flex-col items-center">
+                <p class="font-semibold text-xl mb-2">Email</p>
+                <p class="text-lg">support@tutornet.com</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <p class="font-semibold text-xl mb-2">Phone</p>
+                <p class="text-lg">+967 77 123 4567</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <p class="font-semibold text-xl mb-2">Address</p>
+                <p class="text-lg text-center">Sana’a, Yemen</p>
+            </div>
+        </div>
+
+        <div class="mt-8">
+            <p class="text-lg text-gray-700 dark:text-gray-300">
+                Feel free to reach out to us anytime. We&#39;re always happy to hear from you!
+            </p>
+        </div>
+    </div>
+</section>
+
             </div>
         </main>
     </div>
